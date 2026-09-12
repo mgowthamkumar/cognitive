@@ -361,6 +361,7 @@ export class CodeSandboxService {
       const proc = spawn(command, args, {
         cwd,
         windowsHide: true,
+        shell: true,
         stdio: ['pipe', 'pipe', 'pipe']
       });
 

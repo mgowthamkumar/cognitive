@@ -43,7 +43,7 @@ export const runCode = async (req: AuthenticatedRequest, res: Response): Promise
 
 export const submitCode = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
-    const { topicId } = req.params;
+    const topicId = req.params.topicId || req.body.topicId || req.body.topic_id;
     const { code, language, coding_time_seconds, keystrokes, paste_events } = req.body;
     const userId = req.user?.id || 'guest_user';
 
