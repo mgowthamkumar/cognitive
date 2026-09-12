@@ -1,0 +1,12 @@
+{
+  "language": "python",
+  "level": "beginner",
+  "topic": "recursion",
+  "subtopic": "base_cases_and_call_stacks",
+  "difficulty": "easy",
+  "source": "official_curriculum",
+  "title": "Recursion in Python: Base Cases, Call Stacks, and Decomposition",
+  "content": "Recursion occurs when a function calls itself to solve a smaller instance of the same problem.\n\nTwo Mandatory Rules:\n1. Base Case: The condition that stops recursion. Without it, Python exceeds its stack limit (`RecursionError`).\n2. Recursive Step: The function calls itself with smaller or decremented inputs moving toward the base case.\n\nExample - Factorial:\ndef factorial(n):\n    if n <= 1: # Base case\n        return 1\n    return n * factorial(n - 1) # Recursive call\n\nExample - Fibonacci:\ndef fibonacci(n):\n    if n <= 0: return 0\n    if n == 1: return 1\n    return fibonacci(n - 1) + fibonacci(n - 2)\n\nCommon Mistakes:\n1. Missing base case or condition never reached.\n2. Exceeding default call stack limit (1000 in Python).",
+  "analogy": "Recursion is like Russian nesting dolls: you open each outer doll (recursive step) until you reach the solid tiny doll in the center (base case), then assemble your way back up.",
+  "simplification_tips": "Always write the `if n <= 1: return ...` base case first before writing any recursive call!"
+}

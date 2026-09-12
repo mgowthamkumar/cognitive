@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
-import { CognitiveProvider, useCognitive } from './context/CognitiveContext';
+import { CognitiveProvider } from './context/CognitiveContext';
 import { useOfflineSync } from './hooks/useOfflineSync';
 import { Navbar } from './components/Navbar';
 import { AiAssistantDrawer } from './components/AiAssistantDrawer';
 import { AuthModal } from './components/AuthModal';
+import { GlobalSearchModal } from './components/GlobalSearchModal';
+import { PersonalizedOnboardingModal } from './components/PersonalizedOnboardingModal';
+import { LiveDemoWalkthroughModal } from './components/LiveDemoWalkthroughModal';
 import { LandingPage } from './pages/LandingPage';
 import { CourseCatalogPage } from './pages/CourseCatalogPage';
 import { TopicLessonPage } from './pages/TopicLessonPage';
@@ -14,40 +17,72 @@ import { CodingStudioPage } from './pages/CodingStudioPage';
 import { ProjectHubPage } from './pages/ProjectHubPage';
 import { LearnerDashboardPage } from './pages/LearnerDashboardPage';
 import { AdminAnalyticsPage } from './pages/AdminAnalyticsPage';
+import { DiagnosticAssessmentPage } from './pages/DiagnosticAssessmentPage';
+import { BookmarksPage } from './pages/BookmarksPage';
+import { NotesPage } from './pages/NotesPage';
+import { LearningHistoryPage } from './pages/LearningHistoryPage';
 import { WifiOff } from 'lucide-react';
 
 const AppContent: React.FC = () => {
   const [currentView, setCurrentView] = useState<string>('landing');
   const [selectedTopicId, setSelectedTopicId] = useState<string>('top-py-loops');
+  const [diagnosticLang, setDiagnosticLang] = useState<string>('python');
+  
+  // Modals
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [onboardingModalOpen, setOnboardingModalOpen] = useState(false);
+  const [demoModalOpen, setDemoModalOpen] = useState(false);
+
   const { isOnline } = useOfflineSync();
+
+  // Global Cmd+K keyboard shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchModalOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleSelectTopic = (topicId: string) => {
     setSelectedTopicId(topicId);
     setCurrentView('lesson');
   };
 
+  const handleStartDiagnostic = (lang: string) => {
+    setDiagnosticLang(lang);
+    setCurrentView('diagnostic');
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col selection:bg-cyan-500 selection:text-white">
-      {/* Section 92: Offline Status Banner */}
+      {/* Offline Status Banner */}
       {!isOnline && (
         <div className="bg-amber-500/20 border-b border-amber-500/40 px-4 py-2 text-center text-xs text-amber-300 flex items-center justify-center gap-2 font-medium">
           <WifiOff className="w-4 h-4 text-amber-400" />
           <span>You are currently working offline. Code drafts and responses are autosaving locally to your browser.</span>
         </div>
       )}
+
       <Navbar
         currentView={currentView}
         setCurrentView={setCurrentView}
         openAuthModal={() => setAuthModalOpen(true)}
         openAiDrawer={() => setAiDrawerOpen(true)}
+        openSearchModal={() => setSearchModalOpen(true)}
+        openOnboardingModal={() => setOnboardingModalOpen(true)}
+        openDemoModal={() => setDemoModalOpen(true)}
       />
 
       <main className="flex-1">
         {currentView === 'landing' && (
           <LandingPage
-            onStartLearning={() => setCurrentView('catalog')}
+            onStartLearning={() => setOnboardingModalOpen(true)}
             onExploreCourses={() => setCurrentView('catalog')}
           />
         )}
@@ -85,6 +120,26 @@ const AppContent: React.FC = () => {
           <ProjectHubPage />
         )}
 
+        {currentView === 'diagnostic' && (
+          <DiagnosticAssessmentPage
+            initialLanguage={diagnosticLang}
+            onSelectTopic={handleSelectTopic}
+            onBackToCurriculum={() => setCurrentView('catalog')}
+          />
+        )}
+
+        {currentView === 'bookmarks' && (
+          <BookmarksPage onSelectTopic={handleSelectTopic} />
+        )}
+
+        {currentView === 'notes' && (
+          <NotesPage onSelectTopic={handleSelectTopic} />
+        )}
+
+        {currentView === 'history' && (
+          <LearningHistoryPage onSelectTopic={handleSelectTopic} />
+        )}
+
         {currentView === 'dashboard' && (
           <LearnerDashboardPage onSelectTopic={handleSelectTopic} />
         )}
@@ -111,13 +166,36 @@ const AppContent: React.FC = () => {
         currentTopicTitle={selectedTopicId}
       />
 
+      {/* Global Search Modal */}
+      <GlobalSearchModal
+        isOpen={searchModalOpen}
+        onClose={() => setSearchModalOpen(false)}
+        onNavigateToTopic={handleSelectTopic}
+        onNavigateToCourse={() => setCurrentView('catalog')}
+      />
+
+      {/* Personalized Onboarding Modal */}
+      <PersonalizedOnboardingModal
+        isOpen={onboardingModalOpen}
+        onClose={() => setOnboardingModalOpen(false)}
+        onStartDiagnostic={handleStartDiagnostic}
+        onCompleteOnboarding={() => setCurrentView('catalog')}
+      />
+
+      {/* Section 117 Live Demonstration Walkthrough Modal */}
+      <LiveDemoWalkthroughModal
+        isOpen={demoModalOpen}
+        onClose={() => setDemoModalOpen(false)}
+        onNavigateToTopic={handleSelectTopic}
+      />
+
       {/* Auth Modal */}
       <AuthModal
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
       />
 
-      {/* Platform Footer (Hidden on Landing Page which has its own rich footer) */}
+      {/* Platform Footer */}
       {currentView !== 'landing' && (
         <footer className="border-t border-slate-900 bg-slate-950/80 py-6 text-center text-xs text-slate-500">
           <p>Cognitive-Load-Aware Adaptive Learning Engine • Built with AI/ML, RAG, and Safe Sandbox Execution</p>

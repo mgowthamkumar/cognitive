@@ -1,0 +1,12 @@
+{
+  "language": "python",
+  "level": "beginner",
+  "topic": "functions",
+  "subtopic": "parameters_and_return_values",
+  "difficulty": "easy",
+  "source": "official_curriculum",
+  "title": "Python Functions: Parameters, Return Values, and Examples",
+  "content": "In Python, a function is defined using the `def` keyword, followed by the function name and parentheses enclosing optional parameters.\n\n1. Function Parameters:\nParameters accept input data passed into the function. Python supports positional parameters, default parameters, and variable-length arguments.\nExample:\ndef calculate_total(price, tax_rate=0.08):\n    return price + (price * tax_rate)\n\n2. Return Values:\nThe `return` keyword sends a result back to whoever called the function. A function terminates immediately when `return` executes. If omitted, Python returns `None` by default.\nExample:\ndef compute_average(numbers):\n    if not numbers:\n        return 0\n    return sum(numbers) / len(numbers)\n\n3. Examples:\n- Greet: def greet(name, title='Learner'): return f'Welcome {title} {name}!'\n- Factorial: def factorial(n): return 1 if n <= 1 else n * factorial(n - 1)\n\nCommon Pitfalls:\n1. Missing return: forgetting `return` leads to unexpected `None` values.\n2. Mutable default arguments: `def add_item(item, lst=[])` shares the same list across calls.",
+  "analogy": "A function is like a vending machine: you insert coins and select an item (parameters/arguments), the machine dispenses your snack (return value), and you can use it anytime without knowing internal wiring.",
+  "simplification_tips": "Break functions down: Think input -> process -> output. Name parameters clearly and always test with small sample inputs first."
+}

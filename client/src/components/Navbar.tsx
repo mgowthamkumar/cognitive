@@ -19,7 +19,11 @@ import {
   Sun,
   Moon,
   Monitor,
-  Eye
+  Eye,
+  Bookmark,
+  FileText,
+  History,
+  Search
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -27,13 +31,19 @@ interface NavbarProps {
   setCurrentView: (view: string) => void;
   openAuthModal: () => void;
   openAiDrawer: () => void;
+  openSearchModal?: () => void;
+  openOnboardingModal?: () => void;
+  openDemoModal?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentView,
   setCurrentView,
   openAuthModal,
-  openAiDrawer
+  openAiDrawer,
+  openSearchModal,
+  openOnboardingModal,
+  openDemoModal
 }) => {
   const { user, preferences, updateLanguage, updateLevel, logout } = useAuth();
   const { currentLoad, confidence, contentMode } = useCognitive();
@@ -112,6 +122,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             ))}
           </div>
+
+          {/* Quick Global Search Trigger (Section 111) */}
+          <button
+            onClick={openSearchModal}
+            className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 text-slate-400 text-xs transition-colors"
+            title="Global Search (Cmd/Ctrl+K)"
+          >
+            <Search className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="text-[11px]">Search concepts, questions...</span>
+            <kbd className="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] text-slate-300 font-mono">⌘K</kbd>
+          </button>
         </div>
 
         {/* Center: Nav links */}
@@ -153,18 +174,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <button
-            onClick={() => setCurrentView('projects')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              currentView === 'projects'
-                ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/20'
-                : 'text-slate-300 hover:text-white hover:bg-slate-800/40'
-            }`}
-          >
-            <FolderGit2 className="w-4 h-4" />
-            <span>Projects</span>
-          </button>
-
-          <button
             onClick={() => setCurrentView('dashboard')}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               currentView === 'dashboard'
@@ -173,37 +182,82 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             <BarChart3 className="w-4 h-4" />
-            <span>Learner Stats</span>
+            <span>Dashboard</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentView('bookmarks')}
+            className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-colors ${
+              currentView === 'bookmarks'
+                ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/20'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/40'
+            }`}
+            title="Saved Bookmarks"
+          >
+            <Bookmark className="w-3.5 h-3.5" />
+            <span className="hidden xl:inline">Saved</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentView('notes')}
+            className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-colors ${
+              currentView === 'notes'
+                ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/20'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/40'
+            }`}
+            title="Personal Notes"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span className="hidden xl:inline">Notes</span>
           </button>
 
           <button
             onClick={() => setCurrentView('admin')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs font-medium transition-colors ${
               currentView === 'admin'
                 ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/20'
                 : 'text-slate-300 hover:text-white hover:bg-slate-800/40'
             }`}
           >
-            <ShieldCheck className="w-4 h-4" />
-            <span>Admin & ML</span>
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Admin</span>
           </button>
         </nav>
 
         {/* Right Section: Cognitive State Badge & Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Mobile Search Button */}
+          <button
+            onClick={openSearchModal}
+            className="xl:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
+            title="Global Search"
+          >
+            <Search className="w-4 h-4 text-cyan-400" />
+          </button>
+
+          {/* Section 117 Live Adaptive Demonstration Button */}
+          <button
+            onClick={openDemoModal}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 text-xs font-bold transition-all hover:scale-105 shadow-sm"
+            title="Live Closed-Loop Adaptive Presentation Walkthrough (Section 117)"
+          >
+            <Brain className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <span className="hidden sm:inline">Live Demo</span>
+          </button>
+
           {/* Daily Streak Indicator (Section 68) */}
           <div
             title={`${streakDays} Day Learning Streak`}
             className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold"
           >
             <Flame className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-            <span>{streakDays}d Streak</span>
+            <span>{streakDays}d</span>
           </div>
 
           {/* Cognitive Indicator Pill */}
           <div
             title={`Cognitive Load: ${currentLoad} (${Math.round(confidence * 100)}% Confidence) - Mode: ${contentMode}`}
-            className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold ${getLoadBadgeColor(
+            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-xs font-semibold ${getLoadBadgeColor(
               currentLoad
             )}`}
           >
@@ -211,8 +265,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-current"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-current"></span>
             </span>
-            <span>Load: {currentLoad}</span>
-            <span className="text-[10px] opacity-75 font-mono">({Math.round(confidence * 100)}%)</span>
+            <span className="hidden md:inline">Load:</span>
+            <span>{currentLoad}</span>
           </div>
 
           {/* Theme & A11y Controls (Sections 86 & 87) */}
@@ -224,7 +278,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition-colors"
               aria-label={`Current theme is ${theme}. Click to switch theme.`}
             >
-              {theme === 'dark' ? <Moon className="w-4 h-4" /> : theme === 'light' ? <Sun className="w-4 h-4 text-amber-400" /> : <Monitor className="w-4 h-4" />}
+              {theme === 'dark' ? <Moon className="w-3.5 h-3.5" /> : theme === 'light' ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Monitor className="w-3.5 h-3.5" />}
             </button>
             <button
               type="button"
@@ -233,17 +287,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               className={`p-1.5 rounded-lg transition-colors ${reducedMotion ? 'text-amber-400 bg-amber-500/10' : 'text-slate-500 hover:text-slate-300'}`}
               aria-label="Toggle Reduced Motion"
             >
-              <Eye className="w-4 h-4" />
+              <Eye className="w-3.5 h-3.5" />
             </button>
           </div>
 
           {/* AI Copilot Drawer Trigger */}
           <button
             onClick={openAiDrawer}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-lg shadow-purple-500/20 transition-all hover:scale-105"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-lg shadow-purple-500/20 transition-all hover:scale-105"
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>AI Copilot</span>
+            <span className="hidden md:inline">AI Copilot</span>
           </button>
 
           {/* User Profile */}
@@ -288,6 +342,48 @@ export const Navbar: React.FC<NavbarProps> = ({
                         </button>
                       ))}
                     </div>
+                  </div>
+                  <div className="py-1 border-b border-slate-800">
+                    <button
+                      onClick={() => {
+                        setCurrentView('bookmarks');
+                        setProfileOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2"
+                    >
+                      <Bookmark className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>My Bookmarks</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setCurrentView('notes');
+                        setProfileOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>My Notes</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setCurrentView('history');
+                        setProfileOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2"
+                    >
+                      <History className="w-3.5 h-3.5 text-purple-400" />
+                      <span>Learning History</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        openOnboardingModal?.();
+                        setProfileOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Personalize Path</span>
+                    </button>
                   </div>
                   <button
                     onClick={() => {

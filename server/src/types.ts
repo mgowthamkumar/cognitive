@@ -18,11 +18,79 @@ export interface User {
   created_at: string;
 }
 
+export interface DiagnosticQuestion {
+  id: string;
+  language: 'python' | 'c' | 'cpp' | 'java';
+  category: 'concept' | 'problem_solving' | 'coding_ability';
+  question: string;
+  code_snippet?: string;
+  options: string[];
+  correct_index: number;
+  explanation: string;
+  difficulty_weight: number;
+}
+
+export interface DiagnosticResult {
+  language: string;
+  total_score: number;
+  concept_score: number;
+  problem_solving_score: number;
+  coding_score: number;
+  recommended_level: 'beginner' | 'intermediate' | 'advanced';
+  starting_topic_id: string;
+  evaluated_at: string;
+}
+
+export interface BookmarkRecord {
+  id: string;
+  user_id: string;
+  item_type: 'lesson' | 'example' | 'question' | 'ai_explanation';
+  item_id: string;
+  title: string;
+  snippet?: string;
+  language?: string;
+  topic_id?: string;
+  created_at: string;
+}
+
+export interface NoteRecord {
+  id: string;
+  user_id: string;
+  language: string;
+  course_id?: string;
+  topic_id: string;
+  subtopic_title?: string;
+  title: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LearningHistoryRecord {
+  id: string;
+  user_id: string;
+  date: string;
+  language: string;
+  topic_id: string;
+  topic_title: string;
+  quiz_score?: number;
+  coding_score?: number;
+  time_spent_seconds: number;
+  cognitive_state: CognitiveLoadLevel;
+  confidence: number;
+  adaptive_action: AdaptiveAction;
+  improvement_summary?: string;
+}
+
 export interface UserPreferences {
   user_id: string;
   selected_language: string;
   current_level: string;
   preferred_mode: 'standard' | 'adaptive';
+  experience_level?: 'beginner' | 'some_experience' | 'intermediate' | 'advanced';
+  learning_goal?: 'college' | 'interview' | 'projects' | 'competitive_programming' | 'career' | 'general_learning';
+  diagnostic_completed?: boolean;
+  diagnostic_result?: DiagnosticResult;
 }
 
 export interface Course {

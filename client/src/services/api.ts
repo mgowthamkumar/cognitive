@@ -305,5 +305,121 @@ export const api = {
     });
     if (!res.ok) throw new Error((await res.json()).error || 'Failed to evaluate project');
     return res.json();
+  },
+
+  // Diagnostic Assessment (Section 109)
+  getDiagnosticQuestions: async (language: string) => {
+    const res = await fetch(`${API_BASE}/diagnostic/${language}/questions`);
+    if (!res.ok) throw new Error('Failed to fetch diagnostic questions');
+    return res.json();
+  },
+
+  submitDiagnostic: async (language: string, answers: Record<string, number>) => {
+    const res = await fetch(`${API_BASE}/diagnostic/${language}/submit`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ answers })
+    });
+    if (!res.ok) throw new Error('Failed to submit diagnostic assessment');
+    return res.json();
+  },
+
+  // Global Search System (Section 111)
+  globalSearch: async (query: string, language?: string) => {
+    const params = new URLSearchParams({ q: query });
+    if (language) params.append('language', language);
+    const res = await fetch(`${API_BASE}/search?${params.toString()}`);
+    if (!res.ok) throw new Error('Search failed');
+    return res.json();
+  },
+
+  // Bookmarking System (Section 112)
+  getBookmarks: async (type?: string) => {
+    const params = new URLSearchParams();
+    if (type && type !== 'all') params.append('type', type);
+    const res = await fetch(`${API_BASE}/bookmarks?${params.toString()}`, {
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to fetch bookmarks');
+    return res.json();
+  },
+
+  addBookmark: async (payload: { item_type: string; item_id: string; title: string; snippet?: string; language?: string; topic_id?: string }) => {
+    const res = await fetch(`${API_BASE}/bookmarks`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Failed to save bookmark');
+    return res.json();
+  },
+
+  deleteBookmark: async (id: string) => {
+    const res = await fetch(`${API_BASE}/bookmarks/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to delete bookmark');
+    return res.json();
+  },
+
+  checkBookmarkStatus: async (itemType: string, itemId: string) => {
+    const params = new URLSearchParams({ item_type: itemType, item_id: itemId });
+    const res = await fetch(`${API_BASE}/bookmarks/check?${params.toString()}`, {
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) return { is_bookmarked: false };
+    return res.json();
+  },
+
+  // Notes System (Section 113)
+  getNotes: async (query?: string, language?: string, topicId?: string) => {
+    const params = new URLSearchParams();
+    if (query) params.append('q', query);
+    if (language && language !== 'all') params.append('language', language);
+    if (topicId && topicId !== 'all') params.append('topic_id', topicId);
+    const res = await fetch(`${API_BASE}/notes?${params.toString()}`, {
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to fetch notes');
+    return res.json();
+  },
+
+  createNote: async (payload: { language: string; course_id?: string; topic_id: string; subtopic_title?: string; title: string; content: string }) => {
+    const res = await fetch(`${API_BASE}/notes`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Failed to create note');
+    return res.json();
+  },
+
+  updateNote: async (id: string, payload: { title?: string; content?: string; subtopic_title?: string }) => {
+    const res = await fetch(`${API_BASE}/notes/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Failed to update note');
+    return res.json();
+  },
+
+  deleteNote: async (id: string) => {
+    const res = await fetch(`${API_BASE}/notes/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to delete note');
+    return res.json();
+  },
+
+  // Learning History (Section 114)
+  getLearningHistory: async () => {
+    const res = await fetch(`${API_BASE}/learning-history`, {
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error('Failed to fetch learning history');
+    return res.json();
   }
 };

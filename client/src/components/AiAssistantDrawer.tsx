@@ -13,6 +13,7 @@ import {
   BookOpen,
   ArrowRight
 } from 'lucide-react';
+import { BookmarkButton } from './BookmarkButton';
 
 interface AiAssistantDrawerProps {
   isOpen: boolean;
@@ -207,6 +208,19 @@ export const AiAssistantDrawer: React.FC<AiAssistantDrawerProps> = ({
                 <div className="mt-2.5 pt-2 border-t border-slate-700/50 text-[10px] text-slate-400 flex items-center gap-1">
                   <BookOpen className="w-3 h-3 text-cyan-400" />
                   <span>RAG Grounding: {m.sources.join(', ')}</span>
+                </div>
+              )}
+
+              {m.sender === 'assistant' && m.id !== 'welcome' && (
+                <div className="mt-2 pt-2 border-t border-slate-700/30 flex items-center justify-end">
+                  <BookmarkButton
+                    itemType="ai_explanation"
+                    itemId={`ai-drawer-${m.id}`}
+                    title={`AI: ${currentTopicTitle || 'Tutor'} - ${m.text.slice(0, 40)}...`}
+                    snippet={m.text}
+                    topicId={activeTopicId || 'general'}
+                    language={preferences.selected_language}
+                  />
                 </div>
               )}
             </div>

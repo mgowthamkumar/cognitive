@@ -87,6 +87,54 @@
       "password_hash": "$2a$10$a.Yoa5SdJvDArNBRouSAt.UAMoYzS1lmYYv7Br1p7iBFklgWIJuue",
       "role": "learner",
       "created_at": "2026-09-12T09:42:17.689Z"
+    },
+    {
+      "id": "user_1789234143492_96p15",
+      "name": "Integration Tester",
+      "email": "test_1789234143@cognitive.edu",
+      "password_hash": "$2a$10$X6cWaqKKgCOJPU1EneQetuN9qixftLrPZVsOOhxZdZ5pyXdKlKq1W",
+      "role": "learner",
+      "created_at": "2026-09-12T17:29:03.492Z"
+    },
+    {
+      "id": "user_1789234234979_awlpm",
+      "name": "Integration Tester",
+      "email": "test_1789234234@cognitive.edu",
+      "password_hash": "$2a$10$M7bTndApsWz6E6K8jB.U7epRiRsTgi8zAOub3MwPjuQHJmyaNfP1a",
+      "role": "learner",
+      "created_at": "2026-09-12T17:30:34.979Z"
+    },
+    {
+      "id": "user_1789234261299_tb5ut",
+      "name": "Integration Tester",
+      "email": "test_1789234261@cognitive.edu",
+      "password_hash": "$2a$10$t3EYVF8mjZEwg8MA42X88unB6wLwOTcg.22esyVB0xiJeLReV5VZW",
+      "role": "learner",
+      "created_at": "2026-09-12T17:31:01.299Z"
+    },
+    {
+      "id": "user_1789234288601_p0k9j",
+      "name": "Integration Tester",
+      "email": "test_1789234288@cognitive.edu",
+      "password_hash": "$2a$10$ms123v/gMqBbTYDxFG3.LePV9UtBl/1wQHv.E2EA76Kh7XhDBs9zK",
+      "role": "learner",
+      "created_at": "2026-09-12T17:31:28.601Z"
+    },
+    {
+      "id": "user_1789234331731_8bzz4",
+      "name": "Integration Tester",
+      "email": "test_1789234331@cognitive.edu",
+      "password_hash": "$2a$10$SyP/3Giegyl5ph2SRoi7JORvVhenvELmfRCtUf.AYU/lPolGI5Uoi",
+      "role": "learner",
+      "created_at": "2026-09-12T17:32:11.731Z"
+    },
+    {
+      "id": "user_1789234375607_whbzg",
+      "name": "Integration Tester",
+      "email": "test_1789234375@cognitive.edu",
+      "password_hash": "$2a$10$013qzeT5xZepy6sRqdD0sOCb6Y8xhTnGRvKp.M8jL4Rw0FIlv6Txm",
+      "role": "learner",
+      "created_at": "2026-09-12T17:32:55.607Z"
     }
   ],
   "user_preferences": [],
@@ -378,6 +426,45 @@
       ]
     },
     {
+      "id": "top-py-recursion",
+      "module_id": "mod-py-2",
+      "title": "Recursion and Recursive Thinking",
+      "order_index": 3,
+      "learning_objective": "Understand base cases, recursive decomposition, call stacks, and recursive function execution in Python.",
+      "content_standard": "Recursion occurs when a function calls itself directly or indirectly to solve a smaller instance of the same problem. Every recursive function requires at least one base case to terminate execution.",
+      "content_low": "### ⚡ Fast-Track Summary\n- Base case: Halting condition preventing stack overflow (RecursionError).\n- Python recursion depth limit: default 1000 frames (`sys.getrecursionlimit()`).\n- Tail call optimization (TCO) is NOT supported in CPython; prefer memoization (`functools.lru_cache`) for recursive algorithms.",
+      "content_medium": "### 📘 Standard Guide\nA recursive function has two key elements:\n1. **Base Case**: The simplest scenario that returns immediately without calling the function again.\n2. **Recursive Step**: Calling the function with inputs closer to the base case.",
+      "content_high": "### 🌱 Step-by-Step Breakdown\nImagine Russian nesting dolls (Matryoshka):\n1. To open doll #5, you open doll #4, then #3, then #2, then #1.\n2. Doll #1 is the tiniest solid doll (the **Base Case**).\n3. Once you reach the center, you put them all back together! That is exactly how the computer's call stack works.",
+      "syntax": "def recursive_func(n):\n    if n <= 1: # Base case\n        return 1\n    return n * recursive_func(n - 1) # Recursive step",
+      "examples": "# Example 1: Factorial\ndef factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)\n\nprint(\"5! =\", factorial(5)) # 120",
+      "common_mistakes": "1. Forgetting the base case, leading to RecursionError: maximum recursion depth exceeded.\n2. Failing to shrink the input argument towards the base case on each call.",
+      "practice_prompt": "Write a recursive function `fibonacci(n)` that calculates the nth Fibonacci number.",
+      "prerequisite_topic_id": "top-py-functions",
+      "sections": [
+        {
+          "id": "sec-py-rec-1",
+          "title": "1. What is Recursion?",
+          "order_index": 1,
+          "content": "Recursion is a programming technique where a function solves a problem by breaking it into smaller sub-problems and calling itself.",
+          "code_snippet": "def countdown(n):\n    if n <= 0:\n        print(\"Blast off!\")\n        return\n    print(n)\n    countdown(n - 1)"
+        },
+        {
+          "id": "sec-py-rec-2",
+          "title": "2. The Call Stack & Base Cases",
+          "order_index": 2,
+          "content": "Every recursive invocation allocates a new stack frame containing local variables and return addresses. The base case halts this accumulation.",
+          "pitfalls": "Without a base case, the function will consume all stack memory, causing Python to terminate with `RecursionError: maximum recursion depth exceeded`."
+        },
+        {
+          "id": "sec-py-rec-3",
+          "title": "3. Classic Recursive Pattern: Factorial",
+          "order_index": 3,
+          "content": "The factorial of n (n!) is n * (n - 1)!. The base case is 0! = 1 and 1! = 1.",
+          "code_snippet": "def fact(n):\n    if n <= 1:\n        return 1\n    return n * fact(n - 1)"
+        }
+      ]
+    },
+    {
       "id": "top-py-datastruct",
       "module_id": "mod-py-3",
       "title": "Lists, Dictionaries & Comprehensions",
@@ -653,6 +740,34 @@
       "explanation": "Python checks Local scope first, then Enclosing closures, Global module variables, and finally Built-ins."
     },
     {
+      "id": "mcq-py-rec-1",
+      "topic_id": "top-py-recursion",
+      "difficulty": "easy",
+      "question": "What is the primary role of a base case in a recursive function?",
+      "options": [
+        "To speed up CPU clock speed",
+        "To terminate the recursion and prevent an infinite call loop",
+        "To initialize global variables",
+        "To convert the function to an async generator"
+      ],
+      "correct_index": 1,
+      "explanation": "Without a base case, a recursive function calls itself indefinitely until it exceeds the call stack memory limit."
+    },
+    {
+      "id": "mcq-py-rec-2",
+      "topic_id": "top-py-recursion",
+      "difficulty": "medium",
+      "question": "What exception does Python raise when a recursive function exceeds its maximum recursion depth limit?",
+      "options": [
+        "StackMemoryError",
+        "OutOfMemoryError",
+        "RecursionError",
+        "InfiniteLoopException"
+      ],
+      "correct_index": 2,
+      "explanation": "Python raises `RecursionError: maximum recursion depth exceeded` when the call stack reaches the recursion limit."
+    },
+    {
       "id": "mcq-c-ptr-1",
       "topic_id": "top-c-pointers",
       "difficulty": "easy",
@@ -862,6 +977,43 @@
           "is_hidden": true
         }
       ]
+    },
+    {
+      "id": "code-py-factorial",
+      "topic_id": "top-py-recursion",
+      "title": "Recursive Factorial Engine",
+      "difficulty": "easy",
+      "problem_statement": "Read an integer N from standard input (0 <= N <= 12) and print its factorial (N!) calculated using a recursive function.",
+      "input_format": "A single non-negative integer N.",
+      "output_format": "The factorial of N.",
+      "constraints": "0 <= N <= 12",
+      "sample_input": "5",
+      "sample_output": "120",
+      "starter_code": {
+        "python": "import sys\n\ndef factorial(n: int) -> int:\n    # TODO: Implement recursive factorial with base case\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)\n\nif __name__ == \"__main__\":\n    raw = sys.stdin.read().strip()\n    if raw:\n        n = int(raw)\n        print(factorial(n))"
+      },
+      "test_cases": [
+        {
+          "input": "5",
+          "expected_output": "120",
+          "is_hidden": false
+        },
+        {
+          "input": "0",
+          "expected_output": "1",
+          "is_hidden": false
+        },
+        {
+          "input": "3",
+          "expected_output": "6",
+          "is_hidden": false
+        },
+        {
+          "input": "7",
+          "expected_output": "5040",
+          "is_hidden": true
+        }
+      ]
     }
   ],
   "user_progress": [
@@ -871,7 +1023,7 @@
       "completed": 1,
       "score": 1,
       "unlocked": 1,
-      "last_studied": "2026-09-12T09:42:17.759Z"
+      "last_studied": "2026-09-12T17:32:55.734Z"
     }
   ],
   "behavior_events": [
@@ -2297,6 +2449,1022 @@
         "paste_events": 0
       },
       "id": "evt_1789206141498_2bsvd"
+    },
+    {
+      "user_id": "anonymous_learner",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_START",
+      "duration": 0,
+      "timestamp": "2026-09-12T09:48:31.682Z",
+      "metadata": {
+        "topic_id": "top-py-loops"
+      },
+      "id": "evt_1789206511682_eji9e"
+    },
+    {
+      "user_id": "anonymous_learner",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_START",
+      "duration": 0,
+      "timestamp": "2026-09-12T09:48:31.712Z",
+      "metadata": {
+        "topic_id": "top-py-loops"
+      },
+      "id": "evt_1789206511713_wx50a"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "Sum of Even Integers",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T09:49:01.080Z",
+      "metadata": {
+        "question": "Explain how this code executes step by step",
+        "tutor_mode": "EXPLAIN"
+      },
+      "id": "evt_1789206541080_77sa0"
+    },
+    {
+      "user_id": "anonymous_learner",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_START",
+      "duration": 0,
+      "timestamp": "2026-09-12T09:51:00.979Z",
+      "metadata": {
+        "topic_id": "top-py-loops"
+      },
+      "id": "evt_1789206660979_bff5x"
+    },
+    {
+      "user_id": "anonymous_learner",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_START",
+      "duration": 0,
+      "timestamp": "2026-09-12T09:51:01.006Z",
+      "metadata": {
+        "topic_id": "top-py-loops"
+      },
+      "id": "evt_1789206661006_ogw9j"
+    },
+    {
+      "user_id": "anonymous_learner",
+      "topic_id": "top-py-loops",
+      "event_type": "SCROLL",
+      "duration": 45,
+      "timestamp": "2026-09-12T17:29:03.574Z",
+      "metadata": {
+        "scroll_depth": 0.85
+      },
+      "id": "evt_1789234143574_bnm73"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "MCQ_SUBMIT",
+      "duration": 35,
+      "timestamp": "2026-09-12T17:29:03.686Z",
+      "metadata": {
+        "score": 1,
+        "accuracy": 1,
+        "passed": true
+      },
+      "id": "evt_1789234143686_6vw7y"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:29:04.643Z",
+      "metadata": {
+        "has_error": true,
+        "status": "RUNTIME_ERROR",
+        "passed": false,
+        "keystrokes": 120,
+        "paste_events": 0
+      },
+      "id": "evt_1789234144643_7zdiv"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:29:05.593Z",
+      "metadata": {
+        "has_error": true,
+        "status": "COMPILE_ERROR",
+        "passed": false,
+        "keystrokes": 95,
+        "paste_events": 0
+      },
+      "id": "evt_1789234145593_1zfsf"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:29:05.693Z",
+      "metadata": {
+        "hint_level": 1
+      },
+      "id": "evt_1789234145693_9z3ge"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:29:05.714Z",
+      "metadata": {
+        "hint_level": 2
+      },
+      "id": "evt_1789234145714_an8sq"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:29:05.729Z",
+      "metadata": {
+        "hint_level": 3
+      },
+      "id": "evt_1789234145729_nd2jr"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:29:05.769Z",
+      "metadata": {
+        "hint_level": 4
+      },
+      "id": "evt_1789234145769_9dh0f"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:29:05.817Z",
+      "metadata": {
+        "hint_level": 5
+      },
+      "id": "evt_1789234145817_2gqni"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:29:05.841Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "SIMPLIFY"
+      },
+      "id": "evt_1789234145841_n3ymw"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:29:05.885Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "DEBUG"
+      },
+      "id": "evt_1789234145885_y6fxf"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:29:05.905Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "REVISE"
+      },
+      "id": "evt_1789234145905_g4sv0"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:29:06.758Z",
+      "metadata": {
+        "has_error": true,
+        "status": "RUNTIME_ERROR",
+        "passed": false,
+        "keystrokes": 15,
+        "paste_events": 0
+      },
+      "id": "evt_1789234146758_sw1y8"
+    },
+    {
+      "user_id": "anonymous_learner",
+      "topic_id": "top-py-loops",
+      "event_type": "SCROLL",
+      "duration": 45,
+      "timestamp": "2026-09-12T17:30:35.003Z",
+      "metadata": {
+        "scroll_depth": 0.85
+      },
+      "id": "evt_1789234235003_np20h"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "MCQ_SUBMIT",
+      "duration": 35,
+      "timestamp": "2026-09-12T17:30:35.081Z",
+      "metadata": {
+        "score": 1,
+        "accuracy": 1,
+        "passed": true
+      },
+      "id": "evt_1789234235081_86ns9"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:30:36.120Z",
+      "metadata": {
+        "has_error": true,
+        "status": "RUNTIME_ERROR",
+        "passed": false,
+        "keystrokes": 120,
+        "paste_events": 0
+      },
+      "id": "evt_1789234236120_wd07d"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:30:37.164Z",
+      "metadata": {
+        "has_error": true,
+        "status": "COMPILE_ERROR",
+        "passed": false,
+        "keystrokes": 95,
+        "paste_events": 0
+      },
+      "id": "evt_1789234237164_kormz"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:30:37.259Z",
+      "metadata": {
+        "hint_level": 1
+      },
+      "id": "evt_1789234237259_uoyqb"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:30:37.281Z",
+      "metadata": {
+        "hint_level": 2
+      },
+      "id": "evt_1789234237281_3hozd"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:30:37.309Z",
+      "metadata": {
+        "hint_level": 3
+      },
+      "id": "evt_1789234237309_8kiey"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:30:37.330Z",
+      "metadata": {
+        "hint_level": 4
+      },
+      "id": "evt_1789234237330_6zu54"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:30:37.345Z",
+      "metadata": {
+        "hint_level": 5
+      },
+      "id": "evt_1789234237345_ew6it"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:30:37.363Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "SIMPLIFY"
+      },
+      "id": "evt_1789234237363_txhwx"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:30:37.379Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "DEBUG"
+      },
+      "id": "evt_1789234237379_tdmkn"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:30:37.411Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "REVISE"
+      },
+      "id": "evt_1789234237411_ab90q"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:30:37.818Z",
+      "metadata": {
+        "has_error": true,
+        "status": "RUNTIME_ERROR",
+        "passed": false,
+        "keystrokes": 15,
+        "paste_events": 0
+      },
+      "id": "evt_1789234237818_sq2yo"
+    },
+    {
+      "user_id": "anonymous_learner",
+      "topic_id": "top-py-loops",
+      "event_type": "SCROLL",
+      "duration": 45,
+      "timestamp": "2026-09-12T17:31:01.314Z",
+      "metadata": {
+        "scroll_depth": 0.85
+      },
+      "id": "evt_1789234261314_ljjqk"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "MCQ_SUBMIT",
+      "duration": 35,
+      "timestamp": "2026-09-12T17:31:01.327Z",
+      "metadata": {
+        "score": 1,
+        "accuracy": 1,
+        "passed": true
+      },
+      "id": "evt_1789234261327_hsp63"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:31:02.073Z",
+      "metadata": {
+        "has_error": true,
+        "status": "RUNTIME_ERROR",
+        "passed": false,
+        "keystrokes": 120,
+        "paste_events": 0
+      },
+      "id": "evt_1789234262073_sulok"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:31:02.764Z",
+      "metadata": {
+        "has_error": true,
+        "status": "COMPILE_ERROR",
+        "passed": false,
+        "keystrokes": 95,
+        "paste_events": 0
+      },
+      "id": "evt_1789234262764_cohfh"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:31:02.882Z",
+      "metadata": {
+        "hint_level": 1
+      },
+      "id": "evt_1789234262882_sdfo1"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:31:02.894Z",
+      "metadata": {
+        "hint_level": 2
+      },
+      "id": "evt_1789234262894_igi2t"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:31:02.921Z",
+      "metadata": {
+        "hint_level": 3
+      },
+      "id": "evt_1789234262921_0bahk"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:31:02.943Z",
+      "metadata": {
+        "hint_level": 4
+      },
+      "id": "evt_1789234262943_pk4h0"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:31:02.958Z",
+      "metadata": {
+        "hint_level": 5
+      },
+      "id": "evt_1789234262958_2zgwm"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:31:02.976Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "SIMPLIFY"
+      },
+      "id": "evt_1789234262976_rlwy4"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:31:02.999Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "DEBUG"
+      },
+      "id": "evt_1789234262999_pd46l"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:31:03.021Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "REVISE"
+      },
+      "id": "evt_1789234263021_s3a0c"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:31:03.679Z",
+      "metadata": {
+        "has_error": true,
+        "status": "RUNTIME_ERROR",
+        "passed": false,
+        "keystrokes": 15,
+        "paste_events": 0
+      },
+      "id": "evt_1789234263679_px9zy"
+    },
+    {
+      "user_id": "anonymous_learner",
+      "topic_id": "top-py-loops",
+      "event_type": "SCROLL",
+      "duration": 45,
+      "timestamp": "2026-09-12T17:31:28.638Z",
+      "metadata": {
+        "scroll_depth": 0.85
+      },
+      "id": "evt_1789234288638_8fxdw"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "MCQ_SUBMIT",
+      "duration": 35,
+      "timestamp": "2026-09-12T17:31:28.665Z",
+      "metadata": {
+        "score": 1,
+        "accuracy": 1,
+        "passed": true
+      },
+      "id": "evt_1789234288665_68tf1"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:31:29.423Z",
+      "metadata": {
+        "has_error": true,
+        "status": "RUNTIME_ERROR",
+        "passed": false,
+        "keystrokes": 120,
+        "paste_events": 0
+      },
+      "id": "evt_1789234289423_4fvwy"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:31:30.119Z",
+      "metadata": {
+        "has_error": true,
+        "status": "COMPILE_ERROR",
+        "passed": false,
+        "keystrokes": 95,
+        "paste_events": 0
+      },
+      "id": "evt_1789234290119_t0ady"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:31:30.277Z",
+      "metadata": {
+        "hint_level": 1
+      },
+      "id": "evt_1789234290277_wap0z"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:31:30.299Z",
+      "metadata": {
+        "hint_level": 2
+      },
+      "id": "evt_1789234290299_ec659"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:31:30.328Z",
+      "metadata": {
+        "hint_level": 3
+      },
+      "id": "evt_1789234290328_3qpb7"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:31:30.344Z",
+      "metadata": {
+        "hint_level": 4
+      },
+      "id": "evt_1789234290344_x3lyi"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:31:30.359Z",
+      "metadata": {
+        "hint_level": 5
+      },
+      "id": "evt_1789234290359_tbogj"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:31:30.373Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "SIMPLIFY"
+      },
+      "id": "evt_1789234290373_eq87b"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:31:30.388Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "DEBUG"
+      },
+      "id": "evt_1789234290388_v08wj"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:31:30.422Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "REVISE"
+      },
+      "id": "evt_1789234290422_82s3j"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:31:30.962Z",
+      "metadata": {
+        "has_error": true,
+        "status": "RUNTIME_ERROR",
+        "passed": false,
+        "keystrokes": 15,
+        "paste_events": 0
+      },
+      "id": "evt_1789234290962_mexav"
+    },
+    {
+      "user_id": "anonymous_learner",
+      "topic_id": "top-py-loops",
+      "event_type": "SCROLL",
+      "duration": 45,
+      "timestamp": "2026-09-12T17:32:11.773Z",
+      "metadata": {
+        "scroll_depth": 0.85
+      },
+      "id": "evt_1789234331774_i9eyu"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "MCQ_SUBMIT",
+      "duration": 35,
+      "timestamp": "2026-09-12T17:32:11.823Z",
+      "metadata": {
+        "score": 1,
+        "accuracy": 1,
+        "passed": true
+      },
+      "id": "evt_1789234331823_hs4o7"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:32:13.199Z",
+      "metadata": {
+        "has_error": true,
+        "status": "RUNTIME_ERROR",
+        "passed": false,
+        "keystrokes": 120,
+        "paste_events": 0
+      },
+      "id": "evt_1789234333199_28wv1"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:32:14.678Z",
+      "metadata": {
+        "has_error": true,
+        "status": "COMPILE_ERROR",
+        "passed": false,
+        "keystrokes": 95,
+        "paste_events": 0
+      },
+      "id": "evt_1789234334678_ve34v"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:32:14.759Z",
+      "metadata": {
+        "hint_level": 1
+      },
+      "id": "evt_1789234334759_1f72l"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:32:14.835Z",
+      "metadata": {
+        "hint_level": 2
+      },
+      "id": "evt_1789234334835_tugd0"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:32:14.872Z",
+      "metadata": {
+        "hint_level": 3
+      },
+      "id": "evt_1789234334872_wdqxn"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:32:14.954Z",
+      "metadata": {
+        "hint_level": 4
+      },
+      "id": "evt_1789234334954_pgcpk"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:32:14.988Z",
+      "metadata": {
+        "hint_level": 5
+      },
+      "id": "evt_1789234334988_ppn2m"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:32:15.051Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "SIMPLIFY"
+      },
+      "id": "evt_1789234335051_6y1cx"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:32:15.090Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "DEBUG"
+      },
+      "id": "evt_1789234335090_ortl1"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:32:15.121Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "REVISE"
+      },
+      "id": "evt_1789234335121_yqtsv"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:32:16.092Z",
+      "metadata": {
+        "has_error": true,
+        "status": "RUNTIME_ERROR",
+        "passed": false,
+        "keystrokes": 15,
+        "paste_events": 0
+      },
+      "id": "evt_1789234336092_8xesj"
+    },
+    {
+      "user_id": "anonymous_learner",
+      "topic_id": "top-py-loops",
+      "event_type": "SCROLL",
+      "duration": 45,
+      "timestamp": "2026-09-12T17:32:55.652Z",
+      "metadata": {
+        "scroll_depth": 0.85
+      },
+      "id": "evt_1789234375652_wnljs"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "MCQ_SUBMIT",
+      "duration": 35,
+      "timestamp": "2026-09-12T17:32:55.712Z",
+      "metadata": {
+        "score": 1,
+        "accuracy": 1,
+        "passed": true
+      },
+      "id": "evt_1789234375712_ex1tz"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:32:56.364Z",
+      "metadata": {
+        "has_error": true,
+        "status": "RUNTIME_ERROR",
+        "passed": false,
+        "keystrokes": 120,
+        "paste_events": 0
+      },
+      "id": "evt_1789234376364_jm0sf"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:32:57.147Z",
+      "metadata": {
+        "has_error": true,
+        "status": "COMPILE_ERROR",
+        "passed": false,
+        "keystrokes": 95,
+        "paste_events": 0
+      },
+      "id": "evt_1789234377147_yyltw"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:32:57.315Z",
+      "metadata": {
+        "hint_level": 1
+      },
+      "id": "evt_1789234377315_pacij"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:32:57.360Z",
+      "metadata": {
+        "hint_level": 2
+      },
+      "id": "evt_1789234377360_ubsby"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:32:57.388Z",
+      "metadata": {
+        "hint_level": 3
+      },
+      "id": "evt_1789234377388_vjic3"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:32:57.402Z",
+      "metadata": {
+        "hint_level": 4
+      },
+      "id": "evt_1789234377402_2bl2l"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T17:32:57.450Z",
+      "metadata": {
+        "hint_level": 5
+      },
+      "id": "evt_1789234377450_l5ikl"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:32:57.510Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "SIMPLIFY"
+      },
+      "id": "evt_1789234377510_jemof"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:32:57.554Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "DEBUG"
+      },
+      "id": "evt_1789234377554_fhwll"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T17:32:57.569Z",
+      "metadata": {
+        "question": "What is variable scoping in loops?",
+        "tutor_mode": "REVISE"
+      },
+      "id": "evt_1789234377570_8kh5a"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T17:32:58.175Z",
+      "metadata": {
+        "has_error": true,
+        "status": "RUNTIME_ERROR",
+        "passed": false,
+        "keystrokes": 15,
+        "paste_events": 0
+      },
+      "id": "evt_1789234378175_5gp4c"
     }
   ],
   "cognitive_predictions": [
@@ -2639,6 +3807,246 @@
       "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
       "timestamp": "2026-09-12T09:42:21.707Z",
       "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234143916_cl60",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:29:03.916Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234144716_zyca",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:29:04.716Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234145667_ghah",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.575,
+      "probabilities": "{\"LOW\":0.3417,\"MEDIUM\":0.575,\"HIGH\":0.0833}",
+      "timestamp": "2026-09-12T17:29:05.668Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234146849_lylw",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:29:06.849Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234235213_kg0t",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:30:35.213Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234236233_6m58",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:30:36.233Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234237247_k6ju",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.5667,
+      "probabilities": "{\"LOW\":0.325,\"MEDIUM\":0.5667,\"HIGH\":0.1083}",
+      "timestamp": "2026-09-12T17:30:37.247Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234237976_2s95",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:30:37.976Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234261406_md31",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:31:01.406Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234262168_53ya",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:31:02.168Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234262873_3muj",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.5667,
+      "probabilities": "{\"LOW\":0.325,\"MEDIUM\":0.5667,\"HIGH\":0.1083}",
+      "timestamp": "2026-09-12T17:31:02.873Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234263751_inp4",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:31:03.751Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234288775_rqo0",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:31:28.775Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234289492_qjbr",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:31:29.492Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234290255_jynj",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.5667,
+      "probabilities": "{\"LOW\":0.325,\"MEDIUM\":0.5667,\"HIGH\":0.1083}",
+      "timestamp": "2026-09-12T17:31:30.255Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234291033_oe5k",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:31:31.033Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234332010_pg3l",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:32:12.010Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234333303_ip3g",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:32:13.303Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234334745_68ki",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.575,
+      "probabilities": "{\"LOW\":0.325,\"MEDIUM\":0.575,\"HIGH\":0.1}",
+      "timestamp": "2026-09-12T17:32:14.745Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234336170_9rzd",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:32:16.170Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234375799_4nho",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:32:55.799Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234376436_5g0b",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:32:56.436Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234377260_slnv",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6583,
+      "probabilities": "{\"LOW\":0.2833,\"MEDIUM\":0.6583,\"HIGH\":0.0583}",
+      "timestamp": "2026-09-12T17:32:57.260Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
+    },
+    {
+      "id": "pred_1789234378233_rd64",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "MEDIUM",
+      "confidence": 0.6833,
+      "probabilities": "{\"LOW\":0.2,\"MEDIUM\":0.6833,\"HIGH\":0.1167}",
+      "timestamp": "2026-09-12T17:32:58.233Z",
+      "factors": "[\"Balanced engagement pace with standard learning progression\"]"
     }
   ],
   "recommendations": [
@@ -2913,6 +4321,198 @@
       "recommended_topic_id": "top-py-loops",
       "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
       "timestamp": "2026-09-12T09:42:21.712Z"
+    },
+    {
+      "id": "rec_1789234143935_zp2g",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:29:03.935Z"
+    },
+    {
+      "id": "rec_1789234144719_c9ai",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:29:04.719Z"
+    },
+    {
+      "id": "rec_1789234145670_q2fw",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-c-pointers",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:29:05.670Z"
+    },
+    {
+      "id": "rec_1789234146856_sl7g",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:29:06.856Z"
+    },
+    {
+      "id": "rec_1789234235214_ghtz",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:30:35.214Z"
+    },
+    {
+      "id": "rec_1789234236236_iwxt",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:30:36.236Z"
+    },
+    {
+      "id": "rec_1789234237254_i3x9",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-c-pointers",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:30:37.254Z"
+    },
+    {
+      "id": "rec_1789234237978_hhi5",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:30:37.978Z"
+    },
+    {
+      "id": "rec_1789234261409_b4ve",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:31:01.409Z"
+    },
+    {
+      "id": "rec_1789234262170_7bmu",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:31:02.170Z"
+    },
+    {
+      "id": "rec_1789234262876_732n",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-c-pointers",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:31:02.876Z"
+    },
+    {
+      "id": "rec_1789234263755_nzlj",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:31:03.755Z"
+    },
+    {
+      "id": "rec_1789234288782_kp68",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:31:28.782Z"
+    },
+    {
+      "id": "rec_1789234289494_po5a",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:31:29.494Z"
+    },
+    {
+      "id": "rec_1789234290265_9wuo",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-c-pointers",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:31:30.265Z"
+    },
+    {
+      "id": "rec_1789234291036_37z9",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:31:31.036Z"
+    },
+    {
+      "id": "rec_1789234332013_8clp",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:32:12.013Z"
+    },
+    {
+      "id": "rec_1789234333315_e943",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:32:13.315Z"
+    },
+    {
+      "id": "rec_1789234334751_wgt6",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-c-pointers",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:32:14.751Z"
+    },
+    {
+      "id": "rec_1789234336171_21ui",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:32:16.171Z"
+    },
+    {
+      "id": "rec_1789234375803_g2np",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:32:55.803Z"
+    },
+    {
+      "id": "rec_1789234376438_q9pz",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:32:56.438Z"
+    },
+    {
+      "id": "rec_1789234377292_7sal",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-c-pointers",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:32:57.292Z"
+    },
+    {
+      "id": "rec_1789234378236_uvrm",
+      "user_id": "guest_user",
+      "recommended_action": "CONTINUE",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.",
+      "timestamp": "2026-09-12T17:32:58.236Z"
     }
   ],
   "quiz_attempts": [
@@ -3005,6 +4605,60 @@
       "time_spent": 35,
       "passed": 1,
       "timestamp": "2026-09-12T09:42:17.741Z"
+    },
+    {
+      "id": "quiz_1789234143632_ebzy",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "score": 1,
+      "time_spent": 35,
+      "passed": 1,
+      "timestamp": "2026-09-12T17:29:03.632Z"
+    },
+    {
+      "id": "quiz_1789234235075_8olr",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "score": 1,
+      "time_spent": 35,
+      "passed": 1,
+      "timestamp": "2026-09-12T17:30:35.075Z"
+    },
+    {
+      "id": "quiz_1789234261323_7x33",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "score": 1,
+      "time_spent": 35,
+      "passed": 1,
+      "timestamp": "2026-09-12T17:31:01.323Z"
+    },
+    {
+      "id": "quiz_1789234288652_44g4",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "score": 1,
+      "time_spent": 35,
+      "passed": 1,
+      "timestamp": "2026-09-12T17:31:28.652Z"
+    },
+    {
+      "id": "quiz_1789234331819_ewm8",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "score": 1,
+      "time_spent": 35,
+      "passed": 1,
+      "timestamp": "2026-09-12T17:32:11.819Z"
+    },
+    {
+      "id": "quiz_1789234375681_c3b7",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "score": 1,
+      "time_spent": 35,
+      "passed": 1,
+      "timestamp": "2026-09-12T17:32:55.681Z"
     }
   ],
   "coding_attempts": [
@@ -3247,6 +4901,186 @@
       "execution_time": 785,
       "error_count": 1,
       "timestamp": "2026-09-12T09:42:21.467Z"
+    },
+    {
+      "id": "att_1789234144642_1g3p",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "code": "\nimport sys\ninput_data = sys.stdin.read().strip()\nnums = [int(x) for x in input_data.split()] if input_data else []\neven_sum = sum(x for x in nums if x % 2 == 0)\nprint(even_sum)\n",
+      "passed": 0,
+      "execution_time": 689,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:29:04.642Z"
+    },
+    {
+      "id": "att_1789234145589_2fc8",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "code": "\n#include <stdio.h>\nvoid swap(int *a, int *b) {\n    int t = *a;\n    *a = *b;\n    *b = t;\n}\nint main() {\n    int x, y;\n    if (scanf(\"%d %d\", &x, &y) == 2) {\n        swap(&x, &y);\n        printf(\"%d %d\\n\", x, y);\n    }\n    return 0;\n}\n",
+      "passed": 0,
+      "execution_time": 859,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:29:05.589Z"
+    },
+    {
+      "id": "att_1789234146756_7lzf",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "code": "def broken(:\n    return 1",
+      "passed": 0,
+      "execution_time": 828,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:29:06.756Z"
+    },
+    {
+      "id": "att_1789234236119_9tkf",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "code": "\nimport sys\ninput_data = sys.stdin.read().strip()\nnums = [int(x) for x in input_data.split()] if input_data else []\neven_sum = sum(x for x in nums if x % 2 == 0)\nprint(even_sum)\n",
+      "passed": 0,
+      "execution_time": 885,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:30:36.119Z"
+    },
+    {
+      "id": "att_1789234237160_sy9r",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "code": "\n#include <stdio.h>\nvoid swap(int *a, int *b) {\n    int t = *a;\n    *a = *b;\n    *b = t;\n}\nint main() {\n    int x, y;\n    if (scanf(\"%d %d\", &x, &y) == 2) {\n        swap(&x, &y);\n        printf(\"%d %d\\n\", x, y);\n    }\n    return 0;\n}\n",
+      "passed": 0,
+      "execution_time": 912,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:30:37.160Z"
+    },
+    {
+      "id": "att_1789234237817_mpic",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "code": "def broken(:\n    return 1",
+      "passed": 0,
+      "execution_time": 381,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:30:37.817Z"
+    },
+    {
+      "id": "att_1789234262068_hb8m",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "code": "\nimport sys\ninput_data = sys.stdin.read().strip()\nnums = [int(x) for x in input_data.split()] if input_data else []\neven_sum = sum(x for x in nums if x % 2 == 0)\nprint(even_sum)\n",
+      "passed": 0,
+      "execution_time": 637,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:31:02.068Z"
+    },
+    {
+      "id": "att_1789234262760_ami8",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "code": "\n#include <stdio.h>\nvoid swap(int *a, int *b) {\n    int t = *a;\n    *a = *b;\n    *b = t;\n}\nint main() {\n    int x, y;\n    if (scanf(\"%d %d\", &x, &y) == 2) {\n        swap(&x, &y);\n        printf(\"%d %d\\n\", x, y);\n    }\n    return 0;\n}\n",
+      "passed": 0,
+      "execution_time": 558,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:31:02.760Z"
+    },
+    {
+      "id": "att_1789234263658_ds8i",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "code": "def broken(:\n    return 1",
+      "passed": 0,
+      "execution_time": 579,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:31:03.658Z"
+    },
+    {
+      "id": "att_1789234289422_i3yv",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "code": "\nimport sys\ninput_data = sys.stdin.read().strip()\nnums = [int(x) for x in input_data.split()] if input_data else []\neven_sum = sum(x for x in nums if x % 2 == 0)\nprint(even_sum)\n",
+      "passed": 0,
+      "execution_time": 631,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:31:29.422Z"
+    },
+    {
+      "id": "att_1789234290114_l6zs",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "code": "\n#include <stdio.h>\nvoid swap(int *a, int *b) {\n    int t = *a;\n    *a = *b;\n    *b = t;\n}\nint main() {\n    int x, y;\n    if (scanf(\"%d %d\", &x, &y) == 2) {\n        swap(&x, &y);\n        printf(\"%d %d\\n\", x, y);\n    }\n    return 0;\n}\n",
+      "passed": 0,
+      "execution_time": 613,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:31:30.114Z"
+    },
+    {
+      "id": "att_1789234290960_cx6r",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "code": "def broken(:\n    return 1",
+      "passed": 0,
+      "execution_time": 503,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:31:30.960Z"
+    },
+    {
+      "id": "att_1789234333196_0kmy",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "code": "\nimport sys\ninput_data = sys.stdin.read().strip()\nnums = [int(x) for x in input_data.split()] if input_data else []\neven_sum = sum(x for x in nums if x % 2 == 0)\nprint(even_sum)\n",
+      "passed": 0,
+      "execution_time": 1135,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:32:13.196Z"
+    },
+    {
+      "id": "att_1789234334649_690h",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "code": "\n#include <stdio.h>\nvoid swap(int *a, int *b) {\n    int t = *a;\n    *a = *b;\n    *b = t;\n}\nint main() {\n    int x, y;\n    if (scanf(\"%d %d\", &x, &y) == 2) {\n        swap(&x, &y);\n        printf(\"%d %d\\n\", x, y);\n    }\n    return 0;\n}\n",
+      "passed": 0,
+      "execution_time": 1321,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:32:14.649Z"
+    },
+    {
+      "id": "att_1789234336087_rdio",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "code": "def broken(:\n    return 1",
+      "passed": 0,
+      "execution_time": 858,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:32:16.087Z"
+    },
+    {
+      "id": "att_1789234376362_ighg",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "code": "\nimport sys\ninput_data = sys.stdin.read().strip()\nnums = [int(x) for x in input_data.split()] if input_data else []\neven_sum = sum(x for x in nums if x % 2 == 0)\nprint(even_sum)\n",
+      "passed": 0,
+      "execution_time": 544,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:32:56.362Z"
+    },
+    {
+      "id": "att_1789234377135_yjhv",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "code": "\n#include <stdio.h>\nvoid swap(int *a, int *b) {\n    int t = *a;\n    *a = *b;\n    *b = t;\n}\nint main() {\n    int x, y;\n    if (scanf(\"%d %d\", &x, &y) == 2) {\n        swap(&x, &y);\n        printf(\"%d %d\\n\", x, y);\n    }\n    return 0;\n}\n",
+      "passed": 0,
+      "execution_time": 682,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:32:57.135Z"
+    },
+    {
+      "id": "att_1789234378172_xht5",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "code": "def broken(:\n    return 1",
+      "passed": 0,
+      "execution_time": 586,
+      "error_count": 1,
+      "timestamp": "2026-09-12T17:32:58.172Z"
     }
   ],
   "weak_concepts": [
@@ -3256,7 +5090,7 @@
       "concept_name": "Exception handling and input parsing",
       "topic_id": "top-py-loops",
       "language": "python",
-      "error_count": 12,
+      "error_count": 24,
       "failure_count": 0,
       "hint_count": 0,
       "detected_at": "2026-09-12T09:11:24.371Z",
@@ -3268,7 +5102,7 @@
       "concept_name": "Declarations, header files, and types",
       "topic_id": "top-c-pointers",
       "language": "c",
-      "error_count": 6,
+      "error_count": 12,
       "failure_count": 0,
       "hint_count": 0,
       "detected_at": "2026-09-12T09:11:29.995Z",
@@ -3280,9 +5114,9 @@
       "id": "rev_1789204279210_706w",
       "user_id": "guest_user",
       "topic_id": "top-py-loops",
-      "review_count": 6,
-      "last_review": "2026-09-12T09:42:17.754Z",
-      "next_review": "2026-09-19T09:42:17.754Z",
+      "review_count": 12,
+      "last_review": "2026-09-12T17:32:55.726Z",
+      "next_review": "2026-09-19T17:32:55.726Z",
       "retention_score": 100,
       "status": "pending"
     }
@@ -3370,6 +5204,54 @@
       "feedback": "yes",
       "comment": "The micro-learning breakdown helped clarify the condition syntax!",
       "created_at": "2026-09-12T09:42:21.737Z"
+    },
+    {
+      "id": "fb_1789234146933",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "feedback": "yes",
+      "comment": "The micro-learning breakdown helped clarify the condition syntax!",
+      "created_at": "2026-09-12T17:29:06.933Z"
+    },
+    {
+      "id": "fb_1789234238005",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "feedback": "yes",
+      "comment": "The micro-learning breakdown helped clarify the condition syntax!",
+      "created_at": "2026-09-12T17:30:38.005Z"
+    },
+    {
+      "id": "fb_1789234263807",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "feedback": "yes",
+      "comment": "The micro-learning breakdown helped clarify the condition syntax!",
+      "created_at": "2026-09-12T17:31:03.807Z"
+    },
+    {
+      "id": "fb_1789234291068",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "feedback": "yes",
+      "comment": "The micro-learning breakdown helped clarify the condition syntax!",
+      "created_at": "2026-09-12T17:31:31.068Z"
+    },
+    {
+      "id": "fb_1789234336180",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "feedback": "yes",
+      "comment": "The micro-learning breakdown helped clarify the condition syntax!",
+      "created_at": "2026-09-12T17:32:16.180Z"
+    },
+    {
+      "id": "fb_1789234378245",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "feedback": "yes",
+      "comment": "The micro-learning breakdown helped clarify the condition syntax!",
+      "created_at": "2026-09-12T17:32:58.245Z"
     }
   ],
   "projects": [
@@ -4520,6 +6402,320 @@
         }
       ],
       "submitted_at": "2026-09-12T09:42:22.685Z"
+    },
+    {
+      "project_id": "proj-py-beg-calc",
+      "user_id": "guest_user",
+      "overall_score": 44,
+      "passed": false,
+      "correctness": 10,
+      "code_quality": 95,
+      "complexity": 80,
+      "test_case_score": 0,
+      "best_practices": 80,
+      "concept_coverage": 67,
+      "feedback": "Good effort on CLI Scientific Calculator. Your solution scored 44%. Focus on fixing failing test assertions and checking milestone hints to achieve full certification.",
+      "detailed_rubric": [
+        {
+          "criterion": "Functional Correctness (30%)",
+          "score": 10,
+          "max_score": 100,
+          "feedback": "Encountered test deviations or execution warnings during automated runs."
+        },
+        {
+          "criterion": "Automated Test Cases (20%)",
+          "score": 0,
+          "max_score": 100,
+          "feedback": "0/1 test cases verified successfully."
+        },
+        {
+          "criterion": "Code Quality & Clean Architecture (15%)",
+          "score": 95,
+          "max_score": 100,
+          "feedback": "Clean identifier naming, modular decomposition, and readable formatting."
+        },
+        {
+          "criterion": "Algorithmic Complexity & Performance (15%)",
+          "score": 80,
+          "max_score": 100,
+          "feedback": "Demonstrates optimal data structures and scalable design."
+        },
+        {
+          "criterion": "Language Best Practices & Safety (10%)",
+          "score": 80,
+          "max_score": 100,
+          "feedback": "Ensure proper exception handling and defensive argument validation."
+        },
+        {
+          "criterion": "Syllabus Concept Coverage (10%)",
+          "score": 67,
+          "max_score": 100,
+          "feedback": "Ensure all milestone requirements are explicitly implemented."
+        }
+      ],
+      "submitted_at": "2026-09-12T17:29:07.646Z"
+    },
+    {
+      "project_id": "proj-py-beg-calc",
+      "user_id": "guest_user",
+      "overall_score": 44,
+      "passed": false,
+      "correctness": 10,
+      "code_quality": 95,
+      "complexity": 80,
+      "test_case_score": 0,
+      "best_practices": 80,
+      "concept_coverage": 67,
+      "feedback": "Good effort on CLI Scientific Calculator. Your solution scored 44%. Focus on fixing failing test assertions and checking milestone hints to achieve full certification.",
+      "detailed_rubric": [
+        {
+          "criterion": "Functional Correctness (30%)",
+          "score": 10,
+          "max_score": 100,
+          "feedback": "Encountered test deviations or execution warnings during automated runs."
+        },
+        {
+          "criterion": "Automated Test Cases (20%)",
+          "score": 0,
+          "max_score": 100,
+          "feedback": "0/1 test cases verified successfully."
+        },
+        {
+          "criterion": "Code Quality & Clean Architecture (15%)",
+          "score": 95,
+          "max_score": 100,
+          "feedback": "Clean identifier naming, modular decomposition, and readable formatting."
+        },
+        {
+          "criterion": "Algorithmic Complexity & Performance (15%)",
+          "score": 80,
+          "max_score": 100,
+          "feedback": "Demonstrates optimal data structures and scalable design."
+        },
+        {
+          "criterion": "Language Best Practices & Safety (10%)",
+          "score": 80,
+          "max_score": 100,
+          "feedback": "Ensure proper exception handling and defensive argument validation."
+        },
+        {
+          "criterion": "Syllabus Concept Coverage (10%)",
+          "score": 67,
+          "max_score": 100,
+          "feedback": "Ensure all milestone requirements are explicitly implemented."
+        }
+      ],
+      "submitted_at": "2026-09-12T17:30:38.738Z"
+    },
+    {
+      "project_id": "proj-py-beg-calc",
+      "user_id": "guest_user",
+      "overall_score": 44,
+      "passed": false,
+      "correctness": 10,
+      "code_quality": 95,
+      "complexity": 80,
+      "test_case_score": 0,
+      "best_practices": 80,
+      "concept_coverage": 67,
+      "feedback": "Good effort on CLI Scientific Calculator. Your solution scored 44%. Focus on fixing failing test assertions and checking milestone hints to achieve full certification.",
+      "detailed_rubric": [
+        {
+          "criterion": "Functional Correctness (30%)",
+          "score": 10,
+          "max_score": 100,
+          "feedback": "Encountered test deviations or execution warnings during automated runs."
+        },
+        {
+          "criterion": "Automated Test Cases (20%)",
+          "score": 0,
+          "max_score": 100,
+          "feedback": "0/1 test cases verified successfully."
+        },
+        {
+          "criterion": "Code Quality & Clean Architecture (15%)",
+          "score": 95,
+          "max_score": 100,
+          "feedback": "Clean identifier naming, modular decomposition, and readable formatting."
+        },
+        {
+          "criterion": "Algorithmic Complexity & Performance (15%)",
+          "score": 80,
+          "max_score": 100,
+          "feedback": "Demonstrates optimal data structures and scalable design."
+        },
+        {
+          "criterion": "Language Best Practices & Safety (10%)",
+          "score": 80,
+          "max_score": 100,
+          "feedback": "Ensure proper exception handling and defensive argument validation."
+        },
+        {
+          "criterion": "Syllabus Concept Coverage (10%)",
+          "score": 67,
+          "max_score": 100,
+          "feedback": "Ensure all milestone requirements are explicitly implemented."
+        }
+      ],
+      "submitted_at": "2026-09-12T17:31:04.278Z"
+    },
+    {
+      "project_id": "proj-py-beg-calc",
+      "user_id": "guest_user",
+      "overall_score": 44,
+      "passed": false,
+      "correctness": 10,
+      "code_quality": 95,
+      "complexity": 80,
+      "test_case_score": 0,
+      "best_practices": 80,
+      "concept_coverage": 67,
+      "feedback": "Good effort on CLI Scientific Calculator. Your solution scored 44%. Focus on fixing failing test assertions and checking milestone hints to achieve full certification.",
+      "detailed_rubric": [
+        {
+          "criterion": "Functional Correctness (30%)",
+          "score": 10,
+          "max_score": 100,
+          "feedback": "Encountered test deviations or execution warnings during automated runs."
+        },
+        {
+          "criterion": "Automated Test Cases (20%)",
+          "score": 0,
+          "max_score": 100,
+          "feedback": "0/1 test cases verified successfully."
+        },
+        {
+          "criterion": "Code Quality & Clean Architecture (15%)",
+          "score": 95,
+          "max_score": 100,
+          "feedback": "Clean identifier naming, modular decomposition, and readable formatting."
+        },
+        {
+          "criterion": "Algorithmic Complexity & Performance (15%)",
+          "score": 80,
+          "max_score": 100,
+          "feedback": "Demonstrates optimal data structures and scalable design."
+        },
+        {
+          "criterion": "Language Best Practices & Safety (10%)",
+          "score": 80,
+          "max_score": 100,
+          "feedback": "Ensure proper exception handling and defensive argument validation."
+        },
+        {
+          "criterion": "Syllabus Concept Coverage (10%)",
+          "score": 67,
+          "max_score": 100,
+          "feedback": "Ensure all milestone requirements are explicitly implemented."
+        }
+      ],
+      "submitted_at": "2026-09-12T17:31:31.536Z"
+    },
+    {
+      "project_id": "proj-py-beg-calc",
+      "user_id": "guest_user",
+      "overall_score": 44,
+      "passed": false,
+      "correctness": 10,
+      "code_quality": 95,
+      "complexity": 80,
+      "test_case_score": 0,
+      "best_practices": 80,
+      "concept_coverage": 67,
+      "feedback": "Good effort on CLI Scientific Calculator. Your solution scored 44%. Focus on fixing failing test assertions and checking milestone hints to achieve full certification.",
+      "detailed_rubric": [
+        {
+          "criterion": "Functional Correctness (30%)",
+          "score": 10,
+          "max_score": 100,
+          "feedback": "Encountered test deviations or execution warnings during automated runs."
+        },
+        {
+          "criterion": "Automated Test Cases (20%)",
+          "score": 0,
+          "max_score": 100,
+          "feedback": "0/1 test cases verified successfully."
+        },
+        {
+          "criterion": "Code Quality & Clean Architecture (15%)",
+          "score": 95,
+          "max_score": 100,
+          "feedback": "Clean identifier naming, modular decomposition, and readable formatting."
+        },
+        {
+          "criterion": "Algorithmic Complexity & Performance (15%)",
+          "score": 80,
+          "max_score": 100,
+          "feedback": "Demonstrates optimal data structures and scalable design."
+        },
+        {
+          "criterion": "Language Best Practices & Safety (10%)",
+          "score": 80,
+          "max_score": 100,
+          "feedback": "Ensure proper exception handling and defensive argument validation."
+        },
+        {
+          "criterion": "Syllabus Concept Coverage (10%)",
+          "score": 67,
+          "max_score": 100,
+          "feedback": "Ensure all milestone requirements are explicitly implemented."
+        }
+      ],
+      "submitted_at": "2026-09-12T17:32:16.742Z"
+    },
+    {
+      "project_id": "proj-py-beg-calc",
+      "user_id": "guest_user",
+      "overall_score": 44,
+      "passed": false,
+      "correctness": 10,
+      "code_quality": 95,
+      "complexity": 80,
+      "test_case_score": 0,
+      "best_practices": 80,
+      "concept_coverage": 67,
+      "feedback": "Good effort on CLI Scientific Calculator. Your solution scored 44%. Focus on fixing failing test assertions and checking milestone hints to achieve full certification.",
+      "detailed_rubric": [
+        {
+          "criterion": "Functional Correctness (30%)",
+          "score": 10,
+          "max_score": 100,
+          "feedback": "Encountered test deviations or execution warnings during automated runs."
+        },
+        {
+          "criterion": "Automated Test Cases (20%)",
+          "score": 0,
+          "max_score": 100,
+          "feedback": "0/1 test cases verified successfully."
+        },
+        {
+          "criterion": "Code Quality & Clean Architecture (15%)",
+          "score": 95,
+          "max_score": 100,
+          "feedback": "Clean identifier naming, modular decomposition, and readable formatting."
+        },
+        {
+          "criterion": "Algorithmic Complexity & Performance (15%)",
+          "score": 80,
+          "max_score": 100,
+          "feedback": "Demonstrates optimal data structures and scalable design."
+        },
+        {
+          "criterion": "Language Best Practices & Safety (10%)",
+          "score": 80,
+          "max_score": 100,
+          "feedback": "Ensure proper exception handling and defensive argument validation."
+        },
+        {
+          "criterion": "Syllabus Concept Coverage (10%)",
+          "score": 67,
+          "max_score": 100,
+          "feedback": "Ensure all milestone requirements are explicitly implemented."
+        }
+      ],
+      "submitted_at": "2026-09-12T17:32:58.801Z"
     }
-  ]
+  ],
+  "bookmarks": [],
+  "notes": []
 }

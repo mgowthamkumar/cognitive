@@ -148,6 +148,45 @@ export const initialCurriculum: CurriculumData = {
       ]
     },
     {
+      id: 'top-py-recursion',
+      module_id: 'mod-py-2',
+      title: 'Recursion and Recursive Thinking',
+      order_index: 3,
+      learning_objective: 'Understand base cases, recursive decomposition, call stacks, and recursive function execution in Python.',
+      content_standard: 'Recursion occurs when a function calls itself directly or indirectly to solve a smaller instance of the same problem. Every recursive function requires at least one base case to terminate execution.',
+      content_low: '### ⚡ Fast-Track Summary\n- Base case: Halting condition preventing stack overflow (RecursionError).\n- Python recursion depth limit: default 1000 frames (`sys.getrecursionlimit()`).\n- Tail call optimization (TCO) is NOT supported in CPython; prefer memoization (`functools.lru_cache`) for recursive algorithms.',
+      content_medium: '### 📘 Standard Guide\nA recursive function has two key elements:\n1. **Base Case**: The simplest scenario that returns immediately without calling the function again.\n2. **Recursive Step**: Calling the function with inputs closer to the base case.',
+      content_high: '### 🌱 Step-by-Step Breakdown\nImagine Russian nesting dolls (Matryoshka):\n1. To open doll #5, you open doll #4, then #3, then #2, then #1.\n2. Doll #1 is the tiniest solid doll (the **Base Case**).\n3. Once you reach the center, you put them all back together! That is exactly how the computer\'s call stack works.',
+      syntax: 'def recursive_func(n):\n    if n <= 1: # Base case\n        return 1\n    return n * recursive_func(n - 1) # Recursive step',
+      examples: '# Example 1: Factorial\ndef factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)\n\nprint("5! =", factorial(5)) # 120',
+      common_mistakes: '1. Forgetting the base case, leading to RecursionError: maximum recursion depth exceeded.\n2. Failing to shrink the input argument towards the base case on each call.',
+      practice_prompt: 'Write a recursive function `fibonacci(n)` that calculates the nth Fibonacci number.',
+      prerequisite_topic_id: 'top-py-functions',
+      sections: [
+        {
+          id: 'sec-py-rec-1',
+          title: '1. What is Recursion?',
+          order_index: 1,
+          content: 'Recursion is a programming technique where a function solves a problem by breaking it into smaller sub-problems and calling itself.',
+          code_snippet: 'def countdown(n):\n    if n <= 0:\n        print("Blast off!")\n        return\n    print(n)\n    countdown(n - 1)'
+        },
+        {
+          id: 'sec-py-rec-2',
+          title: '2. The Call Stack & Base Cases',
+          order_index: 2,
+          content: 'Every recursive invocation allocates a new stack frame containing local variables and return addresses. The base case halts this accumulation.',
+          pitfalls: 'Without a base case, the function will consume all stack memory, causing Python to terminate with `RecursionError: maximum recursion depth exceeded`.'
+        },
+        {
+          id: 'sec-py-rec-3',
+          title: '3. Classic Recursive Pattern: Factorial',
+          order_index: 3,
+          content: 'The factorial of n (n!) is n * (n - 1)!. The base case is 0! = 1 and 1! = 1.',
+          code_snippet: 'def fact(n):\n    if n <= 1:\n        return 1\n    return n * fact(n - 1)'
+        }
+      ]
+    },
+    {
       id: 'top-py-datastruct',
       module_id: 'mod-py-3',
       title: 'Lists, Dictionaries & Comprehensions',
@@ -413,6 +452,36 @@ export const initialCurriculum: CurriculumData = {
       explanation: 'Python checks Local scope first, then Enclosing closures, Global module variables, and finally Built-ins.'
     },
 
+    // Python Recursion MCQs
+    {
+      id: 'mcq-py-rec-1',
+      topic_id: 'top-py-recursion',
+      difficulty: 'easy',
+      question: 'What is the primary role of a base case in a recursive function?',
+      options: [
+        'To speed up CPU clock speed',
+        'To terminate the recursion and prevent an infinite call loop',
+        'To initialize global variables',
+        'To convert the function to an async generator'
+      ],
+      correct_index: 1,
+      explanation: 'Without a base case, a recursive function calls itself indefinitely until it exceeds the call stack memory limit.'
+    },
+    {
+      id: 'mcq-py-rec-2',
+      topic_id: 'top-py-recursion',
+      difficulty: 'medium',
+      question: 'What exception does Python raise when a recursive function exceeds its maximum recursion depth limit?',
+      options: [
+        'StackMemoryError',
+        'OutOfMemoryError',
+        'RecursionError',
+        'InfiniteLoopException'
+      ],
+      correct_index: 2,
+      explanation: 'Python raises `RecursionError: maximum recursion depth exceeded` when the call stack reaches the recursion limit.'
+    },
+
     // C Pointer MCQs
     {
       id: 'mcq-c-ptr-1',
@@ -570,6 +639,29 @@ export const initialCurriculum: CurriculumData = {
         { input: '100 -50', expected_output: '-50 100', is_hidden: false },
         { input: '0 0', expected_output: '0 0', is_hidden: true },
         { input: '-999 999', expected_output: '999 -999', is_hidden: true }
+      ]
+    },
+
+    // Python Coding Challenge 3 (Recursion - Section 117)
+    {
+      id: 'code-py-factorial',
+      topic_id: 'top-py-recursion',
+      title: 'Recursive Factorial Engine',
+      difficulty: 'easy',
+      problem_statement: 'Read an integer N from standard input (0 <= N <= 12) and print its factorial (N!) calculated using a recursive function.',
+      input_format: 'A single non-negative integer N.',
+      output_format: 'The factorial of N.',
+      constraints: '0 <= N <= 12',
+      sample_input: '5',
+      sample_output: '120',
+      starter_code: {
+        python: 'import sys\n\ndef factorial(n: int) -> int:\n    # TODO: Implement recursive factorial with base case\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)\n\nif __name__ == "__main__":\n    raw = sys.stdin.read().strip()\n    if raw:\n        n = int(raw)\n        print(factorial(n))'
+      },
+      test_cases: [
+        { input: '5', expected_output: '120', is_hidden: false },
+        { input: '0', expected_output: '1', is_hidden: false },
+        { input: '3', expected_output: '6', is_hidden: false },
+        { input: '7', expected_output: '5040', is_hidden: true }
       ]
     }
   ]

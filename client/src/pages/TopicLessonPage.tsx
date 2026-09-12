@@ -20,8 +20,11 @@ import {
   ThumbsDown,
   RotateCcw,
   Zap,
-  HelpCircle as QuestionIcon
+  HelpCircle as QuestionIcon,
+  FileText
 } from 'lucide-react';
+import { BookmarkButton } from '../components/BookmarkButton';
+import { QuickNoteModal } from '../components/QuickNoteModal';
 
 interface TopicLessonPageProps {
   topicId: string;
@@ -56,6 +59,9 @@ export const TopicLessonPage: React.FC<TopicLessonPageProps> = ({
 
   // Section 79: User Feedback
   const [feedbackSent, setFeedbackSent] = useState<string | null>(null);
+
+  // Section 112 & 113: Bookmarks & Quick Notes
+  const [noteModalOpen, setNoteModalOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -213,8 +219,24 @@ export const TopicLessonPage: React.FC<TopicLessonPageProps> = ({
             </h1>
           </div>
 
-          <div className="text-right">
-            <span className="text-xs font-mono font-bold text-slate-300">
+          <div className="flex items-center gap-2">
+            <BookmarkButton
+              itemType="lesson"
+              itemId={topic.id}
+              title={topic.title}
+              snippet={currentSection.title}
+              topicId={topic.id}
+              language="python"
+            />
+            <button
+              onClick={() => setNoteModalOpen(true)}
+              className="px-3 py-1.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-xs font-semibold text-slate-300 transition-all flex items-center gap-1.5"
+              title="Add personal note for this topic"
+            >
+              <FileText className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Add Note</span>
+            </button>
+            <span className="text-xs font-mono font-bold text-slate-300 ml-2">
               {progressPercent}% Complete
             </span>
           </div>
@@ -278,13 +300,23 @@ export const TopicLessonPage: React.FC<TopicLessonPageProps> = ({
           <div className="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2 border-b border-slate-800 text-xs text-slate-400 font-mono">
               <span className="flex items-center gap-1.5"><Code className="w-3.5 h-3.5 text-cyan-400" /> Example Code</span>
-              <button
-                onClick={() => copyCode(currentSection.code_snippet)}
-                className="hover:text-white flex items-center gap-1"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                {copied ? 'Copied' : 'Copy'}
-              </button>
+              <div className="flex items-center gap-2">
+                <BookmarkButton
+                  itemType="example"
+                  itemId={`${topic.id}-sec-${currentSectionIndex}-code`}
+                  title={`${topic.title} Code Snippet (${currentSection.title})`}
+                  snippet={currentSection.code_snippet}
+                  topicId={topic.id}
+                  language="python"
+                />
+                <button
+                  onClick={() => copyCode(currentSection.code_snippet)}
+                  className="hover:text-white flex items-center gap-1"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                  {copied ? 'Copied' : 'Copy'}
+                </button>
+              </div>
             </div>
             <pre className="p-4 text-xs font-mono text-cyan-300 overflow-x-auto leading-relaxed">
               <code>{currentSection.code_snippet}</code>
@@ -396,7 +428,18 @@ export const TopicLessonPage: React.FC<TopicLessonPageProps> = ({
         )}
 
         {aiTutorResponse && (
-          <div className="p-4 rounded-2xl border border-purple-500/30 bg-purple-950/10 text-xs text-slate-200 leading-relaxed whitespace-pre-line animate-fade-in">
+          <div className="p-4 rounded-2xl border border-purple-500/30 bg-purple-950/10 text-xs text-slate-200 leading-relaxed whitespace-pre-line animate-fade-in relative">
+            <div className="flex items-center justify-between pb-2 mb-2 border-b border-purple-500/20">
+              <span className="font-bold text-purple-400 uppercase text-[10px] tracking-wider">AI Tutor Response</span>
+              <BookmarkButton
+                itemType="ai_explanation"
+                itemId={`ai-${topic.id}-${activeTutorMode || 'mode'}-${Date.now().toString().slice(-4)}`}
+                title={`${topic.title} - AI: ${activeTutorMode || 'Explanation'}`}
+                snippet={aiTutorResponse.answer}
+                topicId={topic.id}
+                language="python"
+              />
+            </div>
             {aiTutorResponse.answer}
           </div>
         )}
@@ -473,6 +516,15 @@ export const TopicLessonPage: React.FC<TopicLessonPageProps> = ({
           )}
         </div>
       </div>
+      {/* Contextual Quick Note Modal */}
+      <QuickNoteModal
+        isOpen={noteModalOpen}
+        onClose={() => setNoteModalOpen(false)}
+        language="python"
+        topicId={topic.id}
+        subtopicTitle={currentSection.title}
+        defaultTitle={`${topic.title} - Notes`}
+      />
     </div>
   );
 };

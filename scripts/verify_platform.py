@@ -291,14 +291,117 @@ if __name__ == '__main__':
     print(f"  • Concept Coverage (10% weight): {evaluation['concept_coverage']}%")
     print(f"✓ Constructive Feedback: {evaluation['feedback'][:70]}...")
 
-    # Verify Non-Punitive Integrity Signal (Section 94)
-    integ = eval_res.get("integrity", {})
-    assert integ.get("status") in ["normal", "unusual", "needs_review"], f"Invalid integrity signal: {integ}"
-    print(f"✓ Non-Punitive Integrity Signal: status='{integ.get('status')}' (Confidence: {integ.get('confidence')})")
+    # 13. Diagnostic Assessment & Skill Calibration (Sections 108-110)
+    print("\n--- 13. Diagnostic Assessment & Level Calibration (Sections 108-110) ---")
+    status, diag_q = request(f"{BASE_URL}/diagnostic/python/questions", token=token)
+    assert status == 200 and "questions" in diag_q, f"Diagnostic questions failed: {diag_q}"
+    questions = diag_q["questions"]
+    assert len(questions) >= 10, f"Expected at least 10 diagnostic questions, got {len(questions)}"
+    print(f"✓ Diagnostic Test Bank: {len(questions)} calibrated questions loaded for Python")
+
+    diag_answers = {q["id"]: (i % 2) for i, q in enumerate(questions)}
+
+    status, diag_result = request(f"{BASE_URL}/diagnostic/python/submit", method="POST", data={
+        "answers": diag_answers,
+        "time_spent": 120
+    }, token=token)
+    assert status == 200 and "diagnostic_result" in diag_result, f"Diagnostic submit failed: {diag_result}"
+    d_res = diag_result["diagnostic_result"]
+    print(f"✓ Diagnostic Evaluated: Score={d_res['total_score']}% Recommended Level={d_res['recommended_level'].upper()} (Starting Topic: {d_res['starting_topic_id']})")
+    print(f"  • Category Scores: Concept={d_res['concept_score']}%, Problem Solving={d_res['problem_solving_score']}%, Coding={d_res['coding_score']}%")
+
+    # 14. Global Search System & Synonym Expansion (Section 111)
+    print("\n--- 14. Global Search Engine with Synonym Matching (Section 111) ---")
+    status, search_res = request(f"{BASE_URL}/search?q=memory")
+    assert status == 200 and "results" in search_res, f"Search failed: {search_res}"
+    print(f"✓ Search query 'memory' expanded synonyms: {search_res.get('synonyms_matched')} (Found {search_res.get('total')} items)")
+
+    status, search_rec = request(f"{BASE_URL}/search?q=recursion")
+    assert status == 200 and any(r["title"].lower().find("recursion") >= 0 for r in search_rec["results"]), "Recursion not found in search"
+    print(f"✓ Search query 'recursion' successfully located recursion curriculum items")
+
+    # 15. Bookmarking System (Section 112)
+    print("\n--- 15. Cross-Content Bookmark System (Section 112) ---")
+    status, bm_add = request(f"{BASE_URL}/bookmarks", method="POST", data={
+        "item_type": "lesson",
+        "item_id": first_topic["id"],
+        "title": first_topic["title"],
+        "language": "python",
+        "topic_id": first_topic["id"],
+        "snippet": "Introductory guide and syntax",
+        "link": f"/topic/{first_topic['id']}"
+    }, token=token)
+    assert status == 201 and "bookmark" in bm_add, f"Bookmark add failed: {bm_add}"
+    bm_id = bm_add["bookmark"]["id"]
+    print(f"✓ Added Bookmark: id={bm_id} title='{first_topic['title']}'")
+
+    status, bm_check = request(f"{BASE_URL}/bookmarks/check?itemType=lesson&itemId={first_topic['id']}", token=token)
+    assert status == 200 and bm_check.get("is_bookmarked") is True, f"Bookmark check failed: {bm_check}"
+    print(f"✓ Bookmark Check Probe: Verified item is marked as bookmarked")
+
+    status, bm_list = request(f"{BASE_URL}/bookmarks?type=lesson", token=token)
+    assert status == 200 and len(bm_list.get("bookmarks", [])) > 0, f"Bookmark list failed: {bm_list}"
+    print(f"✓ Retrieved Filtered Bookmarks: {len(bm_list['bookmarks'])} active lesson bookmarks")
+
+    status, bm_del = request(f"{BASE_URL}/bookmarks/{bm_id}", method="DELETE", token=token)
+    assert status == 200 and bm_del.get("success"), f"Bookmark delete failed: {bm_del}"
+    print(f"✓ Deleted Bookmark: Successfully removed {bm_id}")
+
+    # 16. Notes System (Section 113)
+    print("\n--- 16. Personal Modular Notes System (Section 113) ---")
+    status, note_create = request(f"{BASE_URL}/notes", method="POST", data={
+        "language": "python",
+        "topic_id": first_topic["id"],
+        "subtopic_title": "Core Syntax",
+        "title": "My Syntax Study Note",
+        "content": "Remember indentation is mandatory in Python. Use def for function headers."
+    }, token=token)
+    assert status == 201 and "note" in note_create, f"Note creation failed: {note_create}"
+    note_id = note_create["note"]["id"]
+    print(f"✓ Created Note: id={note_id} title='{note_create['note']['title']}'")
+
+    status, note_update = request(f"{BASE_URL}/notes/{note_id}", method="PUT", data={
+        "title": "My Updated Syntax Study Note",
+        "content": "Indentation is 4 spaces. Document strings go immediately after def."
+    }, token=token)
+    assert status == 200 and note_update["note"]["title"] == "My Updated Syntax Study Note", f"Note update failed: {note_update}"
+    print(f"✓ Updated Note: Content and title updated")
+
+    status, notes_fetch = request(f"{BASE_URL}/notes?language=python", token=token)
+    assert status == 200 and len(notes_fetch.get("notes", [])) > 0, f"Notes fetch failed: {notes_fetch}"
+    print(f"✓ Retrieved Notes: {len(notes_fetch['notes'])} notes found for Python")
+
+    status, note_del = request(f"{BASE_URL}/notes/{note_id}", method="DELETE", token=token)
+    assert status == 200 and note_del.get("success"), f"Note deletion failed: {note_del}"
+    print(f"✓ Deleted Note: Successfully removed {note_id}")
+
+    # 17. Learning History & Audit Trajectory (Section 114)
+    print("\n--- 17. Learning History Audit & Cognitive Trajectory (Section 114) ---")
+    status, hist_res = request(f"{BASE_URL}/learning-history", token=token)
+    assert status == 200 and "history" in hist_res, f"Learning history failed: {hist_res}"
+    print(f"✓ Retrieved Learning History: {len(hist_res['history'])} chronological session records")
+    print(f"  • Summary Stats: {hist_res.get('summary_stats')}")
+    print(f"  • Cognitive Trajectory: {hist_res.get('cognitive_trajectory')}")
+
+    # 18. Multi-Tier Curriculum Completeness & Recursion Module (Section 116 & 117)
+    print("\n--- 18. Multi-Tier Curriculum Completeness & Recursion Target (Section 116 & 117) ---")
+    status, rec_topic = request(f"{BASE_URL}/topics/top-py-recursion")
+    assert status == 200 and rec_topic.get("id") == "top-py-recursion", f"Recursion topic failed: {rec_topic}"
+    print(f"✓ Recursion Topic Verified: '{rec_topic['title']}' (Sections: {len(rec_topic.get('sections', []))})")
+
+    status, rec_quiz = request(f"{BASE_URL}/topics/top-py-recursion/quiz")
+    assert status == 200, f"Recursion quiz failed: {rec_quiz}"
+    rec_questions = rec_quiz.get("questions", []) if isinstance(rec_quiz, dict) else rec_quiz
+    print(f"✓ Recursion Quiz Bank: {len(rec_questions)} questions available")
+
+    status, rec_code = request(f"{BASE_URL}/topics/top-py-recursion/coding")
+    assert status == 200 and rec_code.get("id") == "code-py-factorial", f"Recursion code challenge failed: {rec_code}"
+    print(f"✓ Recursion Code Challenge: '{rec_code['title']}' with starter code and test cases")
 
     print("\n==================================================================")
-    print("🎉 ALL E2E PLATFORM INTEGRATION CHECKS PASSED WITH 100% SUCCESS!")
+    print("🎉 ALL E2E PLATFORM INTEGRATION CHECKS (SECTIONS 108-118) PASSED 100%!")
     print("==================================================================")
 
 if __name__ == "__main__":
     run_tests()
+

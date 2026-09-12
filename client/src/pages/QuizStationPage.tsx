@@ -14,6 +14,7 @@ import {
   Terminal,
   Zap
 } from 'lucide-react';
+import { BookmarkButton } from '../components/BookmarkButton';
 
 interface QuizStationProps {
   topicId: string;
@@ -286,9 +287,19 @@ export const QuizStationPage: React.FC<QuizStationProps> = ({
                 <span className="text-xs font-mono text-cyan-400 font-bold">
                   Question {idx + 1} of {questions.length}
                 </span>
-                <span className="px-2 py-0.5 rounded-md bg-slate-800 text-[10px] uppercase font-mono text-slate-400">
-                  {q.difficulty}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-md bg-slate-800 text-[10px] uppercase font-mono text-slate-400">
+                    {q.difficulty}
+                  </span>
+                  <BookmarkButton
+                    itemType="question"
+                    itemId={q.id}
+                    title={`Question: ${q.question.slice(0, 45)}...`}
+                    snippet={q.options ? q.options.join(' | ') : q.question}
+                    topicId={topicId}
+                    language="python"
+                  />
+                </div>
               </div>
 
               <p className="text-sm font-semibold text-white mb-4 leading-relaxed">

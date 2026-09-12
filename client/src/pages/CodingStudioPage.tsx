@@ -24,8 +24,11 @@ import {
   Code2,
   Bug,
   Cpu,
-  BookOpen
+  BookOpen,
+  FileText
 } from 'lucide-react';
+import { BookmarkButton } from '../components/BookmarkButton';
+import { QuickNoteModal } from '../components/QuickNoteModal';
 
 interface CodingStudioProps {
   topicId?: string;
@@ -67,6 +70,9 @@ export const CodingStudioPage: React.FC<CodingStudioProps> = ({
   // Section 54: AI Assistant Action Modals / Cards
   const [aiActionLoading, setAiActionLoading] = useState(false);
   const [aiActionResult, setAiActionResult] = useState<{ title: string; content: string } | null>(null);
+
+  // Section 112 & 113: Bookmarks & Quick Notes
+  const [noteModalOpen, setNoteModalOpen] = useState(false);
 
   const quickKeys = ['()', '{}', '[]', ':', '=', '"', "'", 'tab', '->', ';', '<', '>'];
   const insertQuickKey = (token: string) => {
@@ -310,6 +316,22 @@ export const CodingStudioPage: React.FC<CodingStudioProps> = ({
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
+          <BookmarkButton
+            itemType="lesson"
+            itemId={challenge?.id || activeTopic}
+            title={challenge?.title || 'Coding Challenge'}
+            snippet={challenge?.problem_statement?.slice(0, 80)}
+            topicId={activeTopic}
+            language={preferences.selected_language}
+          />
+          <button
+            onClick={() => setNoteModalOpen(true)}
+            className="px-3 py-2 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-xs font-semibold text-slate-300 transition-all flex items-center gap-1.5"
+            title="Add note for this challenge"
+          >
+            <FileText className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Note</span>
+          </button>
           <button
             onClick={onBackToLesson}
             className="px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-xs font-semibold text-slate-300 transition-all"
@@ -728,6 +750,15 @@ export const CodingStudioPage: React.FC<CodingStudioProps> = ({
           </div>
         </div>
       )}
+      {/* Contextual Quick Note Modal */}
+      <QuickNoteModal
+        isOpen={noteModalOpen}
+        onClose={() => setNoteModalOpen(false)}
+        language={preferences.selected_language}
+        topicId={activeTopic}
+        subtopicTitle={challenge?.title}
+        defaultTitle={`${challenge?.title || 'Challenge'} - Notes`}
+      />
     </div>
   );
 };
