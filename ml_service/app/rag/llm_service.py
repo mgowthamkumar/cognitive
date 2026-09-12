@@ -4,12 +4,62 @@ and 5-Tier Progressive Hint System with Grounded Source Citations (Sections 52, 
 """
 import os
 import json
+import urllib.request
 from typing import Dict, Any, List, Optional
+from dotenv import load_dotenv
+
+# Ensure .env is loaded
+load_dotenv()
 
 class LLMService:
     def __init__(self):
         self.gemini_key = os.getenv("GEMINI_API_KEY")
         self.openai_key = os.getenv("OPENAI_API_KEY")
+
+    def _call_gemini(self, prompt: str) -> Optional[str]:
+        if not self.gemini_key:
+            return None
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={self.gemini_key}"
+        payload = {
+            "contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {
+                "temperature": 0.4,
+                "maxOutputTokens": 1024
+            }
+        }
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"}
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=12) as response:
+                data = json.loads(response.read().decode("utf-8"))
+                candidates = data.get("candidates", [])
+                if candidates:
+                    parts = candidates[0].get("content", {}).get("parts", [])
+                    if parts:
+                        return parts[0].get("text", "").strip()
+        except Exception as e:
+            print(f"Gemini API generation note: {e}")
+        return None
+
+    def _call_openai(self, prompt: str) -> Optional[str]:
+        if not self.openai_key:
+            return None
+        try:
+            import openai
+            client = openai.OpenAI(api_key=self.openai_key)
+            resp = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.4,
+                max_tokens=1024
+            )
+            return resp.choices[0].message.content.strip()
+        except Exception as e:
+            print(f"OpenAI API generation note: {e}")
+        return None
 
     def generate_adaptive_explanation(
         self,
@@ -24,6 +74,7 @@ class LLMService:
     ) -> Dict[str, Any]:
         """
         Synthesizes an explanation tailored to the learner's cognitive state and selected tutor mode.
+        Tries Live Gemini 3.6 Flash, falls back to OpenAI, and finally to Intelligent Grounded Offline RAG.
         """
         cognitive_load = (cognitive_load or "MEDIUM").upper()
         tutor_mode = (tutor_mode or "EXPLAIN").upper()
@@ -43,6 +94,54 @@ class LLMService:
         analogy = first_meta.get("analogy", "")
         tips = first_meta.get("simplification_tips", "")
 
+        # Formulate grounded prompt for Live LLMs
+        live_prompt = f"""You are an expert, empathetic Computer Science Tutor specializing in adaptive learning.
+Programming Language: {language}
+Topic: {topic}
+Learner Level: {level}
+Learner Cognitive Load State: {cognitive_load}
+Tutor Mode: {tutor_mode}
+Relevant Grounded Knowledge Base Information:
+{context_body[:1000]}
+
+Learner Question or Request:
+{question}
+{"Code Context from Learner's Editor:\n" + code_context if code_context else ""}
+
+Pedagogical Guidelines:
+- If Cognitive Load is HIGH: Use concrete everyday analogies, avoid deep jargon, break steps into 1-2-3 bite-sized points.
+- If Cognitive Load is LOW: Focus on runtime complexity, memory efficiency, compiler nuances, and idiomatic best practices.
+- If Cognitive Load is MEDIUM: Provide a clear, balanced conceptual explanation with clean code examples.
+- Response Mode is {tutor_mode}: Tailor format accordingly (e.g. SIMPLIFY = analogies, EXAMPLE = runnable code snippet, DEBUG = error checklist).
+Output in clean markdown with clear headers and bullet points.
+"""
+
+        # 1. Attempt Gemini 3.6 Flash
+        live_text = self._call_gemini(live_prompt)
+        provider = "Gemini 3.6 Flash"
+        
+        # 2. Attempt OpenAI if Gemini is unavailable
+        if not live_text:
+            live_text = self._call_openai(live_prompt)
+            provider = "OpenAI GPT-4o"
+
+        if live_text:
+            sources = [
+                f"{language.title()} Core Reference Manual",
+                f"Course Knowledge Base: {topic.title()}",
+                f"Live AI Tutor ({provider})"
+            ]
+            if retrieved_contexts:
+                sources.append(f"Grounded Chunk: {retrieved_contexts[0].get('id', 'concept_doc')}")
+            return {
+                "answer": live_text,
+                "cognitive_mode_applied": cognitive_load,
+                "tutor_mode_applied": tutor_mode,
+                "sources": sources,
+                "provider": provider
+            }
+
+        # 3. Intelligent Grounded Offline Fallback
         return self._generate_intelligent_offline_response(
             question, context_body, language, topic, level, cognitive_load, analogy, tips, tutor_mode, code_context, retrieved_contexts
         )

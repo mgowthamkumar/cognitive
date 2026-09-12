@@ -5,9 +5,11 @@
   "scripts": {
     "start": "node launcher.js",
     "dev:server": "npm --prefix server run dev",
+    "dev:py-backend": "python python_backend/run.py",
     "dev:client": "npm --prefix client run dev",
     "dev:ml": "uvicorn ml_service.app.main:app --host 127.0.0.1 --port 8000 --reload",
     "build:client": "npm --prefix client run build",
+    "build:docs": "npm --prefix client run build",
     "train:ml": "python ml_service/app/ml/train_model.py"
   },
   "keywords": ["adaptive-learning", "cognitive-load", "machine-learning", "rag", "llm", "education"],

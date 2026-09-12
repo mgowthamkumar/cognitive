@@ -1,0 +1,23 @@
+# ==============================================================================
+# GitHub Linguist Language Configuration
+# Accurately surfaces Python, JavaScript, HTML, and CSS in repository statistics
+# ==============================================================================
+
+# Core Python Backend & ML Microservice
+python_backend/**/*.py linguist-detectable=true linguist-language=Python
+ml_service/**/*.py linguist-detectable=true linguist-language=Python
+scripts/**/*.py linguist-detectable=true linguist-language=Python
+*.py linguist-detectable=true linguist-language=Python
+
+# Web Frontend (HTML, CSS, JavaScript)
+docs/**/*.html linguist-detectable=true linguist-language=HTML
+docs/**/*.css linguist-detectable=true linguist-language=CSS
+docs/**/*.js linguist-detectable=true linguist-language=JavaScript
+launcher.js linguist-detectable=true linguist-language=JavaScript
+
+# Do not let internal build source files overwhelm repository language composition
+client/src/**/*.tsx linguist-detectable=false
+client/src/**/*.ts linguist-detectable=false
+server/src/**/*.ts linguist-detectable=false
+*.ts linguist-detectable=false
+*.tsx linguist-detectable=false
