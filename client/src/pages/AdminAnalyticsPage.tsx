@@ -6,12 +6,17 @@ import {
   Activity,
   Cpu,
   BarChart2,
-  PieChart as PieIcon,
   CheckCircle,
   TrendingDown,
   AlertTriangle,
   Sparkles,
-  Layers
+  Layers,
+  RefreshCw,
+  Play,
+  Terminal,
+  X,
+  Zap,
+  BookOpen
 } from 'lucide-react';
 import {
   BarChart,
@@ -19,10 +24,7 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer,
-  Cell,
-  PieChart,
-  Pie
+  ResponsiveContainer
 } from 'recharts';
 
 export const AdminAnalyticsPage: React.FC = () => {
@@ -30,25 +32,84 @@ export const AdminAnalyticsPage: React.FC = () => {
   const [mlMetrics, setMlMetrics] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const [statsData, mlData] = await Promise.all([
-          api.getAdminAnalytics(),
-          api.getMLMetrics()
-        ]);
-        setAnalytics(statsData);
-        setMlMetrics(mlData);
-      } catch (err) {
-        console.error('Failed to load admin analytics:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // In-Browser Automation Action States
+  const [retraining, setRetraining] = useState(false);
+  const [reindexing, setReindexing] = useState(false);
+  const [diagnosticsRunning, setDiagnosticsRunning] = useState(false);
+  const [diagnosticsResult, setDiagnosticsResult] = useState<any | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  const loadData = async () => {
+    try {
+      const [statsData, mlData] = await Promise.all([
+        api.getAdminAnalytics(),
+        api.getMLMetrics()
+      ]);
+      setAnalytics(statsData);
+      setMlMetrics(mlData);
+    } catch (err) {
+      console.error('Failed to load admin analytics:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadData();
   }, []);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 4000);
+  };
+
+  // In-Browser ML Retraining
+  const handleRetrainML = async () => {
+    if (retraining) return;
+    setRetraining(true);
+    try {
+      const res = await api.retrainMLModel();
+      showToast(`✓ All 4 ML Models retrained! Champion: ${res.metrics?.best_model || 'Random Forest'} (F1: ${res.metrics?.best_f1 || 1.0})`);
+      await loadData();
+    } catch (err: any) {
+      showToast(`⚠️ Retraining error: ${err.message}`);
+    } finally {
+      setRetraining(false);
+    }
+  };
+
+  // In-Browser RAG Reindexing
+  const handleReindexRAG = async () => {
+    if (reindexing) return;
+    setReindexing(true);
+    try {
+      const res = await api.reindexRAG();
+      showToast(`✓ ${res.message || 'Knowledge Base successfully re-indexed into Vector Store!'}`);
+    } catch (err: any) {
+      showToast(`⚠️ Reindexing error: ${err.message}`);
+    } finally {
+      setReindexing(false);
+    }
+  };
+
+  // In-Browser System Self-Test / Diagnostics
+  const handleRunDiagnostics = async () => {
+    if (diagnosticsRunning) return;
+    setDiagnosticsRunning(true);
+    try {
+      const res = await api.runSystemDiagnostics();
+      setDiagnosticsResult(res);
+      showToast(res.passed ? '✓ Full E2E Diagnostics Passed (100%)!' : '⚠️ Some diagnostic checks failed');
+    } catch (err: any) {
+      setDiagnosticsResult({
+        passed: false,
+        exitCode: 1,
+        output: `Failed to run diagnostics: ${err.message}`
+      });
+    } finally {
+      setDiagnosticsRunning(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -72,23 +133,18 @@ export const AdminAnalyticsPage: React.FC = () => {
     .sort((a, b) => b.importance - a.importance)
     .slice(0, 8);
 
-  // Cognitive Load Distribution Pie Data
-  const loadDist = analytics?.cognitive_load_distribution || [
-    { cognitive_load: 'LOW', count: 42 },
-    { cognitive_load: 'MEDIUM', count: 88 },
-    { cognitive_load: 'HIGH', count: 35 }
-  ];
-
-  const pieColors: Record<string, string> = {
-    LOW: '#10b981',
-    MEDIUM: '#f59e0b',
-    HIGH: '#ef4444'
-  };
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in space-y-8">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed top-20 right-8 z-50 p-4 rounded-2xl bg-slate-900 border border-cyan-500/40 text-cyan-300 shadow-2xl text-xs font-semibold animate-fade-in flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-cyan-400" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-mono text-purple-400 font-bold uppercase tracking-wider">
@@ -104,11 +160,98 @@ export const AdminAnalyticsPage: React.FC = () => {
           </p>
         </div>
 
-        <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/30 flex items-center gap-1.5">
+        <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/30 flex items-center gap-1.5 w-fit">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
           <span>Real-time Telemetry Active</span>
         </span>
       </div>
+
+      {/* IN-BROWSER ZERO-COMMAND CONTROL CENTER */}
+      <div className="rounded-3xl border border-purple-500/30 bg-gradient-to-r from-purple-950/30 via-slate-900/80 to-indigo-950/30 p-5 shadow-2xl backdrop-blur-md">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span className="text-[10px] font-mono uppercase tracking-wider text-purple-400 font-bold block mb-1">
+              Zero-Command Browser Control Center
+            </span>
+            <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+              <Zap className="w-4 h-4 text-amber-400" />
+              <span>Execute Platform Operations Directly in Browser</span>
+            </h3>
+            <p className="text-xs text-slate-300 mt-0.5">
+              Retrain supervised models, reload vector embeddings, or run end-to-end diagnostics without touching terminal commands.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              onClick={handleRetrainML}
+              disabled={retraining}
+              className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-all shadow-lg shadow-purple-600/20 disabled:opacity-50 flex items-center gap-1.5"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${retraining ? 'animate-spin' : ''}`} />
+              <span>{retraining ? 'Retraining Models...' : 'Retrain ML Models'}</span>
+            </button>
+
+            <button
+              onClick={handleReindexRAG}
+              disabled={reindexing}
+              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 text-xs font-bold transition-all disabled:opacity-50 flex items-center gap-1.5"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>{reindexing ? 'Re-indexing...' : 'Re-index RAG'}</span>
+            </button>
+
+            <button
+              onClick={handleRunDiagnostics}
+              disabled={diagnosticsRunning}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold transition-all shadow-lg shadow-cyan-500/20 disabled:opacity-50 flex items-center gap-1.5"
+            >
+              <Terminal className="w-3.5 h-3.5" />
+              <span>{diagnosticsRunning ? 'Running Self-Test...' : 'Run System Diagnostics'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Diagnostics Modal */}
+      {diagnosticsResult && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          <div className="w-full max-w-3xl rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl p-6 flex flex-col max-h-[85vh]">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+              <div className="flex items-center gap-2">
+                <Terminal className="w-5 h-5 text-cyan-400" />
+                <h3 className="text-base font-bold text-white">Live System Diagnostics Console</h3>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                  diagnosticsResult.passed
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                    : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                }`}>
+                  {diagnosticsResult.passed ? 'ALL CHECKS PASSED ✓' : 'FAILED ✗'}
+                </span>
+              </div>
+              <button
+                onClick={() => setDiagnosticsResult(null)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <pre className="flex-1 overflow-y-auto p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs font-mono text-cyan-300 whitespace-pre-wrap leading-relaxed">
+              {diagnosticsResult.output}
+            </pre>
+
+            <div className="pt-3 border-t border-slate-800 flex justify-end">
+              <button
+                onClick={() => setDiagnosticsResult(null)}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold"
+              >
+                Close Console
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Overview Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -118,7 +261,7 @@ export const AdminAnalyticsPage: React.FC = () => {
             <Users className="w-4 h-4 text-cyan-400" />
           </div>
           <div className="text-2xl font-extrabold text-white">
-            {analytics?.total_users || 128}
+            {analytics?.total_users || 1}
           </div>
           <p className="text-[11px] text-slate-400 mt-1">Across 4 programming languages</p>
         </div>
@@ -129,7 +272,7 @@ export const AdminAnalyticsPage: React.FC = () => {
             <CheckCircle className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-extrabold text-white">
-            {analytics?.completed_topics || 312}
+            {analytics?.completed_topics || 2}
           </div>
           <p className="text-[11px] text-slate-400 mt-1">Evaluated by sandbox & quizzes</p>
         </div>
@@ -140,21 +283,21 @@ export const AdminAnalyticsPage: React.FC = () => {
             <Activity className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl font-extrabold text-white">
-            {analytics?.total_telemetry_events || 4820}
+            {analytics?.total_telemetry_events || 20}
           </div>
           <p className="text-[11px] text-slate-400 mt-1">Scroll, revisits, dwell, keystrokes</p>
         </div>
 
         <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5 shadow-lg">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-semibold">Deployed ML Model</span>
+            <span className="text-xs font-semibold">Champion ML Model</span>
             <Cpu className="w-4 h-4 text-purple-400" />
           </div>
           <div className="text-lg font-bold text-white truncate">
             {bestModelName}
           </div>
           <p className="text-[11px] text-emerald-400 mt-1">
-            F1 Score: {(mlMetrics?.best_f1 || 1.0) * 100}%
+            F1 Score: {Math.round((mlMetrics?.best_f1 || 1.0) * 100)}%
           </p>
         </div>
       </div>
@@ -172,7 +315,7 @@ export const AdminAnalyticsPage: React.FC = () => {
             </p>
           </div>
           <span className="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 text-xs font-mono font-semibold border border-cyan-500/30">
-            Selected Champion: {bestModelName}
+            Active Champion: {bestModelName}
           </span>
         </div>
 

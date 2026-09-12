@@ -47,5 +47,8 @@ router.post('/ai/hint', aiCtrl.requestProgressiveHint);
 // Admin & ML Analytics (Section 19)
 router.get('/admin/analytics', adminCtrl.getAdminAnalytics);
 router.get('/admin/ml-metrics', adminCtrl.getMLModelMetrics);
+router.post('/admin/retrain-ml', adminCtrl.retrainMLModel);
+router.post('/admin/reindex-rag', adminCtrl.reindexRAG);
+router.post('/admin/run-diagnostics', adminCtrl.runSystemDiagnostics);
 
 export default router;

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "AI/ML + RAG + LLM Adaptive Programming Learning Platform",
   "scripts": {
+    "start": "node launcher.js",
     "dev:server": "npm --prefix server run dev",
     "dev:client": "npm --prefix client run dev",
     "dev:ml": "uvicorn ml_service.app.main:app --host 127.0.0.1 --port 8000 --reload",

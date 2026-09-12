@@ -85,32 +85,49 @@ flowchart TB
 
 ---
 
-## 🚀 Quick Start Guide
+## 🚀 Quick Start Guide (Zero-Command Automation)
 
-### Prerequisites
-- Node.js (v18+)
-- Python (3.10+)
-- C/C++ MinGW compiler (`g++`)
+### ⭐ One-Click Automatic Launch (Recommended)
+You do not need to run manual commands. Everything starts and opens automatically!
 
-### 1. Launch Python ML & RAG Microservice
+1. **Windows**: Simply double-click **`start.bat`** in the project folder.
+2. **Cross-Platform**: Run `npm start` (or `node launcher.js`).
+
+**What happens automatically:**
+- Spawns the **Python ML/RAG Microservice** on port `8000`.
+- Spawns the **Node.js Express Backend** on port `5000`.
+- Spawns the **Vite React Client** on port `3000`.
+- **Automatically opens your default web browser** to `http://localhost:3000`!
+- **To stop everything**: Double-click **`stop.bat`** or press `Ctrl+C` in the launcher window.
+
+### 🌐 Zero-Command In-Browser Control Center
+Once in the browser, all platform operations can be triggered with one click without touching the terminal:
+- **Retrain Machine Learning Model**: In *Admin Analytics*, click **"Retrain ML Model"** to regenerate datasets, retrain Random Forest / Gradient Boosting, and update model weights in real-time.
+- **Reindex RAG Knowledge Base**: Click **"Re-index Knowledge Base"** to re-embed topics across Python, C, C++, and Java.
+- **Run Live System Diagnostics**: Click **"Run Full System Diagnostics"** to run a comprehensive 8-stage automated audit across ML, RAG, Code Sandboxes, and Database with live log output in an in-browser console!
+- **Execute Code**: In *Coding Studio*, code is compiled and executed in real-time with sandboxed test case grading.
+
+---
+
+### Manual Launch (Alternative)
+If you prefer running services individually:
+
+#### 1. Launch Python ML & RAG Microservice
 ```bash
-# In project root:
-uvicorn ml_service.app.main:app --host 127.0.0.1 --port 8000 --reload
+python -m uvicorn ml_service.app.main:app --host 127.0.0.1 --port 8000
 ```
-*The ML service runs at `http://127.0.0.1:8000` with Swagger docs at `http://127.0.0.1:8000/docs`.*
+*ML service runs at `http://127.0.0.1:8000` with Swagger docs at `http://127.0.0.1:8000/docs`.*
 
-### 2. Launch Backend API Gateway
+#### 2. Launch Backend API Gateway
 ```bash
 cd server
-npm install
 npm run dev
 ```
-*The Backend API runs at `http://localhost:5000/api`.*
+*Backend API runs at `http://localhost:5000/api`.*
 
-### 3. Launch Frontend React Application
+#### 3. Launch Frontend React Application
 ```bash
 cd client
-npm install
 npm run dev
 ```
 *Open `http://localhost:3000` in your browser.*

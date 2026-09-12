@@ -92,6 +92,38 @@ def get_ml_metrics():
         raise HTTPException(status_code=404, detail="Model metrics not found. Run training script first.")
     return predictor.metrics
 
+@app.post("/api/ml/retrain")
+def retrain_ml_models():
+    """
+    Retrains all 4 models (Logistic Regression, Decision Tree, Random Forest, Gradient Boosting),
+    evaluates performance, saves artifacts, and reloads the active predictor live in memory.
+    """
+    try:
+        from ml.train_model import train_and_evaluate_all
+        metrics = train_and_evaluate_all()
+        predictor.load()
+        return {
+            "status": "success",
+            "message": "Models successfully retrained and reloaded in memory.",
+            "metrics": metrics
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Model retraining failed: {str(e)}")
+
+@app.post("/api/rag/reindex")
+def reindex_rag_knowledge():
+    """
+    Re-indexes all knowledge base files for Python, C, C++, and Java live into the vector store.
+    """
+    try:
+        rag_pipeline.vector_store.load_and_index()
+        return {
+            "status": "success",
+            "message": f"Successfully re-indexed {len(rag_pipeline.vector_store.chunks)} knowledge chunks."
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Knowledge re-indexing failed: {str(e)}")
+
 @app.post("/api/rag/ask")
 def ask_rag(payload: RAGQueryPayload):
     """

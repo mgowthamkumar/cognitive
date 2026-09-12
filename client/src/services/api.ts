@@ -214,5 +214,32 @@ export const api = {
   getMLMetrics: async () => {
     const res = await fetch(`${API_BASE}/admin/ml-metrics`);
     return res.json();
+  },
+
+  retrainMLModel: async () => {
+    const res = await fetch(`${API_BASE}/admin/retrain-ml`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error((await res.json()).error || 'Failed to retrain ML models');
+    return res.json();
+  },
+
+  reindexRAG: async () => {
+    const res = await fetch(`${API_BASE}/admin/reindex-rag`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error((await res.json()).error || 'Failed to reindex knowledge base');
+    return res.json();
+  },
+
+  runSystemDiagnostics: async () => {
+    const res = await fetch(`${API_BASE}/admin/run-diagnostics`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    if (!res.ok) throw new Error((await res.json()).error || 'Failed to execute system diagnostics');
+    return res.json();
   }
 };

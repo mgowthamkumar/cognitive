@@ -23,6 +23,14 @@
       "password_hash": "$2a$10$qt7tl5/b6DwCpaZ2u3HSQOEFAv1Id6twvYXMQJdiBJRU5He/a2dD2",
       "role": "learner",
       "created_at": "2026-09-12T07:26:44.921Z"
+    },
+    {
+      "id": "user_1789198992351_pdf4f",
+      "name": "Integration Tester",
+      "email": "test_1789198992@cognitive.edu",
+      "password_hash": "$2a$10$D3EpGfpjNdQwJ52kBEkjbOou3u3KTsSyKVBeY8IxoOZN2d9HTL/oO",
+      "role": "learner",
+      "created_at": "2026-09-12T07:43:12.351Z"
     }
   ],
   "user_preferences": [],
@@ -464,7 +472,7 @@
       "completed": 1,
       "score": 1,
       "unlocked": 1,
-      "last_studied": "2026-09-12T07:26:45.020Z"
+      "last_studied": "2026-09-12T07:43:12.390Z"
     }
   ],
   "behavior_events": [
@@ -709,6 +717,115 @@
         "question": "Explain pointers in simple terms"
       },
       "id": "evt_1789198007493_gkrre"
+    },
+    {
+      "user_id": "anonymous_learner",
+      "topic_id": "top-py-loops",
+      "event_type": "SCROLL",
+      "duration": 45,
+      "timestamp": "2026-09-12T07:43:12.373Z",
+      "metadata": {
+        "scroll_depth": 0.85
+      },
+      "id": "evt_1789198992373_ol372"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "MCQ_SUBMIT",
+      "duration": 35,
+      "timestamp": "2026-09-12T07:43:12.387Z",
+      "metadata": {
+        "score": 1,
+        "accuracy": 1,
+        "passed": true
+      },
+      "id": "evt_1789198992387_cjopk"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T07:43:13.498Z",
+      "metadata": {
+        "has_error": true,
+        "status": "RUNTIME_ERROR",
+        "passed": false,
+        "keystrokes": 120,
+        "paste_events": 0
+      },
+      "id": "evt_1789198993498_ihw18"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "event_type": "CODE_SUBMIT",
+      "duration": 60,
+      "timestamp": "2026-09-12T07:43:14.565Z",
+      "metadata": {
+        "has_error": true,
+        "status": "COMPILE_ERROR",
+        "passed": false,
+        "keystrokes": 95,
+        "paste_events": 0
+      },
+      "id": "evt_1789198994565_rtre0"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T07:43:14.754Z",
+      "metadata": {
+        "hint_level": 1
+      },
+      "id": "evt_1789198994754_n01y3"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T07:43:14.784Z",
+      "metadata": {
+        "hint_level": 2
+      },
+      "id": "evt_1789198994784_adyb4"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T07:43:14.810Z",
+      "metadata": {
+        "hint_level": 3
+      },
+      "id": "evt_1789198994810_ijcjk"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "event_type": "HINT_REQUEST",
+      "duration": 10,
+      "timestamp": "2026-09-12T07:43:14.835Z",
+      "metadata": {
+        "hint_level": 4
+      },
+      "id": "evt_1789198994835_wj6hk"
+    },
+    {
+      "user_id": "guest_user",
+      "topic_id": "pointers",
+      "event_type": "AI_EXPLANATION_REQUEST",
+      "duration": 15,
+      "timestamp": "2026-09-12T07:43:14.876Z",
+      "metadata": {
+        "question": "Explain pointers in simple terms"
+      },
+      "id": "evt_1789198994876_0copm"
     }
   ],
   "cognitive_predictions": [
@@ -781,6 +898,36 @@
       "probabilities": "{\"LOW\":0.675,\"MEDIUM\":0.325,\"HIGH\":0}",
       "timestamp": "2026-09-12T07:26:47.383Z",
       "factors": "[\"Swift coding execution on first or second attempt\",\"Solved topic without requiring hints\"]"
+    },
+    {
+      "id": "pred_1789198992548_lj6b",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "LOW",
+      "confidence": 0.8667,
+      "probabilities": "{\"LOW\":0.8667,\"MEDIUM\":0.1333,\"HIGH\":0}",
+      "timestamp": "2026-09-12T07:43:12.548Z",
+      "factors": "[\"High assessment accuracy (100%)\",\"Swift coding execution on first or second attempt\"]"
+    },
+    {
+      "id": "pred_1789198993639_ci7g",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "cognitive_load": "LOW",
+      "confidence": 0.65,
+      "probabilities": "{\"LOW\":0.65,\"MEDIUM\":0.3416,\"HIGH\":0.0083}",
+      "timestamp": "2026-09-12T07:43:13.639Z",
+      "factors": "[\"High assessment accuracy (100%)\"]"
+    },
+    {
+      "id": "pred_1789198994739_d2sx",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "cognitive_load": "LOW",
+      "confidence": 0.55,
+      "probabilities": "{\"LOW\":0.55,\"MEDIUM\":0.45,\"HIGH\":0}",
+      "timestamp": "2026-09-12T07:43:14.739Z",
+      "factors": "[\"Solved topic without requiring hints\"]"
     }
   ],
   "recommendations": [
@@ -839,6 +986,30 @@
       "recommended_topic_id": "top-c-pointers",
       "reason": "Outstanding progress! Your high mastery and rapid comprehension unlock advanced exercises and concise fast-tracking.",
       "timestamp": "2026-09-12T07:26:47.386Z"
+    },
+    {
+      "id": "rec_1789198992551_hlmk",
+      "user_id": "guest_user",
+      "recommended_action": "INCREASE_DIFFICULTY",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Outstanding progress! Your high mastery and rapid comprehension unlock advanced exercises and concise fast-tracking.",
+      "timestamp": "2026-09-12T07:43:12.551Z"
+    },
+    {
+      "id": "rec_1789198993641_yxtz",
+      "user_id": "guest_user",
+      "recommended_action": "INCREASE_DIFFICULTY",
+      "recommended_topic_id": "top-py-loops",
+      "reason": "Outstanding progress! Your high mastery and rapid comprehension unlock advanced exercises and concise fast-tracking.",
+      "timestamp": "2026-09-12T07:43:13.641Z"
+    },
+    {
+      "id": "rec_1789198994743_fevc",
+      "user_id": "guest_user",
+      "recommended_action": "INCREASE_DIFFICULTY",
+      "recommended_topic_id": "top-c-pointers",
+      "reason": "Outstanding progress! Your high mastery and rapid comprehension unlock advanced exercises and concise fast-tracking.",
+      "timestamp": "2026-09-12T07:43:14.743Z"
     }
   ],
   "quiz_attempts": [
@@ -868,6 +1039,15 @@
       "time_spent": 35,
       "passed": 1,
       "timestamp": "2026-09-12T07:26:45.011Z"
+    },
+    {
+      "id": "quiz_1789198992383_c6dy",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "score": 1,
+      "time_spent": 35,
+      "passed": 1,
+      "timestamp": "2026-09-12T07:43:12.383Z"
     }
   ],
   "coding_attempts": [
@@ -910,6 +1090,26 @@
       "execution_time": 829,
       "error_count": 1,
       "timestamp": "2026-09-12T07:26:47.210Z"
+    },
+    {
+      "id": "att_1789198993460_on2y",
+      "user_id": "guest_user",
+      "topic_id": "top-py-loops",
+      "code": "\nimport sys\ninput_data = sys.stdin.read().strip()\nnums = [int(x) for x in input_data.split()] if input_data else []\neven_sum = sum(x for x in nums if x % 2 == 0)\nprint(even_sum)\n",
+      "passed": 0,
+      "execution_time": 891,
+      "error_count": 1,
+      "timestamp": "2026-09-12T07:43:13.460Z"
+    },
+    {
+      "id": "att_1789198994561_io9f",
+      "user_id": "guest_user",
+      "topic_id": "top-c-pointers",
+      "code": "\n#include <stdio.h>\nvoid swap(int *a, int *b) {\n    int t = *a;\n    *a = *b;\n    *b = t;\n}\nint main() {\n    int x, y;\n    if (scanf(\"%d %d\", &x, &y) == 2) {\n        swap(&x, &y);\n        printf(\"%d %d\\n\", x, y);\n    }\n    return 0;\n}\n",
+      "passed": 0,
+      "execution_time": 889,
+      "error_count": 1,
+      "timestamp": "2026-09-12T07:43:14.561Z"
     }
   ]
 }
