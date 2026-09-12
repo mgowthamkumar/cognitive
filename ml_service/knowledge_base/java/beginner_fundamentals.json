@@ -1,0 +1,12 @@
+{
+  "language": "java",
+  "level": "beginner",
+  "topic": "fundamentals",
+  "subtopic": "jvm_variables_control_flow",
+  "difficulty": "easy",
+  "source": "official_curriculum",
+  "title": "Java Platform Architecture and Core Fundamentals",
+  "content": "Java is a class-based, object-oriented programming language designed for portability ('Write Once, Run Anywhere').\n\nPlatform Architecture:\n- JDK (Java Development Kit): Includes compiler (javac), debugger, and documentation.\n- JRE (Java Runtime Environment): Provides libraries and runtime environment.\n- JVM (Java Virtual Machine): Executes compiled bytecode (.class files) via Just-In-Time (JIT) compilation to native machine code.\n\nPrimitive Types vs Reference Types:\n- Primitives: byte, short, int, long, float, double, boolean, char (stored directly on stack).\n- Reference Types: Objects, Arrays, Strings (stored on heap, referenced by stack variables).\n\nBasic Structure:\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, Adaptive Java Learner!\");\n    }\n}\n\nCommon Mistakes:\n1. Comparing Strings using == instead of .equals(): == checks memory reference equality, whereas .equals() compares character contents.\n2. NullPointerException: Accessing methods or fields on an object variable that currently points to null.\n3. Case sensitivity with class file names: In Java, public class Main must be saved in Main.java.",
+  "analogy": "The JDK is a factory with tools. The Bytecode is a universal blueprint. The JVM is a local construction robot in each country that reads the blueprint and builds the house using local materials.",
+  "simplification_tips": "Always remember that Java is strictly typed. Every variable must have a declared type before you can store a value in it."
+}

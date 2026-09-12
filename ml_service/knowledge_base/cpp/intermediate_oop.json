@@ -1,0 +1,12 @@
+{
+  "language": "cpp",
+  "level": "intermediate",
+  "topic": "oop",
+  "subtopic": "classes_inheritance_polymorphism",
+  "difficulty": "medium",
+  "source": "official_curriculum",
+  "title": "C++ Object-Oriented Programming: Encapsulation, Inheritance, and Polymorphism",
+  "content": "C++ provides comprehensive object-oriented features enabling reusable, modular, and scalable software architecture.\n\nCore Pillars:\n1. Encapsulation: Bundling data attributes and member functions inside a class while restricting direct access via private, protected, and public access specifiers.\n2. Inheritance: Deriving new classes from existing base classes (class Dog : public Animal).\n3. Polymorphism: Performing a single action in different ways. In C++, runtime polymorphism is achieved using virtual functions and base class pointers/references.\n\nVirtual Functions & vtable:\nclass Shape {\npublic:\n    virtual void draw() const = 0; // Pure virtual (Abstract class)\n    virtual ~Shape() {} // Essential virtual destructor\n};\n\nclass Circle : public Shape {\npublic:\n    void draw() const override {\n        std::cout << \"Drawing Circle\\n\";\n    }\n};\n\nModern C++ Best Practices:\n- Use override keyword explicitly to catch signature mismatches at compile time.\n- Always declare base class destructors virtual to guarantee proper cleanup of derived resources.\n- Prefer composition over deep inheritance hierarchies.",
+  "analogy": "A Blueprint is the Class; a physical house built from it is the Object. A Universal Remote is a polymorphic base interface; pressing 'Power' turns on a TV, Stereo, or Projector according to each device's specific implementation.",
+  "simplification_tips": "Start with a simple class with 2 private fields and getter/setter functions before introducing inheritance."
+}

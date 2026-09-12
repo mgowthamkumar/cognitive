@@ -1,0 +1,12 @@
+{
+  "language": "python",
+  "level": "beginner",
+  "topic": "loops",
+  "subtopic": "for_and_while_loops",
+  "difficulty": "easy",
+  "source": "official_curriculum",
+  "title": "Python Control Flow: Iteration with For and While Loops",
+  "content": "In Python, loops allow a block of code to be executed repeatedly based on a condition or over an iterable collection such as a list, string, or range.\n\n1. For Loop: Iterates over a sequence. Syntax: for item in sequence:\nExample:\nfor i in range(5):\n    print(i)\n\n2. While Loop: Executes as long as a boolean condition remains True. Syntax: while condition:\nExample:\ncount = 0\nwhile count < 5:\n    print(count)\n    count += 1\n\nLoop Control Statements:\n- break: Terminates the nearest enclosing loop immediately.\n- continue: Skips the remainder of the current iteration and jumps to the next.\n- else clause on loops: Executes only if the loop completed normally without encountering a break statement.\n\nCommon Mistakes:\n1. Off-by-one errors with range(start, stop): remember range(1, 5) generates 1, 2, 3, 4 (stop is exclusive).\n2. Infinite while loops: forgetting to increment or mutate the condition variable inside the loop body.\n3. Modifying a list while iterating over it: instead, iterate over a copy or use list comprehension.",
+  "analogy": "Think of a for loop like a conveyor belt where each item is inspected one at a time until the belt is empty. A while loop is like a security guard checking IDs who keeps admitting people as long as the room isn't full.",
+  "simplification_tips": "Break loops down: Start by writing the loop condition first, test it with just print() statements to see every step before adding complex logic."
+}

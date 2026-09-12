@@ -1,0 +1,12 @@
+{
+  "language": "python",
+  "level": "intermediate",
+  "topic": "data_structures",
+  "subtopic": "lists_dicts_comprehensions",
+  "difficulty": "medium",
+  "source": "official_curriculum",
+  "title": "Python Core Data Structures and Comprehensions",
+  "content": "Python provides powerful built-in compound data structures: Lists, Tuples, Dictionaries, and Sets.\n\n1. Lists: Mutable, ordered sequence of elements. [1, 2, 'hello']. Supports append(), pop(), slicing [start:stop:step].\n2. Dictionaries: Hash maps associating unique keys to values. {'name': 'Alice', 'score': 95}. Fast O(1) average lookup.\n3. Sets: Unordered collection of unique items. {1, 2, 3}. Supports union |, intersection &, and difference -.\n4. Tuples: Immutable ordered sequence. (1, 2, 3). Useful for fixed records and dictionary keys.\n\nComprehensions:\n- List Comprehension: [x**2 for x in range(10) if x % 2 == 0]\n- Dict Comprehension: {k: v**2 for k, v in data.items()}\n\nCommon Mistakes:\n1. Using mutable objects like lists as default arguments in function definitions: def add_item(val, items=[]).\n2. Modifying a dictionary while iterating over keys (raises RuntimeError).\n3. Confusing set literal {} (which creates an empty dict) with set().",
+  "analogy": "A list is a notebook where pages are numbered 0, 1, 2. A dictionary is a real dictionary where words (keys) directly map to definitions (values).",
+  "simplification_tips": "If a comprehension feels too complicated, first write it out as a traditional for loop with an empty list and .append()."
+}

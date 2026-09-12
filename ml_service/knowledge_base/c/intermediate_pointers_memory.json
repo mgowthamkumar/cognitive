@@ -1,0 +1,12 @@
+{
+  "language": "c",
+  "level": "intermediate",
+  "topic": "pointers",
+  "subtopic": "memory_addresses_dereferencing",
+  "difficulty": "hard",
+  "source": "official_curriculum",
+  "title": "C Pointers and Dynamic Memory Management",
+  "content": "A pointer is a variable in C that stores the memory address of another variable rather than storing a direct value.\n\nKey Operators:\n1. & (Address-of operator): Retrieves the hexadecimal memory address of a variable. Example: &x gives the address where x is stored in RAM.\n2. * (Dereference operator): Accesses or modifies the value stored at the memory address held by the pointer. Example: *ptr = 20 sets the value at ptr's target address to 20.\n\nDeclaration Syntax:\nint x = 10;\nint *ptr = &x;\nprintf(\"Value: %d, Address: %p\\n\", *ptr, (void*)ptr);\n\nDynamic Memory Allocation (stdlib.h):\n- malloc(size): Allocates raw uninitialized bytes on the heap. Returns void*.\n- calloc(num, size): Allocates and zero-initializes memory on the heap.\n- realloc(ptr, new_size): Resizes existing allocated block.\n- free(ptr): Releases allocated memory back to the OS. Always set ptr = NULL after free() to prevent dangling pointers.\n\nCommon Mistakes:\n1. Dereferencing NULL or uninitialized pointers causing Segmentation Fault.\n2. Memory leaks: Allocating with malloc() and losing the pointer before calling free().\n3. Buffer overflow: Writing beyond allocated array boundaries.",
+  "analogy": "Imagine a street with numbered houses. A normal variable is the person living in house #42. A pointer is a piece of paper that has 'House #42' written on it. Dereferencing (*) is walking up to house #42 and talking to the resident.",
+  "simplification_tips": "Always remember: & means 'where is it?' (address), while * means 'what is inside that address?' (dereference)."
+}

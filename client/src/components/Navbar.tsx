@@ -1,0 +1,244 @@
+import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useCognitive, CognitiveLoadLevel } from '../context/CognitiveContext';
+import {
+  Brain,
+  Terminal,
+  BookOpen,
+  BarChart3,
+  ShieldCheck,
+  User,
+  LogOut,
+  Sparkles,
+  ChevronDown
+} from 'lucide-react';
+
+interface NavbarProps {
+  currentView: string;
+  setCurrentView: (view: string) => void;
+  openAuthModal: () => void;
+  openAiDrawer: () => void;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({
+  currentView,
+  setCurrentView,
+  openAuthModal,
+  openAiDrawer
+}) => {
+  const { user, preferences, updateLanguage, updateLevel, logout } = useAuth();
+  const { currentLoad, confidence, contentMode } = useCognitive();
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const languages = [
+    { id: 'python', label: 'Python', icon: '🐍' },
+    { id: 'c', label: 'C Language', icon: '⚡' },
+    { id: 'cpp', label: 'C++', icon: '🚀' },
+    { id: 'java', label: 'Java', icon: '☕' }
+  ];
+
+  const levels = [
+    { id: 'beginner', label: 'Beginner' },
+    { id: 'intermediate', label: 'Intermediate' },
+    { id: 'advanced', label: 'Advanced' }
+  ];
+
+  const getLoadBadgeColor = (load: CognitiveLoadLevel) => {
+    switch (load) {
+      case 'LOW':
+        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 aura-low';
+      case 'HIGH':
+        return 'bg-rose-500/10 text-rose-400 border-rose-500/30 aura-high';
+      default:
+        return 'bg-amber-500/10 text-amber-400 border-amber-500/30 aura-medium';
+    }
+  };
+
+  return (
+    <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 glass-panel">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        {/* Brand */}
+        <div className="flex items-center gap-6">
+          <div
+            onClick={() => setCurrentView('catalog')}
+            className="flex items-center gap-3 cursor-pointer group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
+              <Brain className="w-6 h-6 text-white animate-pulse" />
+            </div>
+            <div>
+              <span className="text-lg font-bold bg-gradient-to-r from-white via-slate-100 to-cyan-400 bg-clip-text text-transparent">
+                Cognitive<span className="text-cyan-400">Load</span>
+              </span>
+              <span className="block text-[10px] text-cyan-400/80 font-medium tracking-wider uppercase">
+                Adaptive Learning Engine
+              </span>
+            </div>
+          </div>
+
+          {/* Language Selector */}
+          <div className="hidden md:flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/90 border border-slate-800">
+            {languages.map(lang => (
+              <button
+                key={lang.id}
+                onClick={() => updateLanguage(lang.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  preferences.selected_language === lang.id
+                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/20'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                }`}
+              >
+                <span>{lang.icon}</span>
+                <span>{lang.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Center: Nav links */}
+        <nav className="hidden lg:flex items-center gap-1">
+          <button
+            onClick={() => setCurrentView('catalog')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              currentView === 'catalog' || currentView === 'lesson'
+                ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/20'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/40'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            <span>Curriculum</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentView('coding')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              currentView === 'coding'
+                ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/20'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/40'
+            }`}
+          >
+            <Terminal className="w-4 h-4" />
+            <span>Sandbox Studio</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentView('dashboard')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              currentView === 'dashboard'
+                ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/20'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/40'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>Learner Stats</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentView('admin')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              currentView === 'admin'
+                ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/20'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/40'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4" />
+            <span>Admin & ML</span>
+          </button>
+        </nav>
+
+        {/* Right Section: Cognitive State Badge & Actions */}
+        <div className="flex items-center gap-3">
+          {/* Cognitive Indicator Pill */}
+          <div
+            title={`Cognitive Load: ${currentLoad} (${Math.round(confidence * 100)}% Confidence) - Mode: ${contentMode}`}
+            className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold ${getLoadBadgeColor(
+              currentLoad
+            )}`}
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-current"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-current"></span>
+            </span>
+            <span>Load: {currentLoad}</span>
+            <span className="text-[10px] opacity-75 font-mono">({Math.round(confidence * 100)}%)</span>
+          </div>
+
+          {/* AI Copilot Drawer Trigger */}
+          <button
+            onClick={openAiDrawer}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-lg shadow-purple-500/20 transition-all hover:scale-105"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>AI Copilot</span>
+          </button>
+
+          {/* User Profile */}
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="flex items-center gap-2 p-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200"
+              >
+                <div className="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-xs">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <span className="hidden md:inline text-xs font-medium max-w-[100px] truncate">
+                  {user.name}
+                </span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </button>
+
+              {profileOpen && (
+                <div className="absolute right-0 mt-2 w-52 rounded-xl bg-slate-900 border border-slate-800 shadow-2xl py-2 z-50 text-xs">
+                  <div className="px-3 py-2 border-b border-slate-800">
+                    <p className="font-semibold text-white truncate">{user.name}</p>
+                    <p className="text-slate-400 truncate">{user.email}</p>
+                    <span className="inline-block mt-1 px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 text-[10px] font-mono">
+                      Role: {user.role}
+                    </span>
+                  </div>
+                  <div className="px-3 py-2 border-b border-slate-800">
+                    <p className="text-slate-400 mb-1 font-medium">Difficulty Level:</p>
+                    <div className="grid grid-cols-3 gap-1">
+                      {levels.map(lvl => (
+                        <button
+                          key={lvl.id}
+                          onClick={() => updateLevel(lvl.id)}
+                          className={`py-1 rounded text-[10px] font-semibold ${
+                            preferences.current_level === lvl.id
+                              ? 'bg-cyan-500 text-white'
+                              : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                          }`}
+                        >
+                          {lvl.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setProfileOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-rose-400 hover:bg-slate-800 flex items-center gap-2"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={openAuthModal}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors"
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>Sign In</span>
+            </button>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+};

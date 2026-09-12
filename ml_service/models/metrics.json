@@ -1,0 +1,209 @@
+{
+  "best_model": "Random Forest",
+  "best_f1": 1.0,
+  "class_labels": [
+    "LOW",
+    "MEDIUM",
+    "HIGH"
+  ],
+  "feature_names": [
+    "scroll_time",
+    "topic_time",
+    "page_revisit_count",
+    "mcq_time",
+    "mcq_accuracy",
+    "coding_time",
+    "coding_attempts",
+    "coding_error_count",
+    "hint_count",
+    "explanation_request_count",
+    "previous_topic_score",
+    "current_topic_score",
+    "completion_rate",
+    "unusual_completion_signal"
+  ],
+  "models_comparison": {
+    "Logistic Regression": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "cv_f1_mean": 0.9997,
+      "per_class_f1": {
+        "LOW": 1.0,
+        "MEDIUM": 1.0,
+        "HIGH": 1.0
+      },
+      "confusion_matrix": [
+        [
+          240,
+          0,
+          0
+        ],
+        [
+          0,
+          240,
+          0
+        ],
+        [
+          0,
+          0,
+          240
+        ]
+      ],
+      "feature_importance": {
+        "scroll_time": 0.756,
+        "topic_time": 1.1654,
+        "page_revisit_count": 0.7026,
+        "mcq_time": 0.7578,
+        "mcq_accuracy": 0.7704,
+        "coding_time": 1.0147,
+        "coding_attempts": 0.8489,
+        "coding_error_count": 0.8991,
+        "hint_count": 0.9884,
+        "explanation_request_count": 0.7418,
+        "previous_topic_score": 0.4632,
+        "current_topic_score": 0.8526,
+        "completion_rate": 0.6092,
+        "unusual_completion_signal": 0.0745
+      }
+    },
+    "Decision Tree": {
+      "accuracy": 0.9958,
+      "precision": 0.9958,
+      "recall": 0.9958,
+      "f1_score": 0.9958,
+      "cv_f1_mean": 0.9951,
+      "per_class_f1": {
+        "LOW": 0.9937629937629938,
+        "MEDIUM": 0.9937369519832986,
+        "HIGH": 1.0
+      },
+      "confusion_matrix": [
+        [
+          239,
+          1,
+          0
+        ],
+        [
+          2,
+          238,
+          0
+        ],
+        [
+          0,
+          0,
+          240
+        ]
+      ],
+      "feature_importance": {
+        "scroll_time": 0.0143,
+        "topic_time": 0.8909,
+        "page_revisit_count": 0.0021,
+        "mcq_time": 0.0,
+        "mcq_accuracy": 0.0213,
+        "coding_time": 0.0,
+        "coding_attempts": 0.0,
+        "coding_error_count": 0.0499,
+        "hint_count": 0.001,
+        "explanation_request_count": 0.0,
+        "previous_topic_score": 0.0,
+        "current_topic_score": 0.0205,
+        "completion_rate": 0.0,
+        "unusual_completion_signal": 0.0
+      }
+    },
+    "Random Forest": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "cv_f1_mean": 1.0,
+      "per_class_f1": {
+        "LOW": 1.0,
+        "MEDIUM": 1.0,
+        "HIGH": 1.0
+      },
+      "confusion_matrix": [
+        [
+          240,
+          0,
+          0
+        ],
+        [
+          0,
+          240,
+          0
+        ],
+        [
+          0,
+          0,
+          240
+        ]
+      ],
+      "feature_importance": {
+        "scroll_time": 0.0627,
+        "topic_time": 0.2425,
+        "page_revisit_count": 0.0146,
+        "mcq_time": 0.031,
+        "mcq_accuracy": 0.0536,
+        "coding_time": 0.1431,
+        "coding_attempts": 0.0361,
+        "coding_error_count": 0.1185,
+        "hint_count": 0.0879,
+        "explanation_request_count": 0.0679,
+        "previous_topic_score": 0.002,
+        "current_topic_score": 0.1174,
+        "completion_rate": 0.0229,
+        "unusual_completion_signal": 0.0
+      }
+    },
+    "Gradient Boosting": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "cv_f1_mean": 0.9983,
+      "per_class_f1": {
+        "LOW": 1.0,
+        "MEDIUM": 1.0,
+        "HIGH": 1.0
+      },
+      "confusion_matrix": [
+        [
+          240,
+          0,
+          0
+        ],
+        [
+          0,
+          240,
+          0
+        ],
+        [
+          0,
+          0,
+          240
+        ]
+      ],
+      "feature_importance": {
+        "scroll_time": 0.0094,
+        "topic_time": 0.8775,
+        "page_revisit_count": 0.0014,
+        "mcq_time": 0.0004,
+        "mcq_accuracy": 0.0234,
+        "coding_time": 0.0245,
+        "coding_attempts": 0.002,
+        "coding_error_count": 0.013,
+        "hint_count": 0.001,
+        "explanation_request_count": 0.0089,
+        "previous_topic_score": 0.0003,
+        "current_topic_score": 0.0373,
+        "completion_rate": 0.001,
+        "unusual_completion_signal": -0.0
+      }
+    }
+  },
+  "total_training_samples": 2880,
+  "total_test_samples": 720
+}

@@ -1,0 +1,270 @@
+import { Course, Module, Topic, MCQQuestion, CodingQuestion } from '../types.js';
+
+export interface CurriculumData {
+  courses: Course[];
+  modules: Module[];
+  topics: Topic[];
+  mcqQuestions: MCQQuestion[];
+  codingQuestions: CodingQuestion[];
+}
+
+export const initialCurriculum: CurriculumData = {
+  courses: [
+    // Python Courses
+    { id: 'py-beg', language: 'python', level: 'beginner', title: 'Python Fundamentals', description: 'Master variables, conditionals, loops, functions, and elementary data structures in Python.', order_index: 1 },
+    { id: 'py-int', language: 'python', level: 'intermediate', title: 'Intermediate Python & Data Structures', description: 'Lists, dictionaries, comprehensions, file handling, modules, and exception handling.', order_index: 2 },
+    { id: 'py-adv', language: 'python', level: 'advanced', title: 'Advanced Python, OOP & Async', description: 'Object-oriented programming, iterators, generators, decorators, and asynchronous workflows.', order_index: 3 },
+
+    // C Courses
+    { id: 'c-beg', language: 'c', level: 'beginner', title: 'C Programming Foundations', description: 'Procedural foundations, data types, operators, flow control, and modular functions in C.', order_index: 1 },
+    { id: 'c-int', language: 'c', level: 'intermediate', title: 'C Pointers & Memory Management', description: 'Arrays, strings, pointers, address arithmetic, and dynamic heap allocation.', order_index: 2 },
+    { id: 'c-adv', language: 'c', level: 'advanced', title: 'Advanced C Systems & Data Structures', description: 'Structures, unions, file I/O, linked data structures, and the preprocessor.', order_index: 3 },
+
+    // C++ Courses
+    { id: 'cpp-beg', language: 'cpp', level: 'beginner', title: 'C++ Modern Fundamentals', description: 'Standard I/O, control flow, functions, references, and memory basics in modern C++.', order_index: 1 },
+    { id: 'cpp-int', language: 'cpp', level: 'intermediate', title: 'Object-Oriented C++', description: 'Classes, constructors, encapsulation, inheritance, and runtime polymorphism.', order_index: 2 },
+    { id: 'cpp-adv', language: 'cpp', level: 'advanced', title: 'Advanced C++ & STL Architecture', description: 'Templates, STL containers, iterators, lambda expressions, and smart pointers.', order_index: 3 },
+
+    // Java Courses
+    { id: 'java-beg', language: 'java', level: 'beginner', title: 'Java Core Architecture & Basics', description: 'JVM architecture, primitives, control structures, methods, and array processing.', order_index: 1 },
+    { id: 'java-int', language: 'java', level: 'intermediate', title: 'Java Object-Oriented Design', description: 'Classes, encapsulation, inheritance, polymorphism, interfaces, and exceptions.', order_index: 2 },
+    { id: 'java-adv', language: 'java', level: 'advanced', title: 'Advanced Java & Collections Framework', description: 'Collections framework, generics, functional streams, lambdas, and concurrency.', order_index: 3 }
+  ],
+
+  modules: [
+    // Python Modules
+    { id: 'mod-py-1', course_id: 'py-beg', title: 'Control Flow & Iteration', description: 'Conditionals and loop constructs', order_index: 1 },
+    { id: 'mod-py-2', course_id: 'py-beg', title: 'Modular Code with Functions', description: 'Function declarations, scope, and recursion', order_index: 2 },
+    { id: 'mod-py-3', course_id: 'py-int', title: 'Compound Data Structures', description: 'Lists, dictionaries, and comprehension patterns', order_index: 3 },
+    { id: 'mod-py-4', course_id: 'py-adv', title: 'OOP & Metaprogramming', description: 'Classes, decorators, and generators', order_index: 4 },
+
+    // C Modules
+    { id: 'mod-c-1', course_id: 'c-beg', title: 'Core Syntax & Control Flow', description: 'Variables, loops, and conditions', order_index: 1 },
+    { id: 'mod-c-2', course_id: 'c-int', title: 'Pointers & Dynamic Memory', description: 'Memory addressing, malloc, and pointer math', order_index: 2 },
+    { id: 'mod-c-3', course_id: 'c-adv', title: 'Structures & Systems Programming', description: 'Structs, files, and low-level memory handling', order_index: 3 },
+
+    // C++ Modules
+    { id: 'mod-cpp-1', course_id: 'cpp-beg', title: 'Language Foundations', description: 'Control structures and references', order_index: 1 },
+    { id: 'mod-cpp-2', course_id: 'cpp-int', title: 'Object-Oriented C++', description: 'Encapsulation, inheritance, and virtual methods', order_index: 2 },
+    { id: 'mod-cpp-3', course_id: 'cpp-adv', title: 'Standard Template Library (STL)', description: 'Vectors, maps, algorithms, and smart pointers', order_index: 3 },
+
+    // Java Modules
+    { id: 'mod-java-1', course_id: 'java-beg', title: 'Java Basics & Methods', description: 'JVM fundamentals and control structures', order_index: 1 },
+    { id: 'mod-java-2', course_id: 'java-int', title: 'OOP Principles in Java', description: 'Classes, inheritance, and interfaces', order_index: 2 },
+    { id: 'mod-java-3', course_id: 'java-adv', title: 'Collections & Streams API', description: 'Generics, functional pipelines, and streams', order_index: 3 }
+  ],
+
+  topics: [
+    // --- PYTHON TOPICS ---
+    {
+      id: 'top-py-loops',
+      module_id: 'mod-py-1',
+      title: 'Loops and Iteration Constructs',
+      order_index: 1,
+      learning_objective: 'Master for and while loops, iteration over ranges and sequences, and loop termination controls (break, continue, else).',
+      content_standard: 'In Python, loops provide repetition without code duplication. `for item in sequence:` iterates over iterables, while `while condition:` continues until the boolean condition evaluates to False.',
+      content_low: '### ⚡ Fast-Track Summary\n- `for i in range(n)`: O(1) space lazy sequence generation.\n- List comprehensions preferred over imperative loops when mapping/filtering.\n- `break` exits immediately; `continue` skips to next step; `else:` triggers only on non-break completion.',
+      content_medium: '### 📘 Standard Guide\nPython supports two primary loops:\n1. **For Loop**: Best when the count or sequence is known in advance.\n2. **While Loop**: Best when looping depends on dynamic runtime conditions.\nRemember: `range(1, 5)` yields values `1, 2, 3, 4`.',
+      content_high: '### 🌱 Step-by-Step Breakdown\nLet\'s take this slowly! A loop is like an automated counting machine.\n\n1. **Start small**: `for i in range(3): print(i)` will print 0, then 1, then 2.\n2. **Analogy**: Imagine checking off items on a grocery checklist one by one.\n3. **Notice**: Stop value is never included. `range(0, 5)` stops before 5!',
+      syntax: 'for item in iterable:\n    # execute block\n\nwhile condition:\n    # execute block\n    # ensure condition progresses toward False!',
+      examples: '# Example 1: Summing numbers with for loop\ntotal = sum(i for i in range(1, 6))\nprint("Sum 1..5:", total)\n\n# Example 2: While loop with countdown\ncount = 3\nwhile count > 0:\n    print(count)\n    count -= 1\nprint("Blast off!")',
+      common_mistakes: '1. Infinite while loops due to missing update statements.\n2. Off-by-one errors with range(start, stop).\n3. Modifying a collection while actively looping over it.',
+      practice_prompt: 'Write a loop that calculates the sum of all even numbers from 1 to 20 inclusive.'
+    },
+    {
+      id: 'top-py-functions',
+      module_id: 'mod-py-2',
+      title: 'Functions, Parameters & Scope',
+      order_index: 2,
+      learning_objective: 'Define modular functions, understand positional vs keyword parameters, default arguments, and variable scope.',
+      content_standard: 'Functions encapsulate reusable logic using `def func_name(args):`. Python functions are first-class citizens and can be passed as arguments or returned from other functions.',
+      content_low: '### ⚡ Fast-Track Summary\n- First-class citizen functions with `*args`, `**kwargs` unpacking.\n- Closure and lexical scoping (LEGB rule: Local, Enclosing, Global, Built-in).\n- Avoid mutable default arguments (`def f(x=[])`).',
+      content_medium: '### 📘 Standard Guide\nDefine functions using `def`. Return values using `return`. Scope determines where a variable is accessible: local variables inside a function cannot be seen outside.',
+      content_high: '### 🌱 Step-by-Step Breakdown\nA function is like a kitchen recipe or a mini-calculator:\n1. You give it ingredients (parameters).\n2. It follows steps inside its body.\n3. It serves you the final dish (return value).',
+      syntax: 'def function_name(param1, param2=default_val):\n    """Docstring explanation."""\n    result = param1 + param2\n    return result',
+      examples: 'def greet(name, title="Learner"):\n    return f"Welcome, {title} {name}!"\n\nprint(greet("Ada", "Dr."))\nprint(greet("Alan"))',
+      common_mistakes: '1. Forgetting the `return` keyword (functions default to returning `None`).\n2. Defining mutable defaults like `def add(val, lst=[]):` which persist across calls.',
+      practice_prompt: 'Create a function `is_palindrome(text)` that returns True if a given string reads the same forwards and backwards.',
+      prerequisite_topic_id: 'top-py-loops'
+    },
+
+    // --- C TOPICS ---
+    {
+      id: 'top-c-pointers',
+      module_id: 'mod-c-2',
+      title: 'Pointers and Memory Addressing',
+      order_index: 1,
+      learning_objective: 'Understand pointers, memory addresses (& operator), dereferencing (* operator), and pointer arithmetic in C.',
+      content_standard: 'In C, memory is a linear array of byte addresses. A pointer variable stores an address in memory. The `&` operator gets the address; the `*` operator accesses the value at that address.',
+      content_low: '### ⚡ Fast-Track Summary\n- Pointers store 64-bit/32-bit hardware memory addresses.\n- Pointer arithmetic scales automatically by `sizeof(T)`: `ptr + 1` advances by `sizeof(*ptr)` bytes.\n- Avoid undefined behavior: never dereference NULL, uninitialized, or freed pointers.',
+      content_medium: '### 📘 Standard Guide\n1. `int *p = &x;` stores address of x into p.\n2. `*p = 50;` changes x to 50.\n3. Pointers allow functions to modify caller variables via pass-by-reference simulation.',
+      content_high: '### 🌱 Step-by-Step Breakdown\nDon\'t panic! Pointers are just street addresses:\n- `x` is your friend living in house #42.\n- `&x` is writing down the note: "House #42".\n- `p = &x` means `p` holds the note.\n- `*p` means visiting house #42 to see or change what is inside.',
+      syntax: 'int value = 42;\nint *ptr = &value; // ptr stores address\n*ptr = 99;         // dereference: updates value to 99',
+      examples: '#include <stdio.h>\n\nvoid swap(int *a, int *b) {\n    int temp = *a;\n    *a = *b;\n    *b = temp;\n}\n\nint main() {\n    int x = 10, y = 20;\n    swap(&x, &y);\n    printf("x=%d, y=%d\\n", x, y);\n    return 0;\n}',
+      common_mistakes: '1. Dereferencing uninitialized pointers (`int *p; *p = 10;` causes crash).\n2. Confusing `*` in variable declaration with `*` dereference in expressions.',
+      practice_prompt: 'Write a C function `reverse_array(int *arr, int size)` using pointer arithmetic instead of array indexing.'
+    },
+
+    // --- C++ TOPICS ---
+    {
+      id: 'top-cpp-oop',
+      module_id: 'mod-cpp-2',
+      title: 'Classes, Objects & Encapsulation',
+      order_index: 1,
+      learning_objective: 'Construct C++ classes with private/public encapsulation, constructors, member functions, and object instantiation.',
+      content_standard: 'Classes in C++ define user-defined types combining data members and methods. Access specifiers (public, private, protected) enforce encapsulation and protect class invariants.',
+      content_low: '### ⚡ Fast-Track Summary\n- Enforces encapsulation and RAII (Resource Acquisition Is Initialization).\n- Prefer member initializer lists in constructors to prevent default construction overhead.\n- Follow the Rule of Five: destructor, copy constructor, copy assignment, move constructor, move assignment.',
+      content_medium: '### 📘 Standard Guide\nDeclare fields `private` and provide `public` methods (getters/setters/actions). Constructors initialize objects automatically upon instantiation.',
+      content_high: '### 🌱 Step-by-Step Breakdown\nThink of a Class like a blueprint for an automobile:\n1. The blueprint defines what a car has (speed, fuel) and what it does (drive, brake).\n2. An Object is the real car manufactured from that blueprint.\n3. `private` prevents unauthorized passengers from tampering with the engine while running!',
+      syntax: 'class BankAccount {\nprivate:\n    double balance;\npublic:\n    BankAccount(double initial_bal) : balance(initial_bal) {}\n    void deposit(double amount) { balance += amount; }\n    double getBalance() const { return balance; }\n};',
+      examples: '#include <iostream>\n\nclass Counter {\nprivate:\n    int count;\npublic:\n    Counter() : count(0) {}\n    void increment() { count++; }\n    int get() const { return count; }\n};\n\nint main() {\n    Counter c;\n    c.increment();\n    std::cout << "Count: " << c.get() << std::endl;\n    return 0;\n}',
+      common_mistakes: '1. Forgetting the closing semicolon `;` after the class definition body.\n2. Exposing internal mutable pointers/references from private state.',
+      practice_prompt: 'Create a C++ `Rectangle` class with private `width` and `height`, and public methods `area()` and `perimeter()`.'
+    },
+
+    // --- JAVA TOPICS ---
+    {
+      id: 'top-java-oop',
+      module_id: 'mod-java-2',
+      title: 'Classes, Objects & Inheritance',
+      order_index: 1,
+      learning_objective: 'Understand Java class hierarchies, method overriding, `extends` keyword, and polymorphic behavior.',
+      content_standard: 'In Java, all non-primitive types derive from `java.lang.Object`. Inheritance allows derived classes to inherit state and behavior from a superclass using the `extends` keyword.',
+      content_low: '### ⚡ Fast-Track Summary\n- Single inheritance for classes; multiple inheritance via interfaces.\n- Dynamic method dispatch via bytecode `invokevirtual`.\n- Always decorate overridden methods with `@Override` for compile-time signature verification.',
+      content_medium: '### 📘 Standard Guide\nSuperclasses define common behavior. Subclasses use `extends SuperClass` to inherit or override methods using `@Override`. Call superclass constructors with `super()`.',
+      content_high: '### 🌱 Step-by-Step Breakdown\nInheritance is like family traits:\n1. A Parent Class (`Animal`) knows how to breathe and sleep.\n2. A Child Class (`Dog`) inherits breathing and sleeping automatically, but adds its own special ability: barking!\n3. This saves you from having to rewrite code over and over.',
+      syntax: 'class Animal {\n    void speak() {\n        System.out.println("Animal sound");\n    }\n}\n\nclass Dog extends Animal {\n    @Override\n    void speak() {\n        System.out.println("Woof!");\n    }\n}',
+      examples: 'public class Main {\n    public static void main(String[] args) {\n        Animal myPet = new Dog();\n        myPet.speak(); // Prints "Woof!" via polymorphism\n    }\n}',
+      common_mistakes: '1. Forgetting that Java does NOT allow multiple class inheritance (`class C extends A, B` is illegal).\n2. Omitting `@Override` annotation.',
+      practice_prompt: 'Design a `Vehicle` base class and a `Car` subclass in Java that overrides a `startEngine()` method.'
+    }
+  ],
+
+  mcqQuestions: [
+    // Python Loop MCQs
+    {
+      id: 'mcq-py-loop-1',
+      topic_id: 'top-py-loops',
+      difficulty: 'easy',
+      question: 'What is the exact output of list(range(1, 5)) in Python?',
+      options: ['[1, 2, 3, 4, 5]', '[1, 2, 3, 4]', '[0, 1, 2, 3, 4]', '[2, 3, 4, 5]'],
+      correct_index: 1,
+      explanation: 'range(start, stop) generates integers from start up to but NOT including stop. Thus range(1, 5) yields 1, 2, 3, 4.'
+    },
+    {
+      id: 'mcq-py-loop-2',
+      topic_id: 'top-py-loops',
+      difficulty: 'medium',
+      question: 'Under what condition will the else: block attached to a Python for loop execute?',
+      options: [
+        'Whenever the loop encounters a break statement',
+        'Only if the loop terminates normally without hitting a break',
+        'If an exception is raised inside the loop',
+        'It executes on every single iteration'
+      ],
+      correct_index: 1,
+      explanation: 'In Python, a loop else: clause runs only when the loop completes its iteration naturally without being interrupted by a break statement.'
+    },
+    {
+      id: 'mcq-py-loop-3',
+      topic_id: 'top-py-loops',
+      difficulty: 'hard',
+      question: 'What happens if you mutate a list while iterating over it using a standard for loop (e.g. nums.remove(x))?',
+      options: [
+        'Python raises a ConcurrentModificationError immediately',
+        'Elements will be silently skipped or processed out of order due to index shifting',
+        'Python creates an immutable copy automatically behind the scenes',
+        'The loop restarts from the beginning'
+      ],
+      correct_index: 1,
+      explanation: 'Mutating a list in-place shifts the internal index pointer, causing the loop to skip consecutive items without raising an error.'
+    },
+
+    // C Pointer MCQs
+    {
+      id: 'mcq-c-ptr-1',
+      topic_id: 'top-c-pointers',
+      difficulty: 'easy',
+      question: 'Which operator in C is used to obtain the memory address of a variable?',
+      options: ['*', '&', '->', '%'],
+      correct_index: 1,
+      explanation: 'The address-of operator & returns the hexadecimal memory address of its operand.'
+    },
+    {
+      id: 'mcq-c-ptr-2',
+      topic_id: 'top-c-pointers',
+      difficulty: 'medium',
+      question: 'If int *p points to an integer array, what does *(p + 2) evaluate to?',
+      options: [
+        'The address of the 2nd element',
+        'The value stored at array index 2 (the 3rd element)',
+        'The value of *p plus 2 bytes',
+        'Causes a compilation error'
+      ],
+      correct_index: 1,
+      explanation: '*(p + 2) is equivalent to p[2]. Pointer arithmetic scales by sizeof(int), accessing the element at index 2.'
+    },
+    {
+      id: 'mcq-c-ptr-3',
+      topic_id: 'top-c-pointers',
+      difficulty: 'hard',
+      question: 'What is the danger of a dangling pointer in C?',
+      options: [
+        'It causes an immediate compile-time syntax error',
+        'It points to memory that has already been deallocated, risking corruption or crashes',
+        'It consumes infinite RAM on the stack',
+        'It prevents the OS from launching new threads'
+      ],
+      correct_index: 1,
+      explanation: 'A dangling pointer still references memory after free() has released it. Accessing it triggers undefined behavior.'
+    }
+  ],
+
+  codingQuestions: [
+    // Python Coding Challenge
+    {
+      id: 'code-py-sum-evens',
+      topic_id: 'top-py-loops',
+      title: 'Sum of Even Integers',
+      difficulty: 'easy',
+      problem_statement: 'Read space-separated integers from standard input and compute the total sum of only the even integers in the sequence.',
+      input_format: 'A single line containing space-separated integers.',
+      output_format: 'A single integer representing the sum of even numbers.',
+      constraints: '1 <= numbers count <= 1000, -10^5 <= num <= 10^5',
+      sample_input: '1 2 3 4 5 6',
+      sample_output: '12',
+      starter_code: {
+        python: 'import sys\n\ndef solve():\n    input_data = sys.stdin.read().strip()\n    if not input_data:\n        print(0)\n        return\n    numbers = [int(x) for x in input_data.split()]\n    # TODO: Calculate sum of even integers\n    even_sum = 0\n    \n    print(even_sum)\n\nif __name__ == "__main__":\n    solve()'
+      },
+      test_cases: [
+        { input: '1 2 3 4 5 6', expected_output: '12', is_hidden: false },
+        { input: '2 4 6 8 10', expected_output: '30', is_hidden: false },
+        { input: '1 3 5 7 9', expected_output: '0', is_hidden: true },
+        { input: '-2 -4 5 7', expected_output: '-6', is_hidden: true }
+      ]
+    },
+
+    // C Coding Challenge
+    {
+      id: 'code-c-reverse-array',
+      topic_id: 'top-c-pointers',
+      title: 'In-Place Pointer Swap',
+      difficulty: 'medium',
+      problem_statement: 'Given two integers A and B separated by space, swap their values in memory using pointers and print them swapped.',
+      input_format: 'Two integers A and B separated by space.',
+      output_format: 'The two integers swapped, separated by a space.',
+      constraints: '-10^6 <= A, B <= 10^6',
+      sample_input: '15 42',
+      sample_output: '42 15',
+      starter_code: {
+        c: '#include <stdio.h>\n\nvoid swap(int *a, int *b) {\n    // TODO: swap values using pointers\n}\n\nint main() {\n    int a, b;\n    if (scanf("%d %d", &a, &b) == 2) {\n        swap(&a, &b);\n        printf("%d %d\\n", a, b);\n    }\n    return 0;\n}'
+      },
+      test_cases: [
+        { input: '15 42', expected_output: '42 15', is_hidden: false },
+        { input: '100 -50', expected_output: '-50 100', is_hidden: false },
+        { input: '0 0', expected_output: '0 0', is_hidden: true },
+        { input: '-999 999', expected_output: '999 -999', is_hidden: true }
+      ]
+    }
+  ]
+};
