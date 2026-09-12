@@ -94,6 +94,15 @@ export const submitCode = async (req: AuthenticatedRequest, res: Response): Prom
 
     if (isPassed) {
       dbService.markTopicCompleted(userId, topicId, 1.0);
+      dbService.unlockAchievement(userId, 'FIRST_CODE');
+    } else if (execResult.recommended_review_concept) {
+      dbService.recordWeakConcept({
+        userId,
+        conceptName: execResult.recommended_review_concept,
+        topicId,
+        language,
+        isError: true
+      });
     }
 
     // Adaptive evaluation
@@ -101,6 +110,11 @@ export const submitCode = async (req: AuthenticatedRequest, res: Response): Prom
 
     res.json({
       execution: execResult,
+      error_classification: execResult.error_category ? {
+        category: execResult.error_category,
+        diagnosis: execResult.error_diagnosis,
+        recommended_review_concept: execResult.recommended_review_concept
+      } : null,
       is_passed: isPassed,
       adaptive_feedback: adaptiveFeedback
     });

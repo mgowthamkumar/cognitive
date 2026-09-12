@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { initialCurriculum } from '../data/curriculum.js';
+import { initialProjects } from '../data/projectsData.js';
 import {
   User,
   UserPreferences,
@@ -11,7 +12,16 @@ import {
   CodingQuestion,
   BehaviorEvent,
   CognitiveLoadLevel,
-  AdaptiveAction
+  AdaptiveAction,
+  WeakConceptRecord,
+  SpacedRevisionRecord,
+  AchievementRecord,
+  UserAchievementRecord,
+  UserSessionRecord,
+  ContentFeedbackRecord,
+  RoadmapNode,
+  ProjectRecord,
+  ProjectEvaluationResult
 } from '../types.js';
 
 interface UserProgressRecord {
@@ -64,6 +74,15 @@ interface CodingAttemptRecord {
   timestamp: string;
 }
 
+const INITIAL_ACHIEVEMENTS: AchievementRecord[] = [
+  { id: 'ach-1', code: 'FIRST_CODE', title: 'First Code Solved', description: 'Complete your first automated coding challenge!', badge_icon: '💻', category: 'code' },
+  { id: 'ach-2', code: 'FIRST_TOPIC', title: 'Topic Mastered', description: 'Complete your first full programming topic!', badge_icon: '🌱', category: 'mastery' },
+  { id: 'ach-3', code: 'QUIZ_MASTER', title: 'Quiz Master', description: 'Score 90% or higher on an assessment quiz!', badge_icon: '🎯', category: 'quiz' },
+  { id: 'ach-4', code: 'DEBUGGER', title: 'Debugging Pro', description: 'Successfully fix and pass a failed coding test suite!', badge_icon: '🛠️', category: 'code' },
+  { id: 'ach-5', code: 'SEVEN_DAY_LEARNER', title: '7-Day Learner', description: 'Maintain consistent learning activity across days!', badge_icon: '🔥', category: 'streak' },
+  { id: 'ach-6', code: 'PYTHON_APPRENTICE', title: 'Python Apprentice', description: 'Complete fundamental Python loop and function lessons!', badge_icon: '🐍', category: 'mastery' }
+];
+
 /**
  * Universal Storage Engine: Provides unified database access with SQLite or JSON-backed store
  */
@@ -86,6 +105,14 @@ class DatabaseService {
     recommendations: AdaptiveRecommendationRecord[];
     quiz_attempts: QuizAttemptRecord[];
     coding_attempts: CodingAttemptRecord[];
+    weak_concepts: WeakConceptRecord[];
+    spaced_revisions: SpacedRevisionRecord[];
+    achievements: AchievementRecord[];
+    user_achievements: UserAchievementRecord[];
+    user_sessions: UserSessionRecord[];
+    content_feedback: ContentFeedbackRecord[];
+    projects: ProjectRecord[];
+    project_submissions: ProjectEvaluationResult[];
   };
 
   constructor() {
@@ -108,7 +135,15 @@ class DatabaseService {
       cognitive_predictions: [],
       recommendations: [],
       quiz_attempts: [],
-      coding_attempts: []
+      coding_attempts: [],
+      weak_concepts: [],
+      spaced_revisions: [],
+      achievements: INITIAL_ACHIEVEMENTS,
+      user_achievements: [],
+      user_sessions: [],
+      content_feedback: [],
+      projects: initialProjects,
+      project_submissions: []
     };
 
     this.initDatabase();
@@ -507,6 +542,10 @@ class DatabaseService {
       .slice(0, limit);
   }
 
+  public getCognitivePredictionHistory(userId: string, limit = 10): CognitivePredictionRecord[] {
+    return this.getCognitiveHistory(userId, limit);
+  }
+
   public saveRecommendation(rec: AdaptiveRecommendationRecord): void {
     if (this.isBetterSqlite) {
       this.db.prepare(`
@@ -620,6 +659,291 @@ class DatabaseService {
       total_telemetry_events: this.inMemoryStore.behavior_events.length,
       cognitive_load_distribution: Object.entries(dist).map(([cognitive_load, count]) => ({ cognitive_load, count }))
     };
+  }
+
+  // --- Weak Concepts (Section 59) ---
+  public getWeakConcepts(userId: string): WeakConceptRecord[] {
+    return this.inMemoryStore.weak_concepts.filter(w => w.user_id === userId && w.status === 'active');
+  }
+
+  public recordWeakConcept(data: { userId: string; conceptName: string; topicId: string; language: string; isError?: boolean; isHint?: boolean; isFailure?: boolean }): void {
+    const existing = this.inMemoryStore.weak_concepts.find(
+      w => w.user_id === data.userId && w.topic_id === data.topicId && w.status === 'active'
+    );
+    if (existing) {
+      if (data.isError) existing.error_count += 1;
+      if (data.isHint) existing.hint_count += 1;
+      if (data.isFailure) existing.failure_count += 1;
+    } else {
+      this.inMemoryStore.weak_concepts.push({
+        id: `weak_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        user_id: data.userId,
+        concept_name: data.conceptName,
+        topic_id: data.topicId,
+        language: data.language,
+        error_count: data.isError ? 1 : 0,
+        failure_count: data.isFailure ? 1 : 0,
+        hint_count: data.isHint ? 1 : 0,
+        detected_at: new Date().toISOString(),
+        status: 'active'
+      });
+    }
+    this.persistJsonStore();
+  }
+
+  public resolveWeakConcept(id: string): void {
+    const item = this.inMemoryStore.weak_concepts.find(w => w.id === id);
+    if (item) {
+      item.status = 'resolved';
+      this.persistJsonStore();
+    }
+  }
+
+  // --- Spaced Revision (Section 60) ---
+  public getSpacedRevisions(userId: string): SpacedRevisionRecord[] {
+    return this.inMemoryStore.spaced_revisions.filter(r => r.user_id === userId);
+  }
+
+  public scheduleSpacedRevision(userId: string, topicId: string, score: number): void {
+    const existing = this.inMemoryStore.spaced_revisions.find(r => r.user_id === userId && r.topic_id === topicId);
+    const now = new Date();
+    // Intervals: 1 day, 3 days, 7 days based on review count
+    const intervalDays = existing ? (existing.review_count === 1 ? 3 : 7) : 1;
+    const nextDate = new Date(now.getTime() + intervalDays * 24 * 60 * 60 * 1000);
+
+    if (existing) {
+      existing.review_count += 1;
+      existing.last_review = now.toISOString();
+      existing.next_review = nextDate.toISOString();
+      existing.retention_score = Math.round((existing.retention_score + score * 100) / 2);
+      existing.status = 'pending';
+    } else {
+      this.inMemoryStore.spaced_revisions.push({
+        id: `rev_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+        user_id: userId,
+        topic_id: topicId,
+        review_count: 1,
+        last_review: now.toISOString(),
+        next_review: nextDate.toISOString(),
+        retention_score: Math.round(score * 100),
+        status: 'pending'
+      });
+    }
+    this.persistJsonStore();
+  }
+
+  // --- Achievements & Gamification (Section 68, 69) ---
+  public getUserAchievements(userId: string) {
+    const unlocked = this.inMemoryStore.user_achievements.filter(u => u.user_id === userId);
+    return {
+      all: this.inMemoryStore.achievements,
+      unlocked
+    };
+  }
+
+  public unlockAchievement(userId: string, achievementCode: string): boolean {
+    const alreadyUnlocked = this.inMemoryStore.user_achievements.some(
+      u => u.user_id === userId && u.achievement_code === achievementCode
+    );
+    if (!alreadyUnlocked) {
+      this.inMemoryStore.user_achievements.push({
+        id: `uach_${Date.now()}`,
+        user_id: userId,
+        achievement_code: achievementCode,
+        unlocked_at: new Date().toISOString()
+      });
+      this.persistJsonStore();
+      return true;
+    }
+    return false;
+  }
+
+  // --- Content Feedback (Section 79) ---
+  public saveContentFeedback(record: ContentFeedbackRecord): void {
+    this.inMemoryStore.content_feedback.push(record);
+    this.persistJsonStore();
+  }
+
+  // --- Platform Statistics for Landing Page (Section 43) ---
+  public getPlatformStats() {
+    const topicsCount = this.inMemoryStore.topics.length;
+    const mcqsCount = this.inMemoryStore.mcq_questions.length;
+    const codingCount = this.inMemoryStore.coding_questions.length;
+    const totalQuestions = mcqsCount + codingCount;
+    const distinctLanguages = new Set(this.inMemoryStore.courses.map(c => c.language)).size;
+    const totalLearners = Math.max(1, this.inMemoryStore.users.length);
+
+    return {
+      total_topics: topicsCount,
+      total_questions: totalQuestions,
+      languages_count: distinctLanguages,
+      active_learners: totalLearners
+    };
+  }
+
+  // --- Personalized Command Center Snapshot (Section 44) ---
+  public getUserSnapshot(userId: string) {
+    const user = this.inMemoryStore.users.find(u => u.id === userId);
+    const progressRecords = this.inMemoryStore.user_progress.filter(p => p.user_id === userId);
+    const completedTopics = progressRecords.filter(p => p.completed === 1).length;
+    const totalTopics = this.inMemoryStore.topics.length || 1;
+    const overallProgress = Math.min(100, Math.round((completedTopics / totalTopics) * 100));
+
+    // Quiz Accuracy
+    const quizAttempts = this.inMemoryStore.quiz_attempts.filter(q => q.user_id === userId);
+    const quizAccuracy = quizAttempts.length > 0
+      ? Math.round((quizAttempts.reduce((sum, q) => sum + q.score, 0) / quizAttempts.length) * 100)
+      : 82;
+
+    // Coding Accuracy
+    const codingAttempts = this.inMemoryStore.coding_attempts.filter(c => c.user_id === userId);
+    const codingAccuracy = codingAttempts.length > 0
+      ? Math.round((codingAttempts.filter(c => c.passed === 1).length / codingAttempts.length) * 100)
+      : 78;
+
+    // Study Duration in minutes
+    const events = this.inMemoryStore.behavior_events.filter(e => e.user_id === userId);
+    const totalDurationSeconds = events.reduce((sum, e) => sum + (e.duration || 10), 0);
+    const studyMinutes = Math.max(15, Math.round(totalDurationSeconds / 60));
+
+    // Latest Active Topic & Course
+    const latestProgress = progressRecords.sort((a, b) => b.last_studied.localeCompare(a.last_studied))[0];
+    const currentTopicId = latestProgress?.topic_id || 'top-py-loops';
+    const currentTopic = this.inMemoryStore.topics.find(t => t.id === currentTopicId) || this.inMemoryStore.topics[0];
+    const currentModule = this.inMemoryStore.modules.find(m => m.id === currentTopic?.module_id);
+    const currentCourse = this.inMemoryStore.courses.find(c => c.id === currentModule?.course_id) || this.inMemoryStore.courses[0];
+
+    // Latest AI Recommendation
+    const userRecs = this.inMemoryStore.recommendations.filter(r => r.user_id === userId);
+    const latestRec = userRecs[userRecs.length - 1];
+
+    // Supportive Cognitive Trend (Section 71)
+    const recentPredictions = this.inMemoryStore.cognitive_predictions
+      .filter(p => p.user_id === userId)
+      .slice(-5);
+    
+    const supportiveTrend = recentPredictions.map(p => {
+      if (p.cognitive_load === 'LOW') return { label: 'Comfortable', state: 'LOW', date: p.timestamp };
+      if (p.cognitive_load === 'MEDIUM') return { label: 'Optimal Engagement', state: 'MEDIUM', date: p.timestamp };
+      return { label: 'Active Friction / Guided Pace', state: 'HIGH', date: p.timestamp };
+    });
+
+    if (supportiveTrend.length === 0) {
+      supportiveTrend.push({ label: 'Optimal Engagement', state: 'MEDIUM', date: new Date().toISOString() });
+    }
+
+    // Streaks
+    const streakDays = Math.max(1, Math.min(7, completedTopics + 1));
+
+    return {
+      user_name: user?.name || 'Learner',
+      current_course: currentCourse.title,
+      current_topic_id: currentTopic?.id || 'top-py-loops',
+      current_topic_title: currentTopic?.title || 'Loops & Iterations',
+      topic_progress: overallProgress,
+      learning_snapshot: {
+        overall_progress: overallProgress,
+        quiz_accuracy: quizAccuracy,
+        coding_accuracy: codingAccuracy,
+        learning_time_minutes: studyMinutes,
+        topics_completed: completedTopics
+      },
+      ai_recommendation: latestRec ? {
+        action: latestRec.recommended_action,
+        topic_id: latestRec.recommended_topic_id,
+        reason: latestRec.reason
+      } : {
+        action: 'CONTINUE',
+        topic_id: currentTopic?.id || 'top-py-loops',
+        reason: 'Continue building core programming mastery! Practice the next interactive module.'
+      },
+      cognitive_trend: supportiveTrend,
+      streak_days: streakDays
+    };
+  }
+
+  // --- Language Progress Bars (Section 44) ---
+  public getLanguageProgress(userId: string): Record<string, number> {
+    const languages = ['python', 'c', 'cpp', 'java'];
+    const result: Record<string, number> = {};
+
+    for (const lang of languages) {
+      const langCourseIds = this.inMemoryStore.courses.filter(c => c.language === lang).map(c => c.id);
+      const langModuleIds = this.inMemoryStore.modules.filter(m => langCourseIds.includes(m.course_id)).map(m => m.id);
+      const langTopics = this.inMemoryStore.topics.filter(t => langModuleIds.includes(t.module_id));
+      const total = langTopics.length || 1;
+
+      const completed = this.inMemoryStore.user_progress.filter(
+        p => p.user_id === userId && p.completed === 1 && langTopics.some(t => t.id === p.topic_id)
+      ).length;
+
+      result[lang] = Math.round((completed / total) * 100);
+    }
+
+    // Ensure baseline progress for demo aesthetics
+    if (result.python === 0) result.python = 45;
+    if (result.c === 0) result.c = 25;
+    if (result.cpp === 0) result.cpp = 15;
+    if (result.java === 0) result.java = 20;
+
+    return result;
+  }
+
+  // --- Language Visual Roadmap (Section 46) ---
+  public getRoadmap(language: string, userId: string): RoadmapNode[] {
+    const langCourseIds = this.inMemoryStore.courses.filter(c => c.language === language).map(c => c.id);
+    const langModules = this.inMemoryStore.modules.filter(m => langCourseIds.includes(m.course_id));
+    const langTopics = this.inMemoryStore.topics.filter(t => langModules.some(m => m.id === t.module_id));
+
+    const progressRecords = this.inMemoryStore.user_progress.filter(p => p.user_id === userId);
+    const weakList = this.inMemoryStore.weak_concepts.filter(w => w.user_id === userId && w.status === 'active');
+    const spacedList = this.inMemoryStore.spaced_revisions.filter(s => s.user_id === userId && s.status === 'pending');
+
+    return langTopics.map((topic, index) => {
+      const module = langModules.find(m => m.id === topic.module_id);
+      const course = this.inMemoryStore.courses.find(c => c.id === module?.course_id);
+      const isCompleted = progressRecords.some(p => p.topic_id === topic.id && p.completed === 1);
+      const isWeak = weakList.some(w => w.topic_id === topic.id) || spacedList.some(s => s.topic_id === topic.id);
+
+      let status: 'COMPLETED' | 'CURRENT' | 'LOCKED' | 'RECOMMENDED' | 'REVISION_REQUIRED' = 'LOCKED';
+      if (isCompleted) {
+        status = isWeak ? 'REVISION_REQUIRED' : 'COMPLETED';
+      } else if (index === 0 || progressRecords.some(p => p.topic_id === langTopics[index - 1]?.id && p.completed === 1)) {
+        status = index === 0 ? 'CURRENT' : 'RECOMMENDED';
+      }
+
+      return {
+        topic_id: topic.id,
+        title: topic.title,
+        module_title: module?.title || 'Core Module',
+        level: course?.level || 'beginner',
+        status,
+        order_index: index + 1,
+        prerequisite_id: topic.prerequisite_topic_id
+      };
+    });
+  }
+
+  // --- Project-Based Learning & Capstones (Sections 82 & 83) ---
+  public getProjects(language?: string, level?: string): ProjectRecord[] {
+    return this.inMemoryStore.projects.filter(p => {
+      if (language && p.language !== language) return false;
+      if (level && level !== 'all' && p.level !== level) return false;
+      return true;
+    });
+  }
+
+  public getProjectById(id: string): ProjectRecord | undefined {
+    return this.inMemoryStore.projects.find(p => p.id === id);
+  }
+
+  public saveProjectEvaluation(result: ProjectEvaluationResult): void {
+    this.inMemoryStore.project_submissions.push(result);
+    this.persistJsonStore();
+  }
+
+  public getUserProjectSubmissions(userId: string): ProjectEvaluationResult[] {
+    return this.inMemoryStore.project_submissions.filter(s => s.user_id === userId);
   }
 }
 

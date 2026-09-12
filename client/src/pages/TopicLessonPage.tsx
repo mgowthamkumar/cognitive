@@ -9,11 +9,18 @@ import {
   AlertTriangle,
   HelpCircle,
   ArrowRight,
+  ArrowLeft,
   Sparkles,
   Copy,
   Check,
   CheckCircle2,
-  Terminal
+  Terminal,
+  Layers,
+  ThumbsUp,
+  ThumbsDown,
+  RotateCcw,
+  Zap,
+  HelpCircle as QuestionIcon
 } from 'lucide-react';
 
 interface TopicLessonPageProps {
@@ -29,15 +36,40 @@ export const TopicLessonPage: React.FC<TopicLessonPageProps> = ({
   onOpenCoding,
   onBackToCatalog
 }) => {
-  const { contentMode, setActiveTopicId } = useCognitive();
+  const { contentMode, currentLoad, setActiveTopicId } = useCognitive();
   const [topic, setTopic] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+
+  // Section 47: Subtopic Section Navigation & Progress
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const [completedSections, setCompletedSections] = useState<Record<number, boolean>>({});
+
+  // Section 50: Micro-Learning Mode State
+  const [microCheckAnswer, setMicroCheckAnswer] = useState<number | null>(null);
+  const [microCheckSubmitted, setMicroCheckSubmitted] = useState(false);
+
+  // Section 52 & 53: In-Lesson AI Tutor Action Bar
+  const [aiTutorResponse, setAiTutorResponse] = useState<any | null>(null);
+  const [aiTutorLoading, setAiTutorLoading] = useState(false);
+  const [activeTutorMode, setActiveTutorMode] = useState<string | null>(null);
+
+  // Section 79: User Feedback
+  const [feedbackSent, setFeedbackSent] = useState<string | null>(null);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setActiveTopicId(topicId);
     telemetry.initTopicSession(topicId);
+
+    // Load saved section position if available
+    const savedPos = localStorage.getItem(`topic_section_${topicId}`);
+    if (savedPos !== null) {
+      setCurrentSectionIndex(parseInt(savedPos, 10) || 0);
+    } else {
+      setCurrentSectionIndex(0);
+    }
 
     const loadTopic = async () => {
       setLoading(true);
@@ -58,204 +90,387 @@ export const TopicLessonPage: React.FC<TopicLessonPageProps> = ({
     };
   }, [topicId, setActiveTopicId]);
 
-  // Scroll Telemetry Listener
-  useEffect(() => {
-    const handleScroll = () => {
-      telemetry.recordScroll();
-    };
+  // Track section navigation
+  const handleNextSection = () => {
+    if (!topic?.sections || currentSectionIndex >= topic.sections.length - 1) return;
+    const nextIdx = currentSectionIndex + 1;
+    setCurrentSectionIndex(nextIdx);
+    localStorage.setItem(`topic_section_${topicId}`, nextIdx.toString());
+    setMicroCheckAnswer(null);
+    setMicroCheckSubmitted(false);
+    setAiTutorResponse(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+  const handlePrevSection = () => {
+    if (currentSectionIndex <= 0) return;
+    const prevIdx = currentSectionIndex - 1;
+    setCurrentSectionIndex(prevIdx);
+    localStorage.setItem(`topic_section_${topicId}`, prevIdx.toString());
+    setMicroCheckAnswer(null);
+    setMicroCheckSubmitted(false);
+    setAiTutorResponse(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-  const handleCopyCode = (codeText: string) => {
-    navigator.clipboard.writeText(codeText);
+  const handleMarkComplete = () => {
+    setCompletedSections(prev => ({ ...prev, [currentSectionIndex]: true }));
+    handleNextSection();
+  };
+
+  // Trigger Contextual AI Tutor Mode (Section 52, 53)
+  const handleAiTutorAction = async (mode: string, promptText: string) => {
+    setActiveTutorMode(mode);
+    setAiTutorLoading(true);
+    setAiTutorResponse(null);
+
+    try {
+      const resp = await api.askAiAssistant({
+        question: promptText,
+        language: 'python',
+        topic: topic?.title || 'Programming',
+        cognitive_load: currentLoad,
+        tutor_mode: mode
+      });
+      setAiTutorResponse(resp);
+    } catch (err) {
+      console.error('AI Tutor request failed:', err);
+    } finally {
+      setAiTutorLoading(false);
+    }
+  };
+
+  // User Feedback loop (Section 79)
+  const handleFeedback = async (type: 'yes' | 'somewhat' | 'no') => {
+    setFeedbackSent(type);
+    try {
+      await api.submitContentFeedback(topicId, type);
+    } catch (err) {
+      console.error('Feedback error:', err);
+    }
+  };
+
+  const copyCode = (text: string) => {
+    navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-20 flex flex-col items-center justify-center text-slate-400">
-        <div className="w-10 h-10 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin mb-4" />
-        <p className="text-sm">Synthesizing personalized topic lesson...</p>
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center text-slate-400 animate-pulse">
+        Loading topic syllabus and sections...
       </div>
     );
   }
 
   if (!topic) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-20 text-center text-slate-400">
-        <p>Topic not found.</p>
-        <button
-          onClick={onBackToCatalog}
-          className="mt-4 px-4 py-2 rounded-xl bg-slate-800 text-white text-xs font-semibold"
-        >
-          Back to Curriculum
-        </button>
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center text-slate-400">
+        Topic not found.
       </div>
     );
   }
 
-  // Dynamic explanation selection based on predicted Cognitive Load Mode
-  const getAdaptiveExplanation = () => {
-    if (contentMode === 'CONCISE') {
-      return topic.content_low || topic.content_standard;
-    } else if (contentMode === 'SIMPLIFIED') {
-      return topic.content_high || topic.content_standard;
+  const sections = topic.sections && topic.sections.length > 0 ? topic.sections : [
+    {
+      id: 'default-1',
+      title: '1. Core Conceptual Overview',
+      order_index: 1,
+      content: topic.content_standard,
+      code_snippet: topic.syntax,
+      pitfalls: topic.common_mistakes
     }
-    return topic.content_medium || topic.content_standard;
-  };
+  ];
+
+  const currentSection = sections[currentSectionIndex] || sections[0];
+  const totalSections = sections.length;
+  const progressPercent = Math.round(((currentSectionIndex + 1) / totalSections) * 100);
+
+  // Content depth indicator (Section 49)
+  const contentDepthVal = currentLoad === 'LOW' ? 1 : currentLoad === 'HIGH' ? 4 : 2;
+  const contentDepthLabels = { 1: '1 (Quick)', 2: '2 (Normal)', 3: '3 (Detailed)', 4: '4 (Deep)' };
+
+  // Section 50: Is Micro-Learning Active?
+  const isMicroLearning = currentLoad === 'HIGH';
 
   return (
-    <div ref={containerRef} className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
-      {/* Navigation Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs text-slate-400 mb-4">
-        <button onClick={onBackToCatalog} className="hover:text-cyan-400 transition-colors">
-          Curriculum
-        </button>
-        <span>/</span>
-        <span className="text-slate-200 font-semibold">{topic.title}</span>
-      </div>
-
-      {/* Real-time Cognitive State Banner */}
+    <div ref={containerRef} className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      {/* 1. REAL-TIME COGNITIVE LOAD BANNER & OVERRIDE */}
       <CognitiveLoadBanner />
 
-      {/* Topic Header Card */}
-      <div className="rounded-3xl border border-slate-800 bg-slate-900/50 backdrop-blur-md p-6 sm:p-8 mb-8 shadow-2xl">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-[10px] font-mono font-bold uppercase">
-            Lesson {topic.order_index}
-          </span>
-          <span className="text-xs text-slate-400">• Comprehensive Interactive Module</span>
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-          {topic.title}
-        </h1>
-
-        {/* 1. Learning Objective */}
-        <div className="mt-4 p-4 rounded-2xl bg-cyan-950/20 border border-cyan-800/40 text-xs text-cyan-200 flex items-start gap-3">
-          <Sparkles className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
+      {/* 2. TOPIC HEADER & SUBTOPIC PROGRESS (Section 47) */}
+      <div className="p-6 rounded-3xl border border-slate-800 bg-slate-900/60 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
-            <strong className="text-cyan-300 block mb-0.5">Learning Objective:</strong>
-            <p className="leading-relaxed text-slate-300">{topic.learning_objective}</p>
+            <div className="flex items-center gap-2 text-xs font-mono text-cyan-400 font-bold mb-1">
+              <span>SECTION {currentSectionIndex + 1} OF {totalSections}</span>
+              <span>•</span>
+              <span className="text-purple-400">Depth: {contentDepthLabels[contentDepthVal as keyof typeof contentDepthLabels]}</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              {topic.title}
+            </h1>
           </div>
+
+          <div className="text-right">
+            <span className="text-xs font-mono font-bold text-slate-300">
+              {progressPercent}% Complete
+            </span>
+          </div>
+        </div>
+
+        {/* Section Progress Bar */}
+        <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden mb-4">
+          <div
+            className="h-full bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-full transition-all duration-300"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+
+        {/* Section Pill Quick Navigator */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          {sections.map((sec: any, idx: number) => (
+            <button
+              key={sec.id}
+              onClick={() => {
+                setCurrentSectionIndex(idx);
+                localStorage.setItem(`topic_section_${topicId}`, idx.toString());
+              }}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                idx === currentSectionIndex
+                  ? 'bg-cyan-500 text-slate-950 font-bold'
+                  : completedSections[idx]
+                  ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30'
+                  : 'bg-slate-800/80 text-slate-400 hover:text-white'
+              }`}
+            >
+              {idx + 1}. {sec.title.split('. ')[1] || sec.title}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* 2. Adaptive Explanation */}
-      <section className="rounded-3xl border border-slate-800 bg-slate-900/30 p-6 sm:p-8 mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <BookOpen className="w-4 h-4 text-cyan-400" />
-            <span>Conceptual Explanation</span>
-          </h2>
-          <span className="text-[11px] text-slate-400 font-mono">
-            Calibrated for: <strong className="text-cyan-300">{contentMode}</strong> Mode
-          </span>
+      {/* 3. MICRO-LEARNING MODE ALERT (Section 50) */}
+      {isMicroLearning && (
+        <div className="p-4 rounded-2xl border border-rose-500/40 bg-gradient-to-r from-rose-950/30 via-slate-900 to-slate-900 flex items-start gap-3 animate-pulse">
+          <Zap className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+          <div className="text-xs leading-relaxed">
+            <span className="font-bold text-rose-400 block mb-0.5">Micro-Learning Mode Active (High Cognitive Load Detected)</span>
+            We have divided this lesson into 5-minute modular checkpoints with immediate single-question feedback to eliminate information overload.
+          </div>
         </div>
-        <div className="prose prose-invert max-w-none text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
-          {getAdaptiveExplanation()}
-        </div>
-      </section>
-
-      {/* 3. Syntax Reference */}
-      {topic.syntax && (
-        <section className="rounded-3xl border border-slate-800 bg-slate-900/40 p-6 mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Code className="w-4 h-4 text-amber-400" />
-              <span>Standard Syntax</span>
-            </h3>
-            <button
-              onClick={() => handleCopyCode(topic.syntax)}
-              className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-cyan-400 transition-colors"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied' : 'Copy'}</span>
-            </button>
-          </div>
-          <pre className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs font-mono text-cyan-300 overflow-x-auto">
-            <code>{topic.syntax}</code>
-          </pre>
-        </section>
       )}
 
-      {/* 4. Examples */}
-      {topic.examples && (
-        <section className="rounded-3xl border border-slate-800 bg-slate-900/40 p-6 mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Terminal className="w-4 h-4 text-emerald-400" />
-              <span>Working Code Examples</span>
-            </h3>
-            <button
-              onClick={() => handleCopyCode(topic.examples)}
-              className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-cyan-400 transition-colors"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied' : 'Copy'}</span>
-            </button>
-          </div>
-          <pre className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs font-mono text-emerald-300 overflow-x-auto">
-            <code>{topic.examples}</code>
-          </pre>
-        </section>
-      )}
-
-      {/* 5. Common Mistakes */}
-      {topic.common_mistakes && (
-        <section className="rounded-3xl border border-rose-950/40 bg-rose-950/10 p-6 mb-8 border-rose-500/20">
-          <h3 className="text-sm font-bold text-rose-300 flex items-center gap-2 mb-3">
-            <AlertTriangle className="w-4 h-4 text-rose-400" />
-            <span>Common Traps and Compiler Mistakes</span>
-          </h3>
-          <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
-            {topic.common_mistakes}
-          </div>
-        </section>
-      )}
-
-      {/* 6. Practice Prompt */}
-      {topic.practice_prompt && (
-        <section className="rounded-3xl border border-cyan-900/40 bg-cyan-950/20 p-6 mb-10">
-          <h3 className="text-sm font-bold text-cyan-300 flex items-center gap-2 mb-2">
-            <HelpCircle className="w-4 h-4 text-cyan-400" />
-            <span>Recommended Mental Practice</span>
-          </h3>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            {topic.practice_prompt}
-          </p>
-        </section>
-      )}
-
-      {/* Action Footer: Take Assessment & Launch Coding Challenge */}
-      <div className="p-6 rounded-3xl border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* 4. ACTIVE SECTION CONTENT CARD */}
+      <div className="p-6 sm:p-8 rounded-3xl border border-slate-800 bg-slate-900/40 shadow-xl space-y-6">
         <div>
-          <h4 className="text-sm font-bold text-white">Ready to validate your understanding?</h4>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Take the 3-question assessment to calibrate your cognitive model and unlock next steps.
-          </p>
+          <h2 className="text-xl font-bold text-white mb-4">
+            {currentSection.title}
+          </h2>
+          <div className="text-sm sm:text-base text-slate-300 leading-relaxed whitespace-pre-line">
+            {currentSection.content}
+          </div>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <button
-            onClick={onStartQuiz}
-            className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2"
-          >
-            <span>Take MCQ Quiz</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+        {/* Code Snippet if present */}
+        {currentSection.code_snippet && (
+          <div className="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-800 text-xs text-slate-400 font-mono">
+              <span className="flex items-center gap-1.5"><Code className="w-3.5 h-3.5 text-cyan-400" /> Example Code</span>
+              <button
+                onClick={() => copyCode(currentSection.code_snippet)}
+                className="hover:text-white flex items-center gap-1"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? 'Copied' : 'Copy'}
+              </button>
+            </div>
+            <pre className="p-4 text-xs font-mono text-cyan-300 overflow-x-auto leading-relaxed">
+              <code>{currentSection.code_snippet}</code>
+            </pre>
+          </div>
+        )}
 
-          <button
-            onClick={onOpenCoding}
-            className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition-all flex items-center justify-center gap-2"
-          >
-            <Terminal className="w-4 h-4 text-cyan-400" />
-            <span>Coding Challenge</span>
-          </button>
+        {/* Pitfalls & Mistakes if present */}
+        {currentSection.pitfalls && (
+          <div className="p-4 rounded-2xl border border-amber-500/30 bg-amber-950/10 flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+            <div className="text-xs text-amber-200/90 leading-relaxed">
+              <span className="font-bold text-amber-400 block mb-1">Common Beginner Pitfall</span>
+              {currentSection.pitfalls}
+            </div>
+          </div>
+        )}
+
+        {/* SECTION 50: MICRO-LEARNING MINI-CHECK */}
+        {currentSection.mini_check && (
+          <div className="p-5 rounded-2xl border border-cyan-500/30 bg-cyan-950/10 space-y-4">
+            <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider">
+              <Sparkles className="w-4 h-4" /> Micro-Checkpoint (1 Question)
+            </div>
+            <p className="text-sm font-semibold text-white">
+              {currentSection.mini_check.question}
+            </p>
+            <div className="space-y-2">
+              {currentSection.mini_check.options.map((opt: string, optIdx: number) => (
+                <button
+                  key={opt}
+                  disabled={microCheckSubmitted}
+                  onClick={() => setMicroCheckAnswer(optIdx)}
+                  className={`w-full text-left p-3 rounded-xl text-xs font-medium transition-all border ${
+                    microCheckAnswer === optIdx
+                      ? 'border-cyan-500 bg-cyan-950/40 text-cyan-300'
+                      : 'border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-700'
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+
+            {!microCheckSubmitted ? (
+              <button
+                disabled={microCheckAnswer === null}
+                onClick={() => setMicroCheckSubmitted(true)}
+                className="py-2 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-40 text-slate-950 font-bold text-xs transition-all"
+              >
+                Validate Answer
+              </button>
+            ) : (
+              <div className={`p-3 rounded-xl text-xs ${
+                microCheckAnswer === currentSection.mini_check.correct_index
+                  ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/30'
+                  : 'bg-rose-950/60 text-rose-300 border border-rose-500/30'
+              }`}>
+                {microCheckAnswer === currentSection.mini_check.correct_index ? '✔ Correct!' : '✖ Not quite right.'}{' '}
+                {currentSection.mini_check.explanation}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* 5. IN-LESSON CONTEXTUAL AI TUTOR ACTION BAR (Section 52, 53) */}
+      <div className="p-5 rounded-3xl border border-slate-800 bg-slate-900/50 space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-purple-400" />
+            In-Lesson AI Tutor Assistance
+          </span>
+          <span className="text-[11px] text-slate-400 font-mono">8 Contextual Modes</span>
+        </div>
+
+        {/* Action Chips (Section 52) */}
+        <div className="flex flex-wrap gap-2">
+          {[
+            { mode: 'EXPLAIN', label: 'Explain this', prompt: `Explain ${currentSection.title} in detail` },
+            { mode: 'SIMPLIFY', label: 'Make it simpler', prompt: `Simplify ${currentSection.title} with a real-world analogy` },
+            { mode: 'EXAMPLE', label: 'Give an example', prompt: `Provide a minimal code example of ${currentSection.title}` },
+            { mode: 'DEBUG', label: 'Why is this wrong?', prompt: `What common bugs occur with ${currentSection.title}?` },
+            { mode: 'HINT', label: 'Show a hint', prompt: `Give me a hint on mastering ${currentSection.title}` },
+            { mode: 'QUIZ', label: 'Quiz me', prompt: `Ask me a quick practice question on ${currentSection.title}` },
+            { mode: 'REVISE', label: 'Summarize', prompt: `Summarize key takeaways for ${currentSection.title}` },
+            { mode: 'ADVANCED', label: 'Advanced deep dive', prompt: `Give an advanced technical breakdown for ${currentSection.title}` },
+          ].map(chip => (
+            <button
+              key={chip.mode}
+              onClick={() => handleAiTutorAction(chip.mode, chip.prompt)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                activeTutorMode === chip.mode
+                  ? 'border-purple-500 bg-purple-950/40 text-purple-300'
+                  : 'border-slate-800 bg-slate-950/60 text-slate-400 hover:text-white hover:border-slate-700'
+              }`}
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+
+        {/* AI Response Box */}
+        {aiTutorLoading && (
+          <div className="py-4 text-xs text-purple-400 flex items-center gap-2 animate-pulse font-mono">
+            <Sparkles className="w-3.5 h-3.5 animate-spin" />
+            Consulting RAG knowledge base conditioned on your {currentLoad} cognitive state...
+          </div>
+        )}
+
+        {aiTutorResponse && (
+          <div className="p-4 rounded-2xl border border-purple-500/30 bg-purple-950/10 text-xs text-slate-200 leading-relaxed whitespace-pre-line animate-fade-in">
+            {aiTutorResponse.answer}
+          </div>
+        )}
+      </div>
+
+      {/* 6. USER EXPLANATION FEEDBACK (Section 79) */}
+      <div className="p-4 rounded-2xl border border-slate-800 bg-slate-900/30 flex items-center justify-between text-xs text-slate-400">
+        <span>Was this section helpful?</span>
+        <div className="flex items-center gap-2">
+          {feedbackSent ? (
+            <span className="text-emerald-400 font-semibold font-mono">✔ Feedback logged!</span>
+          ) : (
+            <>
+              <button
+                onClick={() => handleFeedback('yes')}
+                className="px-3 py-1 rounded-lg border border-slate-800 hover:border-emerald-500 hover:text-emerald-400 transition-colors"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => handleFeedback('somewhat')}
+                className="px-3 py-1 rounded-lg border border-slate-800 hover:border-amber-500 hover:text-amber-400 transition-colors"
+              >
+                Somewhat
+              </button>
+              <button
+                onClick={() => handleFeedback('no')}
+                className="px-3 py-1 rounded-lg border border-slate-800 hover:border-rose-500 hover:text-rose-400 transition-colors"
+              >
+                No
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* 7. SECTION STEPPER (Section 47) */}
+      <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-800">
+        <button
+          disabled={currentSectionIndex === 0}
+          onClick={handlePrevSection}
+          className="px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 disabled:opacity-40 text-xs font-semibold text-slate-300 transition-all flex items-center gap-1.5"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Previous Section
+        </button>
+
+        <div className="flex items-center gap-2">
+          {currentSectionIndex < totalSections - 1 ? (
+            <button
+              onClick={handleMarkComplete}
+              className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition-all flex items-center gap-1.5 shadow-md shadow-cyan-500/20"
+            >
+              Next Section
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          ) : (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={onStartQuiz}
+                className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-md shadow-purple-500/20"
+              >
+                Start Topic Quiz
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={onOpenCoding}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-md shadow-emerald-500/20"
+              >
+                Coding Challenge
+                <Terminal className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

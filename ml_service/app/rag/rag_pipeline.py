@@ -17,12 +17,14 @@ class RAGPipeline:
         language: str = "python",
         level: str = "beginner",
         topic: str = "loops",
-        cognitive_load: str = "MEDIUM"
+        cognitive_load: str = "MEDIUM",
+        tutor_mode: str = "EXPLAIN",
+        code_context: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         1. Queries vector index with metadata filters.
         2. Retrieves relevant chunks.
-        3. Formats prompt conditioned on cognitive load.
+        3. Formats prompt conditioned on cognitive load and tutor mode.
         4. Synthesizes adaptive answer.
         """
         results = self.vector_store.search(
@@ -39,7 +41,9 @@ class RAGPipeline:
             language=language,
             topic=topic,
             level=level,
-            cognitive_load=cognitive_load
+            cognitive_load=cognitive_load,
+            tutor_mode=tutor_mode,
+            code_context=code_context
         )
 
         return {

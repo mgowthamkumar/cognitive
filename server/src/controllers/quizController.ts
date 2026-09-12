@@ -2,14 +2,61 @@ import { Request, Response } from 'express';
 import { dbService } from '../db/database.js';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 import { adaptiveEngine } from '../services/adaptiveEngine.js';
+import { MCQQuestion } from '../types.js';
 
-export const getTopicQuiz = async (req: Request, res: Response): Promise<void> => {
+/**
+ * Section 55 & 56: Smart Quiz Engine with Dynamic Question Selection and Difficulty Adaptation
+ */
+export const getTopicQuiz = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { topicId } = req.params;
-    const questions = dbService.getMCQsByTopic(topicId);
+    const userId = req.user?.id || 'guest_user';
+    const requestedDiff = (req.query.difficulty as string)?.toLowerCase();
+
+    const allQuestions = dbService.getMCQsByTopic(topicId);
+    if (!allQuestions.length) {
+      res.status(404).json({ error: 'No questions found for this topic' });
+      return;
+    }
+
+    // Inspect user's recent cognitive predictions and quiz history
+    const recentPredictions = dbService.getCognitivePredictionHistory(userId, 1);
+    const cognitiveState = recentPredictions[0]?.cognitive_load || 'MEDIUM';
+
+    // Check consecutive streaks
+    const recentAttempts = dbService.getTopicBehaviorSession(userId, topicId)
+      .filter(e => e.event_type === 'MCQ_SUBMIT')
+      .slice(-3);
     
+    const consecutiveCorrect = recentAttempts.filter(e => e.metadata?.score >= 0.8).length;
+    const consecutiveWrong = recentAttempts.filter(e => e.metadata?.score < 0.5).length;
+
+    // Dynamic Difficulty Determination (Section 56)
+    let targetDifficulty: 'easy' | 'medium' | 'hard' = 'medium';
+    let difficultyNote = 'Standard adaptive difficulty';
+
+    if (requestedDiff === 'easy' || requestedDiff === 'medium' || requestedDiff === 'hard') {
+      targetDifficulty = requestedDiff;
+      difficultyNote = `Manual selection: ${requestedDiff.toUpperCase()}`;
+    } else if (cognitiveState === 'HIGH' || consecutiveWrong >= 2) {
+      targetDifficulty = 'easy';
+      difficultyNote = 'Difficulty eased to rebuild foundational confidence (High Cognitive Load detected)';
+    } else if (cognitiveState === 'LOW' || consecutiveCorrect >= 3) {
+      targetDifficulty = 'hard';
+      difficultyNote = 'Advanced challenges unlocked (3+ consecutive high-accuracy completions!)';
+    }
+
+    // Smart Selection: match target difficulty first, then backfill
+    let selectedQuestions = allQuestions.filter(q => q.difficulty === targetDifficulty);
+    if (selectedQuestions.length < 3) {
+      const others = allQuestions.filter(q => q.difficulty !== targetDifficulty);
+      selectedQuestions = [...selectedQuestions, ...others].slice(0, 4);
+    } else {
+      selectedQuestions = selectedQuestions.slice(0, 4);
+    }
+
     // Omit correct_index and explanation for quiz taking phase
-    const sanitized = questions.map(q => ({
+    const sanitized = selectedQuestions.map(q => ({
       id: q.id,
       topic_id: q.topic_id,
       difficulty: q.difficulty,
@@ -17,7 +64,13 @@ export const getTopicQuiz = async (req: Request, res: Response): Promise<void> =
       options: q.options
     }));
 
-    res.json(sanitized);
+    res.json({
+      questions: sanitized,
+      target_difficulty: targetDifficulty,
+      adaptive_note: difficultyNote,
+      consecutive_correct: consecutiveCorrect,
+      consecutive_wrong: consecutiveWrong
+    });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -29,14 +82,21 @@ export const submitTopicQuiz = async (req: AuthenticatedRequest, res: Response):
     const { answers, time_spent } = req.body; // answers: { [questionId]: selectedIndex }
     const userId = req.user?.id || 'guest_user';
 
-    const questions = dbService.getMCQsByTopic(topicId);
-    if (!questions.length) {
+    const allQuestions = dbService.getMCQsByTopic(topicId);
+    if (!allQuestions.length) {
       res.status(404).json({ error: 'No questions found for this topic' });
       return;
     }
 
+    // Grade only the questions that were part of this quiz session
+    const questionsToGrade = Object.keys(answers || {}).length > 0
+      ? allQuestions.filter(q => answers[q.id] !== undefined)
+      : allQuestions.slice(0, 3);
+
+    const activeList = questionsToGrade.length > 0 ? questionsToGrade : allQuestions;
+
     let correctCount = 0;
-    const review = questions.map(q => {
+    const review = activeList.map(q => {
       const selected = answers ? answers[q.id] : undefined;
       const isCorrect = selected === q.correct_index;
       if (isCorrect) correctCount++;
@@ -52,7 +112,7 @@ export const submitTopicQuiz = async (req: AuthenticatedRequest, res: Response):
       };
     });
 
-    const score = correctCount / questions.length;
+    const score = correctCount / (activeList.length || 1);
     const passed = score >= 0.6;
 
     // Record quiz attempt
@@ -66,7 +126,7 @@ export const submitTopicQuiz = async (req: AuthenticatedRequest, res: Response):
       timestamp: new Date().toISOString()
     });
 
-    // Record telemetry event for MCQ submission
+    // Record behavioral telemetry event for MCQ submission
     dbService.recordBehaviorEvent({
       user_id: userId,
       topic_id: topicId,
@@ -76,19 +136,35 @@ export const submitTopicQuiz = async (req: AuthenticatedRequest, res: Response):
       metadata: { score, accuracy: score, passed }
     });
 
+    // Spaced Revision Tracking (Section 60)
+    dbService.scheduleSpacedRevision(userId, topicId, score);
+
+    const topic = dbService.getTopicById(topicId);
+
     if (passed) {
       dbService.markTopicCompleted(userId, topicId, score);
+      if (score >= 0.9) {
+        dbService.unlockAchievement(userId, 'QUIZ_MASTER');
+      }
+    } else {
+      // Weak Concept Detection (Section 59)
+      dbService.recordWeakConcept({
+        userId,
+        conceptName: topic?.title || 'Quiz Assessment',
+        topicId,
+        language: 'python',
+        isFailure: true
+      });
     }
 
-    // Automatically trigger Adaptive Engine evaluation to compute real-time cognitive feedback
-    const topic = dbService.getTopicById(topicId);
+    // Automatically trigger Adaptive Engine evaluation
     const adaptiveFeedback = await adaptiveEngine.evaluateLearner(userId, topicId, 'python');
 
     res.json({
       score: Math.round(score * 100),
       passed,
       correct_count: correctCount,
-      total_questions: questions.length,
+      total_questions: activeList.length,
       review,
       adaptive_feedback: adaptiveFeedback
     });

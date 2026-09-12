@@ -1,21 +1,27 @@
 import React, { useState } from 'react';
+import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { CognitiveProvider, useCognitive } from './context/CognitiveContext';
+import { useOfflineSync } from './hooks/useOfflineSync';
 import { Navbar } from './components/Navbar';
 import { AiAssistantDrawer } from './components/AiAssistantDrawer';
 import { AuthModal } from './components/AuthModal';
+import { LandingPage } from './pages/LandingPage';
 import { CourseCatalogPage } from './pages/CourseCatalogPage';
 import { TopicLessonPage } from './pages/TopicLessonPage';
 import { QuizStationPage } from './pages/QuizStationPage';
 import { CodingStudioPage } from './pages/CodingStudioPage';
+import { ProjectHubPage } from './pages/ProjectHubPage';
 import { LearnerDashboardPage } from './pages/LearnerDashboardPage';
 import { AdminAnalyticsPage } from './pages/AdminAnalyticsPage';
+import { WifiOff } from 'lucide-react';
 
 const AppContent: React.FC = () => {
-  const [currentView, setCurrentView] = useState<string>('catalog');
+  const [currentView, setCurrentView] = useState<string>('landing');
   const [selectedTopicId, setSelectedTopicId] = useState<string>('top-py-loops');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false);
+  const { isOnline } = useOfflineSync();
 
   const handleSelectTopic = (topicId: string) => {
     setSelectedTopicId(topicId);
@@ -24,6 +30,13 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col selection:bg-cyan-500 selection:text-white">
+      {/* Section 92: Offline Status Banner */}
+      {!isOnline && (
+        <div className="bg-amber-500/20 border-b border-amber-500/40 px-4 py-2 text-center text-xs text-amber-300 flex items-center justify-center gap-2 font-medium">
+          <WifiOff className="w-4 h-4 text-amber-400" />
+          <span>You are currently working offline. Code drafts and responses are autosaving locally to your browser.</span>
+        </div>
+      )}
       <Navbar
         currentView={currentView}
         setCurrentView={setCurrentView}
@@ -32,6 +45,13 @@ const AppContent: React.FC = () => {
       />
 
       <main className="flex-1">
+        {currentView === 'landing' && (
+          <LandingPage
+            onStartLearning={() => setCurrentView('catalog')}
+            onExploreCourses={() => setCurrentView('catalog')}
+          />
+        )}
+
         {currentView === 'catalog' && (
           <CourseCatalogPage onSelectTopic={handleSelectTopic} />
         )}
@@ -59,6 +79,10 @@ const AppContent: React.FC = () => {
             onOpenAiDrawer={() => setAiDrawerOpen(true)}
             onBackToLesson={() => setCurrentView('lesson')}
           />
+        )}
+
+        {currentView === 'projects' && (
+          <ProjectHubPage />
         )}
 
         {currentView === 'dashboard' && (
@@ -93,21 +117,25 @@ const AppContent: React.FC = () => {
         onClose={() => setAuthModalOpen(false)}
       />
 
-      {/* Platform Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 py-6 text-center text-xs text-slate-500">
-        <p>Cognitive-Load-Aware Adaptive Learning Engine • Built with AI/ML, RAG, and Safe Sandbox Execution</p>
-      </footer>
+      {/* Platform Footer (Hidden on Landing Page which has its own rich footer) */}
+      {currentView !== 'landing' && (
+        <footer className="border-t border-slate-900 bg-slate-950/80 py-6 text-center text-xs text-slate-500">
+          <p>Cognitive-Load-Aware Adaptive Learning Engine • Built with AI/ML, RAG, and Safe Sandbox Execution</p>
+        </footer>
+      )}
     </div>
   );
 };
 
 export const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <CognitiveProvider>
-        <AppContent />
-      </CognitiveProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <CognitiveProvider>
+          <AppContent />
+        </CognitiveProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

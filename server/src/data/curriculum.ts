@@ -1,4 +1,4 @@
-import { Course, Module, Topic, MCQQuestion, CodingQuestion } from '../types.js';
+import { Course, Module, Topic, MCQQuestion, CodingQuestion, TopicSection } from '../types.js';
 
 export interface CurriculumData {
   courses: Course[];
@@ -33,7 +33,7 @@ export const initialCurriculum: CurriculumData = {
 
   modules: [
     // Python Modules
-    { id: 'mod-py-1', course_id: 'py-beg', title: 'Control Flow & Iteration', description: 'Conditionals and loop constructs', order_index: 1 },
+    { id: 'mod-py-1', course_id: 'py-beg', title: 'Basics & Control Flow', description: 'Conditionals and loop constructs', order_index: 1 },
     { id: 'mod-py-2', course_id: 'py-beg', title: 'Modular Code with Functions', description: 'Function declarations, scope, and recursion', order_index: 2 },
     { id: 'mod-py-3', course_id: 'py-int', title: 'Compound Data Structures', description: 'Lists, dictionaries, and comprehension patterns', order_index: 3 },
     { id: 'mod-py-4', course_id: 'py-adv', title: 'OOP & Metaprogramming', description: 'Classes, decorators, and generators', order_index: 4 },
@@ -69,7 +69,44 @@ export const initialCurriculum: CurriculumData = {
       syntax: 'for item in iterable:\n    # execute block\n\nwhile condition:\n    # execute block\n    # ensure condition progresses toward False!',
       examples: '# Example 1: Summing numbers with for loop\ntotal = sum(i for i in range(1, 6))\nprint("Sum 1..5:", total)\n\n# Example 2: While loop with countdown\ncount = 3\nwhile count > 0:\n    print(count)\n    count -= 1\nprint("Blast off!")',
       common_mistakes: '1. Infinite while loops due to missing update statements.\n2. Off-by-one errors with range(start, stop).\n3. Modifying a collection while actively looping over it.',
-      practice_prompt: 'Write a loop that calculates the sum of all even numbers from 1 to 20 inclusive.'
+      practice_prompt: 'Write a loop that calculates the sum of all even numbers from 1 to 20 inclusive.',
+      sections: [
+        {
+          id: 'sec-py-loop-1',
+          title: '1. What is a Loop?',
+          order_index: 1,
+          content: 'In programming, repetition is everywhere. A loop allows you to execute a specific block of instructions repeatedly without copy-pasting code.',
+          code_snippet: 'for i in range(3):\n    print("Hello learner!")',
+          mini_check: {
+            question: 'How many times will `for i in range(3)` print the message?',
+            options: ['2 times', '3 times', '4 times'],
+            correct_index: 1,
+            explanation: 'range(3) produces 0, 1, 2 which is exactly 3 iterations.'
+          }
+        },
+        {
+          id: 'sec-py-loop-2',
+          title: '2. For vs While Loops',
+          order_index: 2,
+          content: 'Use a `for` loop when you have a collection or known range. Use a `while` loop when looping depends on a runtime boolean condition.',
+          code_snippet: '# While loop countdown\nenergy = 3\nwhile energy > 0:\n    print("Running...")\n    energy -= 1',
+          pitfalls: 'Always ensure your while loop has a condition that eventually turns False, otherwise your program will freeze in an infinite loop!'
+        },
+        {
+          id: 'sec-py-loop-3',
+          title: '3. Controlling Flow: break and continue',
+          order_index: 3,
+          content: '`break` terminates the enclosing loop immediately. `continue` skips the remainder of the current iteration and jumps to the next.',
+          code_snippet: 'for num in range(10):\n    if num == 5:\n        break # Stop here\n    if num % 2 == 0:\n        continue # Skip evens\n    print("Odd:", num)'
+        },
+        {
+          id: 'sec-py-loop-4',
+          title: '4. Common Mistakes & Best Practices',
+          order_index: 4,
+          content: '1. Off-by-one errors with `range(1, 10)` which stops at 9.\n2. In-place mutation of a list while iterating over it.\n3. Forgetting accumulator step in while loops.',
+          pitfalls: 'Never do `for x in my_list: my_list.remove(x)`. It causes items to be skipped because the internal index shifts.'
+        }
+      ]
     },
     {
       id: 'top-py-functions',
@@ -85,7 +122,62 @@ export const initialCurriculum: CurriculumData = {
       examples: 'def greet(name, title="Learner"):\n    return f"Welcome, {title} {name}!"\n\nprint(greet("Ada", "Dr."))\nprint(greet("Alan"))',
       common_mistakes: '1. Forgetting the `return` keyword (functions default to returning `None`).\n2. Defining mutable defaults like `def add(val, lst=[]):` which persist across calls.',
       practice_prompt: 'Create a function `is_palindrome(text)` that returns True if a given string reads the same forwards and backwards.',
-      prerequisite_topic_id: 'top-py-loops'
+      prerequisite_topic_id: 'top-py-loops',
+      sections: [
+        {
+          id: 'sec-py-func-1',
+          title: '1. What is a Function?',
+          order_index: 1,
+          content: 'A function is a named block of code that performs a specific task. Instead of rewriting the same 10 lines of code across your project, you call the function.',
+          code_snippet: 'def calculate_area(width, height):\n    return width * height'
+        },
+        {
+          id: 'sec-py-func-2',
+          title: '2. Parameters & Default Arguments',
+          order_index: 2,
+          content: 'Parameters accept input values. You can provide default values for optional arguments.',
+          code_snippet: 'def power(base, exponent=2):\n    return base ** exponent\n\nprint(power(4))    # 16 (default exponent 2)\nprint(power(2, 3)) # 8'
+        },
+        {
+          id: 'sec-py-func-3',
+          title: '3. Variable Scope & LEGB Rule',
+          order_index: 3,
+          content: 'Scope determines variable visibility. Python looks up names in LEGB order: Local -> Enclosing -> Global -> Built-in. Variables declared inside a function are local.',
+          pitfalls: 'A common trap is defining `def append_to(item, target_list=[]):`. Default values are evaluated ONCE when the function is defined, making mutable defaults shared across all calls!'
+        }
+      ]
+    },
+    {
+      id: 'top-py-datastruct',
+      module_id: 'mod-py-3',
+      title: 'Lists, Dictionaries & Comprehensions',
+      order_index: 3,
+      learning_objective: 'Master Python sequences, hash maps (dictionaries), set operations, and idiomatic comprehensions.',
+      content_standard: 'Lists are mutable ordered arrays. Dictionaries are O(1) average lookup key-value hash maps. Comprehensions offer concise declarative mapping and filtering syntax.',
+      content_low: '### ⚡ Fast-Track Summary\n- Dictionaries are hash tables with O(1) amortized access.\n- List comprehensions `[expr for x in iterable if cond]` compiled into bytecode loop with zero method lookup overhead.\n- Use `collections.defaultdict` and `collections.deque` for specialized queues.',
+      content_medium: '### 📘 Standard Guide\nLists store ordered items: `[1, 2, 3]`. Dictionaries store key-value pairs: `{"name": "Python", "year": 1991}`. Access values using `.get(key, default)`.',
+      content_high: '### 🌱 Step-by-Step Breakdown\n- A **List** is like a numbered to-do list.\n- A **Dictionary** is like a real phonebook: you look up a person\'s name (the key) to find their number (the value).',
+      syntax: 'my_list = [1, 2, 3]\nmy_dict = {"a": 10, "b": 20}\nsquares = [x**2 for x in range(5) if x % 2 == 0]',
+      examples: 'student = {"name": "Grace", "gpa": 3.9}\nif student.get("gpa", 0) > 3.5:\n    print("Dean\'s Honor Roll!")',
+      common_mistakes: 'Using key lookup `dict[k]` directly when the key might not exist, causing KeyError instead of using `.get(k)`.',
+      practice_prompt: 'Write a dictionary comprehension that maps numbers 1 through 5 to their cubes.',
+      prerequisite_topic_id: 'top-py-functions',
+      sections: [
+        {
+          id: 'sec-py-ds-1',
+          title: '1. Lists & Indexing',
+          order_index: 1,
+          content: 'Lists in Python are dynamic, zero-indexed arrays that can hold mixed data types.',
+          code_snippet: 'fruits = ["apple", "banana", "cherry"]\nprint(fruits[0]) # "apple"\nprint(fruits[-1]) # "cherry" (reverse indexing)'
+        },
+        {
+          id: 'sec-py-ds-2',
+          title: '2. Dictionaries & Fast Key-Value Lookups',
+          order_index: 2,
+          content: 'Dictionaries use hashing to give O(1) instant lookups by key.',
+          code_snippet: 'scores = {"Alice": 95, "Bob": 82}\nprint(scores.get("Charlie", 0)) # Safe fallback 0'
+        }
+      ]
     },
 
     // --- C TOPICS ---
@@ -102,7 +194,61 @@ export const initialCurriculum: CurriculumData = {
       syntax: 'int value = 42;\nint *ptr = &value; // ptr stores address\n*ptr = 99;         // dereference: updates value to 99',
       examples: '#include <stdio.h>\n\nvoid swap(int *a, int *b) {\n    int temp = *a;\n    *a = *b;\n    *b = temp;\n}\n\nint main() {\n    int x = 10, y = 20;\n    swap(&x, &y);\n    printf("x=%d, y=%d\\n", x, y);\n    return 0;\n}',
       common_mistakes: '1. Dereferencing uninitialized pointers (`int *p; *p = 10;` causes crash).\n2. Confusing `*` in variable declaration with `*` dereference in expressions.',
-      practice_prompt: 'Write a C function `reverse_array(int *arr, int size)` using pointer arithmetic instead of array indexing.'
+      practice_prompt: 'Write a C function `reverse_array(int *arr, int size)` using pointer arithmetic instead of array indexing.',
+      sections: [
+        {
+          id: 'sec-c-ptr-1',
+          title: '1. What is a Memory Address?',
+          order_index: 1,
+          content: 'Every variable you declare in C resides at a specific physical location in RAM known as a memory address. You can print it using the `&` address-of operator.',
+          code_snippet: 'int x = 10;\nprintf("Value: %d, Address: %p\\n", x, (void*)&x);'
+        },
+        {
+          id: 'sec-c-ptr-2',
+          title: '2. Declaring and Dereferencing Pointers',
+          order_index: 2,
+          content: 'A pointer is simply a variable whose value IS another memory address. The asterisk `*` serves two distinct roles: in declaration it marks a pointer type; in statements it dereferences.',
+          code_snippet: 'int num = 100;\nint *p = &num; // p points to num\n*p = 250;      // modifies num directly\nprintf("%d\\n", num); // prints 250'
+        },
+        {
+          id: 'sec-c-ptr-3',
+          title: '3. Pointer Arithmetic',
+          order_index: 3,
+          content: 'Adding 1 to a pointer doesn\'t simply add 1 byte; it advances by the size of the data type it points to. For an `int*`, `p + 1` advances by 4 bytes.',
+          pitfalls: 'Never access memory after calling `free()` (dangling pointer) or dereference a pointer initialized without an address (wild pointer).'
+        }
+      ]
+    },
+    {
+      id: 'top-c-malloc',
+      module_id: 'mod-c-2',
+      title: 'Dynamic Memory Allocation (malloc & free)',
+      order_index: 2,
+      learning_objective: 'Allocate heap memory dynamically with malloc/calloc, avoid memory leaks with free(), and handle allocation failures.',
+      content_standard: 'Stack memory has a fixed size and lifetime tied to function execution. Dynamic memory allocation (`malloc`, `calloc`, `realloc`, `free`) requests memory from the system heap at runtime.',
+      content_low: '### ⚡ Fast-Track Summary\n- Heap allocation managed via `malloc(size_t)`. Always pair with `free(ptr)`.\n- Check for `NULL` to guard against Out-Of-Memory (OOM) conditions.\n- Use Valgrind/ASan to detect heap leaks and buffer overflows.',
+      content_medium: '### 📘 Standard Guide\n1. `int *arr = malloc(n * sizeof(int));`\n2. Always verify `if (arr == NULL)` before writing.\n3. Always call `free(arr); arr = NULL;` when finished.',
+      content_high: '### 🌱 Step-by-Step Breakdown\nStack memory is like a small desk: it is fast, but you cannot change its size while working. The Heap is like a storage warehouse: you ask for as much space as you need with `malloc`, but you must remember to return the keys with `free`!',
+      syntax: 'int *ptr = (int *)malloc(10 * sizeof(int));\nif (ptr == NULL) { /* handle error */ }\nfree(ptr);\nptr = NULL;',
+      examples: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *arr = malloc(5 * sizeof(int));\n    if (!arr) return 1;\n    for(int i=0; i<5; i++) arr[i] = i * 10;\n    free(arr);\n    return 0;\n}',
+      common_mistakes: '1. Forgetting to free allocated memory, causing cumulative leaks.\n2. Double-freeing memory.',
+      practice_prompt: 'Write a C program that dynamically allocates an array of N integers, reads them, and frees the array.',
+      prerequisite_topic_id: 'top-c-pointers',
+      sections: [
+        {
+          id: 'sec-c-malloc-1',
+          title: '1. Stack vs Heap Memory',
+          order_index: 1,
+          content: 'Variables created inside functions live on the stack and disappear when the function exits. When you need memory that outlives a function or has a size only known at runtime, you allocate from the heap.'
+        },
+        {
+          id: 'sec-c-malloc-2',
+          title: '2. Safe malloc() and free() Protocol',
+          order_index: 2,
+          content: 'Always multiply the element count by `sizeof(type)`. Always check for NULL return.',
+          code_snippet: 'int *data = malloc(100 * sizeof(int));\nif (data == NULL) {\n    fprintf(stderr, "Memory allocation failed!\\n");\n    exit(1);\n}\n// Use data...\nfree(data);\ndata = NULL;'
+        }
+      ]
     },
 
     // --- C++ TOPICS ---
@@ -119,7 +265,22 @@ export const initialCurriculum: CurriculumData = {
       syntax: 'class BankAccount {\nprivate:\n    double balance;\npublic:\n    BankAccount(double initial_bal) : balance(initial_bal) {}\n    void deposit(double amount) { balance += amount; }\n    double getBalance() const { return balance; }\n};',
       examples: '#include <iostream>\n\nclass Counter {\nprivate:\n    int count;\npublic:\n    Counter() : count(0) {}\n    void increment() { count++; }\n    int get() const { return count; }\n};\n\nint main() {\n    Counter c;\n    c.increment();\n    std::cout << "Count: " << c.get() << std::endl;\n    return 0;\n}',
       common_mistakes: '1. Forgetting the closing semicolon `;` after the class definition body.\n2. Exposing internal mutable pointers/references from private state.',
-      practice_prompt: 'Create a C++ `Rectangle` class with private `width` and `height`, and public methods `area()` and `perimeter()`.'
+      practice_prompt: 'Create a C++ `Rectangle` class with private `width` and `height`, and public methods `area()` and `perimeter()`.',
+      sections: [
+        {
+          id: 'sec-cpp-oop-1',
+          title: '1. Encapsulation & Access Specifiers',
+          order_index: 1,
+          content: 'Encapsulation binds data and functions together while hiding internal implementation details using `private`, `public`, and `protected`.',
+          code_snippet: 'class Wallet {\nprivate:\n    int cash;\npublic:\n    Wallet(int amount) : cash(amount) {}\n    int getCash() const { return cash; }\n};'
+        },
+        {
+          id: 'sec-cpp-oop-2',
+          title: '2. Member Initializer Lists',
+          order_index: 2,
+          content: 'Always prefer member initialization lists in constructors (`: cash(amount)`) over assigning inside the constructor body, as it avoids redundant default initialization.'
+        }
+      ]
     },
 
     // --- JAVA TOPICS ---
@@ -136,7 +297,22 @@ export const initialCurriculum: CurriculumData = {
       syntax: 'class Animal {\n    void speak() {\n        System.out.println("Animal sound");\n    }\n}\n\nclass Dog extends Animal {\n    @Override\n    void speak() {\n        System.out.println("Woof!");\n    }\n}',
       examples: 'public class Main {\n    public static void main(String[] args) {\n        Animal myPet = new Dog();\n        myPet.speak(); // Prints "Woof!" via polymorphism\n    }\n}',
       common_mistakes: '1. Forgetting that Java does NOT allow multiple class inheritance (`class C extends A, B` is illegal).\n2. Omitting `@Override` annotation.',
-      practice_prompt: 'Design a `Vehicle` base class and a `Car` subclass in Java that overrides a `startEngine()` method.'
+      practice_prompt: 'Design a `Vehicle` base class and a `Car` subclass in Java that overrides a `startEngine()` method.',
+      sections: [
+        {
+          id: 'sec-java-oop-1',
+          title: '1. Inheritance Fundamentals',
+          order_index: 1,
+          content: 'Inheritance models an "IS-A" relationship between classes. A subclass inherits accessible members from its superclass.',
+          code_snippet: 'class Employee {\n    double salary = 50000;\n}\nclass Engineer extends Employee {\n    double bonus = 10000;\n}'
+        },
+        {
+          id: 'sec-java-oop-2',
+          title: '2. Method Overriding & Polymorphism',
+          order_index: 2,
+          content: 'Polymorphism allows an object of a derived class to be treated as an instance of its parent type while invoking the overridden child implementation at runtime.'
+        }
+      ]
     }
   ],
 
@@ -179,6 +355,63 @@ export const initialCurriculum: CurriculumData = {
       correct_index: 1,
       explanation: 'Mutating a list in-place shifts the internal index pointer, causing the loop to skip consecutive items without raising an error.'
     },
+    {
+      id: 'mcq-py-loop-4',
+      topic_id: 'top-py-loops',
+      difficulty: 'easy',
+      question: 'What keyword is used to skip the rest of the current loop iteration and move to the next?',
+      options: ['pass', 'continue', 'break', 'skip'],
+      correct_index: 1,
+      explanation: 'continue skips the rest of the current loop cycle and advances to the next iteration.'
+    },
+    {
+      id: 'mcq-py-loop-5',
+      topic_id: 'top-py-loops',
+      difficulty: 'medium',
+      question: 'How many times will a while loop with condition while False: execute?',
+      options: ['0 times', '1 time', 'Infinite times', 'Raises SyntaxError'],
+      correct_index: 0,
+      explanation: 'Since the boolean condition evaluates to False at the outset, the body is never entered (0 times).'
+    },
+
+    // Python Functions MCQs
+    {
+      id: 'mcq-py-func-1',
+      topic_id: 'top-py-functions',
+      difficulty: 'easy',
+      question: 'What is the default return value of a Python function that does not include an explicit return statement?',
+      options: ['0', 'None', 'False', '"" (empty string)'],
+      correct_index: 1,
+      explanation: 'In Python, functions implicitly return None if no return statement is reached.'
+    },
+    {
+      id: 'mcq-py-func-2',
+      topic_id: 'top-py-functions',
+      difficulty: 'medium',
+      question: 'What occurs when a mutable object like a list is used as a default argument (def add(item, lst=[]))?',
+      options: [
+        'A fresh new list is instantiated each time the function is called',
+        'The same list instance is reused across multiple function calls',
+        'Python raises a MutableDefaultWarning at compile time',
+        'The function arguments become read-only'
+      ],
+      correct_index: 1,
+      explanation: 'Default arguments are evaluated once at function definition time, meaning mutable defaults persist mutations across subsequent calls.'
+    },
+    {
+      id: 'mcq-py-func-3',
+      topic_id: 'top-py-functions',
+      difficulty: 'hard',
+      question: 'In Python lexical scoping, what is the correct resolution order defined by the LEGB rule?',
+      options: [
+        'Local, Enclosing, Global, Built-in',
+        'Local, Explicit, General, Base',
+        'Lexical, Environment, Global, Binary',
+        'Loop, Enclosing, Global, Built-in'
+      ],
+      correct_index: 0,
+      explanation: 'Python checks Local scope first, then Enclosing closures, Global module variables, and finally Built-ins.'
+    },
 
     // C Pointer MCQs
     {
@@ -217,11 +450,61 @@ export const initialCurriculum: CurriculumData = {
       ],
       correct_index: 1,
       explanation: 'A dangling pointer still references memory after free() has released it. Accessing it triggers undefined behavior.'
+    },
+
+    // C++ OOP MCQs
+    {
+      id: 'mcq-cpp-oop-1',
+      topic_id: 'top-cpp-oop',
+      difficulty: 'easy',
+      question: 'By default, what is the access level of members in a C++ class if no specifier is given?',
+      options: ['public', 'private', 'protected', 'internal'],
+      correct_index: 1,
+      explanation: 'In C++ classes, members default to private. (In structs, they default to public).'
+    },
+    {
+      id: 'mcq-cpp-oop-2',
+      topic_id: 'top-cpp-oop',
+      difficulty: 'medium',
+      question: 'Why should class members be initialized using member initializer lists rather than assignment in the constructor body?',
+      options: [
+        'It avoids calling default constructors before re-assignment, improving performance',
+        'Member initializer lists are required by the OS kernel',
+        'It automatically makes members const',
+        'There is zero difference in performance or semantics'
+      ],
+      correct_index: 0,
+      explanation: 'Initialization lists initialize members directly, avoiding redundant default construction followed by assignment.'
+    },
+
+    // Java OOP MCQs
+    {
+      id: 'mcq-java-oop-1',
+      topic_id: 'top-java-oop',
+      difficulty: 'easy',
+      question: 'Which keyword in Java is used by a class to inherit from a superclass?',
+      options: ['implements', 'extends', 'inherits', 'super'],
+      correct_index: 1,
+      explanation: 'The extends keyword is used to establish class inheritance in Java.'
+    },
+    {
+      id: 'mcq-java-oop-2',
+      topic_id: 'top-java-oop',
+      difficulty: 'medium',
+      question: 'Can a class in Java inherit directly from multiple concrete classes using extends?',
+      options: [
+        'Yes, separated by commas (class C extends A, B)',
+        'No, Java supports single class inheritance to avoid the diamond problem',
+        'Yes, if both classes are marked abstract',
+        'Only in Java 21+'
+      ],
+      correct_index: 1,
+      explanation: 'Java supports single class inheritance for simplicity; multiple inheritance is achieved through interfaces.'
     }
   ],
 
   codingQuestions: [
-    // Python Coding Challenge
+    // Python Coding Challenge 1 (Loops)
     {
       id: 'code-py-sum-evens',
       topic_id: 'top-py-loops',
@@ -244,7 +527,30 @@ export const initialCurriculum: CurriculumData = {
       ]
     },
 
-    // C Coding Challenge
+    // Python Coding Challenge 2 (Functions)
+    {
+      id: 'code-py-palindrome',
+      topic_id: 'top-py-functions',
+      title: 'Palindrome Validator',
+      difficulty: 'medium',
+      problem_statement: 'Read a string from stdin and determine if it is a palindrome (reads the same forward and backwards), ignoring case and non-alphanumeric characters. Print "TRUE" or "FALSE".',
+      input_format: 'A single line containing an input string.',
+      output_format: '"TRUE" or "FALSE".',
+      constraints: '1 <= string length <= 1000',
+      sample_input: 'A man, a plan, a canal: Panama',
+      sample_output: 'TRUE',
+      starter_code: {
+        python: 'import sys\n\ndef is_palindrome(s: str) -> bool:\n    # TODO: Implement palindrome validation\n    return False\n\nif __name__ == "__main__":\n    text = sys.stdin.read().strip()\n    print("TRUE" if is_palindrome(text) else "FALSE")'
+      },
+      test_cases: [
+        { input: 'A man, a plan, a canal: Panama', expected_output: 'TRUE', is_hidden: false },
+        { input: 'race a car', expected_output: 'FALSE', is_hidden: false },
+        { input: 'Was it a car or a cat I saw?', expected_output: 'TRUE', is_hidden: true },
+        { input: 'hello', expected_output: 'FALSE', is_hidden: true }
+      ]
+    },
+
+    // C Coding Challenge (Pointers)
     {
       id: 'code-c-reverse-array',
       topic_id: 'top-c-pointers',

@@ -31,6 +31,12 @@ export const QuizStationPage: React.FC<QuizStationProps> = ({
   const { updateFromFeedback } = useCognitive();
   const [questions, setQuestions] = useState<any[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
+  const [adaptiveInfo, setAdaptiveInfo] = useState<{
+    target_difficulty?: string;
+    adaptive_note?: string;
+    consecutive_correct?: number;
+    consecutive_wrong?: number;
+  }>({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<any | null>(null);
@@ -41,7 +47,16 @@ export const QuizStationPage: React.FC<QuizStationProps> = ({
       setLoading(true);
       try {
         const data = await api.getTopicQuiz(topicId);
-        setQuestions(data);
+        const questionList = Array.isArray(data) ? data : (data.questions || []);
+        setQuestions(questionList);
+        if (data && data.target_difficulty) {
+          setAdaptiveInfo({
+            target_difficulty: data.target_difficulty,
+            adaptive_note: data.adaptive_note,
+            consecutive_correct: data.consecutive_correct,
+            consecutive_wrong: data.consecutive_wrong
+          });
+        }
       } catch (err) {
         console.error('Failed to load quiz:', err);
       } finally {
@@ -218,6 +233,41 @@ export const QuizStationPage: React.FC<QuizStationProps> = ({
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Dynamic Difficulty Adjustment Banner (Section 55 & 56) */}
+      {adaptiveInfo.target_difficulty && !result && (
+        <div className="mb-6 p-4 rounded-2xl bg-cyan-950/30 border border-cyan-500/30 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold">
+              <Zap className="w-4 h-4 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-white">Dynamic Quiz Engine:</span>
+                <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono font-bold ${
+                  adaptiveInfo.target_difficulty === 'hard'
+                    ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                    : adaptiveInfo.target_difficulty === 'easy'
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                }`}>
+                  {adaptiveInfo.target_difficulty} Tier
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                {adaptiveInfo.adaptive_note}
+              </p>
+            </div>
+          </div>
+
+          {adaptiveInfo.consecutive_correct && adaptiveInfo.consecutive_correct > 0 ? (
+            <div className="px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 font-semibold flex items-center gap-1.5">
+              <span>🔥</span>
+              <span>{adaptiveInfo.consecutive_correct} Streak</span>
+            </div>
+          ) : null}
         </div>
       )}
 

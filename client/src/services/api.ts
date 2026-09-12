@@ -174,6 +174,44 @@ export const api = {
     return res.json();
   },
 
+  // Platform Public Stats (Section 43)
+  getPlatformStats: async () => {
+    const res = await fetch(`${API_BASE}/stats/platform`);
+    return res.json();
+  },
+
+  // Dashboard & Roadmaps (Section 44, 46)
+
+  getDashboardSnapshot: async () => {
+    const res = await fetch(`${API_BASE}/dashboard/snapshot`, {
+      headers: getAuthHeaders()
+    });
+    return res.json();
+  },
+
+  getUserSnapshot: async () => {
+    const res = await fetch(`${API_BASE}/dashboard/snapshot`, {
+      headers: getAuthHeaders()
+    });
+    return res.json();
+  },
+
+  getLanguageRoadmap: async (language: string) => {
+    const res = await fetch(`${API_BASE}/dashboard/roadmap/${language}`, {
+      headers: getAuthHeaders()
+    });
+    return res.json();
+  },
+
+  submitContentFeedback: async (topicId: string, feedback: 'yes' | 'somewhat' | 'no', comment?: string) => {
+    const res = await fetch(`${API_BASE}/feedback/submit`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ topic_id: topicId, feedback, comment })
+    });
+    return res.json();
+  },
+
   // AI Learning Assistant & RAG
   askAiAssistant: async (payload: {
     question: string;
@@ -181,6 +219,8 @@ export const api = {
     level?: string;
     topic?: string;
     cognitive_load?: string;
+    tutor_mode?: string;
+    code_context?: string;
   }) => {
     const res = await fetch(`${API_BASE}/ai/ask`, {
       method: 'POST',
@@ -240,6 +280,30 @@ export const api = {
       headers: getAuthHeaders()
     });
     if (!res.ok) throw new Error((await res.json()).error || 'Failed to execute system diagnostics');
+    return res.json();
+  },
+
+  // Project-Based Learning & Capstones (Sections 82 & 83)
+  getProjects: async (language?: string, level?: string) => {
+    const params = new URLSearchParams();
+    if (language) params.append('language', language);
+    if (level) params.append('level', level);
+    const res = await fetch(`${API_BASE}/projects?${params.toString()}`);
+    return res.json();
+  },
+
+  getProjectDetail: async (projectId: string) => {
+    const res = await fetch(`${API_BASE}/projects/${projectId}`);
+    return res.json();
+  },
+
+  submitProject: async (projectId: string, payload: { code: string; completion_time_seconds?: number; keystrokes?: number; paste_events?: number }) => {
+    const res = await fetch(`${API_BASE}/projects/${projectId}/submit`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error((await res.json()).error || 'Failed to evaluate project');
     return res.json();
   }
 };

@@ -54,6 +54,8 @@ class RAGQueryPayload(BaseModel):
     level: Optional[str] = "beginner"
     topic: Optional[str] = "loops"
     cognitive_load: Optional[str] = "MEDIUM"
+    tutor_mode: Optional[str] = "EXPLAIN"
+    code_context: Optional[str] = None
 
 class HintRequestPayload(BaseModel):
     question: str
@@ -135,7 +137,9 @@ def ask_rag(payload: RAGQueryPayload):
             language=payload.language,
             level=payload.level,
             topic=payload.topic,
-            cognitive_load=payload.cognitive_load
+            cognitive_load=payload.cognitive_load,
+            tutor_mode=payload.tutor_mode or "EXPLAIN",
+            code_context=payload.code_context
         )
         return response
     except Exception as e:

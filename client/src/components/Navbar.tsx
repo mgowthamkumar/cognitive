@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCognitive, CognitiveLoadLevel } from '../context/CognitiveContext';
+import { useTheme } from '../context/ThemeContext';
+import { api } from '../services/api';
 import {
   Brain,
+  Home,
   Terminal,
   BookOpen,
   BarChart3,
@@ -10,7 +13,13 @@ import {
   User,
   LogOut,
   Sparkles,
-  ChevronDown
+  ChevronDown,
+  Flame,
+  FolderGit2,
+  Sun,
+  Moon,
+  Monitor,
+  Eye
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -28,7 +37,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { user, preferences, updateLanguage, updateLevel, logout } = useAuth();
   const { currentLoad, confidence, contentMode } = useCognitive();
+  const { theme, setTheme, reducedMotion, toggleReducedMotion } = useTheme();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [streakDays, setStreakDays] = useState<number>(3);
+
+  useEffect(() => {
+    api.getUserSnapshot().then(res => {
+      if (res && res.snapshot && typeof res.snapshot.streak_days === 'number') {
+        setStreakDays(res.snapshot.streak_days);
+      }
+    }).catch(() => {});
+  }, [user]);
 
   const languages = [
     { id: 'python', label: 'Python', icon: '🐍' },
@@ -60,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Brand */}
         <div className="flex items-center gap-6">
           <div
-            onClick={() => setCurrentView('catalog')}
+            onClick={() => setCurrentView('landing')}
             className="flex items-center gap-3 cursor-pointer group"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
@@ -98,6 +117,18 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Center: Nav links */}
         <nav className="hidden lg:flex items-center gap-1">
           <button
+            onClick={() => setCurrentView('landing')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              currentView === 'landing'
+                ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/20'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/40'
+            }`}
+          >
+            <Home className="w-4 h-4" />
+            <span>Home</span>
+          </button>
+
+          <button
             onClick={() => setCurrentView('catalog')}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               currentView === 'catalog' || currentView === 'lesson'
@@ -119,6 +150,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Terminal className="w-4 h-4" />
             <span>Sandbox Studio</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentView('projects')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              currentView === 'projects'
+                ? 'text-cyan-400 bg-cyan-500/10 border border-cyan-500/20'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/40'
+            }`}
+          >
+            <FolderGit2 className="w-4 h-4" />
+            <span>Projects</span>
           </button>
 
           <button
@@ -148,6 +191,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right Section: Cognitive State Badge & Actions */}
         <div className="flex items-center gap-3">
+          {/* Daily Streak Indicator (Section 68) */}
+          <div
+            title={`${streakDays} Day Learning Streak`}
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold"
+          >
+            <Flame className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+            <span>{streakDays}d Streak</span>
+          </div>
+
           {/* Cognitive Indicator Pill */}
           <div
             title={`Cognitive Load: ${currentLoad} (${Math.round(confidence * 100)}% Confidence) - Mode: ${contentMode}`}
@@ -161,6 +213,28 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
             <span>Load: {currentLoad}</span>
             <span className="text-[10px] opacity-75 font-mono">({Math.round(confidence * 100)}%)</span>
+          </div>
+
+          {/* Theme & A11y Controls (Sections 86 & 87) */}
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-900/90 border border-slate-800">
+            <button
+              type="button"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : theme === 'light' ? 'system' : 'dark')}
+              title={`Theme: ${theme} (Click to switch)`}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition-colors"
+              aria-label={`Current theme is ${theme}. Click to switch theme.`}
+            >
+              {theme === 'dark' ? <Moon className="w-4 h-4" /> : theme === 'light' ? <Sun className="w-4 h-4 text-amber-400" /> : <Monitor className="w-4 h-4" />}
+            </button>
+            <button
+              type="button"
+              onClick={toggleReducedMotion}
+              title={reducedMotion ? "Reduced Motion Enabled" : "Standard Animations"}
+              className={`p-1.5 rounded-lg transition-colors ${reducedMotion ? 'text-amber-400 bg-amber-500/10' : 'text-slate-500 hover:text-slate-300'}`}
+              aria-label="Toggle Reduced Motion"
+            >
+              <Eye className="w-4 h-4" />
+            </button>
           </div>
 
           {/* AI Copilot Drawer Trigger */}

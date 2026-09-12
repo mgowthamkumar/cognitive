@@ -2,7 +2,10 @@ import { dbService } from '../db/database.js';
 import {
   CognitiveLoadLevel,
   AdaptiveAction,
-  CognitivePredictionResult
+  CognitivePredictionResult,
+  ContentDepth,
+  LearningMode,
+  AiTutorMode
 } from '../types.js';
 
 export interface AdaptiveEvaluationOutput {
@@ -10,6 +13,10 @@ export interface AdaptiveEvaluationOutput {
   confidence: number;
   recommended_action: AdaptiveAction;
   content_mode: 'CONCISE' | 'BALANCED' | 'SIMPLIFIED';
+  content_depth: ContentDepth;
+  lesson_mode: LearningMode;
+  micro_learning_enabled: boolean;
+  ai_tutor_mode: AiTutorMode;
   recommended_difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   recommend_revision: boolean;
   recommended_topic_id: string;
@@ -25,7 +32,9 @@ export class AdaptiveEngineService {
   private mlServiceUrl = process.env.ML_SERVICE_URL || 'http://127.0.0.1:8000';
 
   /**
-   * Section 10 & 16: Evaluates learner telemetry and computes adaptive adjustments
+   * Centralized Adaptive Decision Engine (Section 76)
+   * Coordinates telemetry, ML prediction, temporal smoothing, confidence thresholding,
+   * content depth (Section 49), micro-learning mode (Section 50), and spaced revision.
    */
   public async evaluateLearner(
     userId: string,
@@ -56,25 +65,32 @@ export class AdaptiveEngineService {
       predictionResult = this.heuristicPredict(telemetryFeatures);
     }
 
-    // 4. Save prediction record to database
+    // 4. Temporal Smoothing (Section 75) & Confidence Thresholding (Section 74)
+    const smoothedState = this.applyTemporalSmoothing(userId, predictionResult);
+
+    // 5. Save prediction record to database
     const predId = `pred_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
     dbService.saveCognitivePrediction({
       id: predId,
       user_id: userId,
       topic_id: topicId,
-      cognitive_load: predictionResult.prediction,
-      confidence: predictionResult.confidence,
+      cognitive_load: smoothedState.level,
+      confidence: smoothedState.confidence,
       probabilities: JSON.stringify(predictionResult.probabilities),
       timestamp: new Date().toISOString(),
       factors: JSON.stringify(predictionResult.contributing_factors)
     });
 
-    // 5. Compute Adaptive Actions according to Section 9 & 16
+    // 6. Compute Adaptive Actions & Pacing
     const currentTopic = dbService.getTopicById(topicId);
-    const cognitiveLevel = predictionResult.prediction;
+    const cognitiveLevel = smoothedState.level;
 
     let recommendedAction: AdaptiveAction = 'CONTINUE';
     let contentMode: 'CONCISE' | 'BALANCED' | 'SIMPLIFIED' = 'BALANCED';
+    let contentDepth: ContentDepth = 2; // Normal
+    let lessonMode: LearningMode = 'STANDARD';
+    let microLearningEnabled = false;
+    let aiTutorMode: AiTutorMode = 'EXPLAIN';
     let recommendedDifficulty: 'EASY' | 'MEDIUM' | 'HARD' = 'MEDIUM';
     let recommendRevision = false;
     let recommendedTopicId = topicId;
@@ -82,33 +98,57 @@ export class AdaptiveEngineService {
 
     if (cognitiveLevel === 'HIGH') {
       contentMode = 'SIMPLIFIED';
+      contentDepth = 4; // Deep/Detailed breakdown to reduce overload
+      lessonMode = 'AI_GUIDED';
+      microLearningEnabled = true; // Section 50: Micro-learning mode
+      aiTutorMode = 'SIMPLIFY';
       recommendedDifficulty = 'EASY';
       recommendRevision = true;
+
+      // Track weak concept
+      dbService.recordWeakConcept({
+        userId,
+        conceptName: currentTopic?.title || 'Programming Concepts',
+        topicId,
+        language,
+        isFailure: true
+      });
+
+      // Schedule spaced revision
+      dbService.scheduleSpacedRevision(userId, topicId, 0.45);
 
       if (currentTopic?.prerequisite_topic_id) {
         recommendedAction = 'RECOMMEND_PREREQUISITE';
         recommendedTopicId = currentTopic.prerequisite_topic_id;
-        reason = `You are finding this topic challenging. Let's review the foundational prerequisite before tackling this again!`;
+        reason = `High cognitive load detected. We recommend reinforcing foundational concepts in "${currentTopic.prerequisite_topic_id}" before continuing.`;
       } else {
         recommendedAction = 'SIMPLIFY';
-        reason = `High cognitive load detected. We have broken this topic into smaller micro-steps and beginner examples.`;
+        reason = `Active learning friction detected. We have activated Micro-Learning Mode with 5-minute modular checkpoints and beginner analogies.`;
       }
     } else if (cognitiveLevel === 'LOW') {
       contentMode = 'CONCISE';
+      contentDepth = 1; // Quick fast-track
+      lessonMode = 'QUICK';
+      microLearningEnabled = false;
+      aiTutorMode = 'ADVANCED';
       recommendedDifficulty = 'HARD';
       recommendedAction = 'INCREASE_DIFFICULTY';
       recommendRevision = false;
-      reason = `Outstanding progress! Your high mastery and rapid comprehension unlock advanced exercises and concise fast-tracking.`;
+      reason = `Outstanding progress! Your rapid pace and accuracy unlocked Advanced exercises and fast-track summaries.`;
     } else {
       // MEDIUM
       contentMode = 'BALANCED';
+      contentDepth = 2; // Normal
+      lessonMode = 'STANDARD';
+      microLearningEnabled = false;
+      aiTutorMode = 'EXPLAIN';
       recommendedDifficulty = 'MEDIUM';
       recommendedAction = 'CONTINUE';
       recommendRevision = false;
-      reason = `Balanced learning pace detected. Continue at the current steady progression with guided hints available if needed.`;
+      reason = `Balanced learning pace detected. Continue at the current steady progression with progressive hints available if needed.`;
     }
 
-    // 6. Record recommendation
+    // 7. Record recommendation
     const recId = `rec_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
     dbService.saveRecommendation({
       id: recId,
@@ -121,15 +161,54 @@ export class AdaptiveEngineService {
 
     return {
       cognitive_level: cognitiveLevel,
-      confidence: predictionResult.confidence,
+      confidence: smoothedState.confidence,
       recommended_action: recommendedAction,
       content_mode: contentMode,
+      content_depth: contentDepth,
+      lesson_mode: lessonMode,
+      micro_learning_enabled: microLearningEnabled,
+      ai_tutor_mode: aiTutorMode,
       recommended_difficulty: recommendedDifficulty,
       recommend_revision: recommendRevision,
       recommended_topic_id: recommendedTopicId,
       reason,
       contributing_factors: predictionResult.contributing_factors,
       unusual_completion: predictionResult.unusual_completion
+    };
+  }
+
+  /**
+   * Section 74 & 75: Temporal Smoothing & Confidence Thresholding
+   */
+  private applyTemporalSmoothing(userId: string, currentPred: CognitivePredictionResult): { level: CognitiveLoadLevel; confidence: number } {
+    // If confidence is low (< 0.60), be conservative and pull towards MEDIUM
+    if (currentPred.confidence < 0.60) {
+      return { level: 'MEDIUM', confidence: currentPred.confidence };
+    }
+
+    const history = dbService.getCognitivePredictionHistory(userId, 4);
+    if (history.length === 0) {
+      return { level: currentPred.prediction, confidence: currentPred.confidence };
+    }
+
+    const stateToNum = (state: string) => (state === 'LOW' ? 1 : state === 'HIGH' ? 3 : 2);
+    const numToState = (val: number): CognitiveLoadLevel => (val < 1.6 ? 'LOW' : val > 2.4 ? 'HIGH' : 'MEDIUM');
+
+    // Weighted average: current = 0.5, past = 0.5 distributed
+    let totalWeight = 0.5;
+    let weightedSum = stateToNum(currentPred.prediction) * 0.5;
+
+    const weights = [0.25, 0.15, 0.10];
+    history.slice(0, 3).forEach((rec: any, idx: number) => {
+      const w = weights[idx] || 0.05;
+      weightedSum += stateToNum(rec.cognitive_load) * w;
+      totalWeight += w;
+    });
+
+    const smoothedVal = weightedSum / totalWeight;
+    return {
+      level: numToState(smoothedVal),
+      confidence: currentPred.confidence
     };
   }
 

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
-import { TestCase } from '../types.js';
+import { TestCase, CodingErrorCategory } from '../types.js';
 
 export interface ExecutionResult {
   status: 'PASSED' | 'FAILED' | 'COMPILE_ERROR' | 'RUNTIME_ERROR' | 'TIME_LIMIT_EXCEEDED';
@@ -12,6 +12,9 @@ export interface ExecutionResult {
   execution_time_ms: number;
   compilation_error?: string;
   runtime_error?: string;
+  error_category?: CodingErrorCategory;
+  error_diagnosis?: string;
+  recommended_review_concept?: string;
   details: {
     input: string;
     expected: string;
@@ -43,17 +46,19 @@ export class CodeSandboxService {
 
     const startTime = Date.now();
     try {
+      let rawResult: ExecutionResult;
       if (language === 'python' || language === 'py') {
-        return await this.evaluatePython(runDir, code, testCases, startTime);
+        rawResult = await this.evaluatePython(runDir, code, testCases, startTime);
       } else if (language === 'c') {
-        return await this.evaluateC(runDir, code, testCases, startTime);
+        rawResult = await this.evaluateC(runDir, code, testCases, startTime);
       } else if (language === 'cpp' || language === 'c++') {
-        return await this.evaluateCpp(runDir, code, testCases, startTime);
+        rawResult = await this.evaluateCpp(runDir, code, testCases, startTime);
       } else if (language === 'java') {
-        return await this.evaluateJava(runDir, code, testCases, startTime);
+        rawResult = await this.evaluateJava(runDir, code, testCases, startTime);
       } else {
         throw new Error(`Unsupported programming language: ${language}`);
       }
+      return this.decorateResult(rawResult);
     } finally {
       // Clean up sandbox directory asynchronously
       try {
@@ -381,12 +386,30 @@ export class CodeSandboxService {
         proc.stdin.end();
       }
 
+      const MAX_OUTPUT_BYTES = 50 * 1024; // 50KB safety cap (Section 93)
+
       proc.stdout?.on('data', data => {
-        stdout += data.toString();
+        if (stdout.length < MAX_OUTPUT_BYTES) {
+          stdout += data.toString();
+          if (stdout.length >= MAX_OUTPUT_BYTES) {
+            stdout += '\n[OUTPUT TRUNCATED: Exceeded 50KB limit]';
+            try { proc.kill(); } catch (e) {}
+          }
+        }
       });
 
       proc.stderr?.on('data', data => {
-        stderr += data.toString();
+        if (stderr.length < MAX_OUTPUT_BYTES) {
+          stderr += data.toString();
+          if (stderr.length >= MAX_OUTPUT_BYTES) {
+            stderr += '\n[STDERR TRUNCATED: Exceeded 50KB limit]';
+          }
+        }
+      });
+
+      proc.on('error', err => {
+        clearTimeout(timer);
+        resolve({ stdout, stderr: err.message, exitCode: 1, timedOut: false });
       });
 
       proc.on('close', code => {
@@ -399,6 +422,95 @@ export class CodeSandboxService {
         resolve({ stdout, stderr: err.message, exitCode: 1, timedOut: false });
       });
     });
+  }
+
+  /**
+   * Section 58: Error Classification System
+   */
+  public classifyError(
+    status: string,
+    stderr: string,
+    hasWrongOutput: boolean
+  ): { category: CodingErrorCategory; diagnosis: string; reviewConcept: string } {
+    const errLower = (stderr || '').toLowerCase();
+
+    if (status === 'TIME_LIMIT_EXCEEDED') {
+      return {
+        category: 'TIME_LIMIT',
+        diagnosis: 'Execution exceeded 5000ms limit. Check for infinite loops or missing base cases in recursive calls.',
+        reviewConcept: 'Loop termination conditions and algorithmic efficiency'
+      };
+    }
+
+    if (
+      status === 'COMPILE_ERROR' ||
+      errLower.includes('syntaxerror') ||
+      errLower.includes('parse error') ||
+      errLower.includes('expected') ||
+      errLower.includes('error:')
+    ) {
+      if (errLower.includes('syntaxerror') || errLower.includes('invalid syntax')) {
+        return {
+          category: 'SYNTAX_ERROR',
+          diagnosis: 'Language syntax error detected. Check colons (:), unclosed brackets, or indentation.',
+          reviewConcept: 'Syntax rules and language grammar'
+        };
+      }
+      return {
+        category: 'COMPILATION_ERROR',
+        diagnosis: 'Source code failed to compile into executable binary. Check function declarations and header includes.',
+        reviewConcept: 'Declarations, header files, and types'
+      };
+    }
+
+    if (
+      errLower.includes('typeerror') ||
+      errLower.includes('incompatible type') ||
+      errLower.includes('cannot convert')
+    ) {
+      return {
+        category: 'TYPE_ERROR',
+        diagnosis: 'Type mismatch detected. You may be passing incorrect parameter types or performing unsupported operations.',
+        reviewConcept: 'Data types, type casting, and function signatures'
+      };
+    }
+
+    if (
+      errLower.includes('indexerror') ||
+      errLower.includes('out of bounds') ||
+      errLower.includes('segmentation fault') ||
+      errLower.includes('sigsegv')
+    ) {
+      return {
+        category: 'RUNTIME_ERROR',
+        diagnosis: 'Index out-of-range or invalid memory access. Check that indices are strictly between 0 and size - 1.',
+        reviewConcept: 'Array indexing and boundary validation'
+      };
+    }
+
+    if (hasWrongOutput || status === 'FAILED') {
+      return {
+        category: 'WRONG_OUTPUT',
+        diagnosis: 'Code executed cleanly but stdout output did not match test case requirements. Check edge cases and spacing.',
+        reviewConcept: 'Output formatting and conditional edge cases'
+      };
+    }
+
+    return {
+      category: 'RUNTIME_ERROR',
+      diagnosis: 'Runtime exception encountered during execution.',
+      reviewConcept: 'Exception handling and input parsing'
+    };
+  }
+
+  private decorateResult(result: ExecutionResult): ExecutionResult {
+    if (result.status === 'PASSED') return result;
+    const stderr = result.compilation_error || result.runtime_error || '';
+    const classification = this.classifyError(result.status, stderr, result.status === 'FAILED');
+    result.error_category = classification.category;
+    result.error_diagnosis = classification.diagnosis;
+    result.recommended_review_concept = classification.reviewConcept;
+    return result;
   }
 }
 

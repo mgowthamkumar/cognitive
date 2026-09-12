@@ -1,7 +1,6 @@
 """
-Adaptive LLM Service with Cognitive Load Prompt Conditioning and Progressive Hint System.
-Connects with external LLM APIs (Gemini/OpenAI) if keys are provided in environment,
-and provides a resilient, intelligent offline generator fallback with curriculum grounding.
+Adaptive LLM Service with Cognitive Load Prompt Conditioning, 8 AI Tutor Modes,
+and 5-Tier Progressive Hint System with Grounded Source Citations (Sections 52, 53, 54, 63, 64, 65, 66).
 """
 import os
 import json
@@ -19,26 +18,33 @@ class LLMService:
         language: str,
         topic: str,
         level: str,
-        cognitive_load: str
+        cognitive_load: str,
+        tutor_mode: Optional[str] = "EXPLAIN",
+        code_context: Optional[str] = None
     ) -> Dict[str, Any]:
         """
-        Synthesizes an explanation tailored to the learner's cognitive state (LOW, MEDIUM, HIGH).
+        Synthesizes an explanation tailored to the learner's cognitive state and selected tutor mode.
         """
         cognitive_load = (cognitive_load or "MEDIUM").upper()
+        tutor_mode = (tutor_mode or "EXPLAIN").upper()
         
+        # Section 65: Fallback if retrieval confidence is low or empty
+        if not retrieved_contexts and not question:
+            return {
+                "answer": "I couldn't find enough information in the current learning knowledge base. Would you like a general explanation?",
+                "cognitive_mode_applied": cognitive_load,
+                "sources": [],
+                "confidence_flag": "FALLBACK"
+            }
+
         # Pull best context text and metadata
         context_body = "\n\n".join([c["text"] for c in retrieved_contexts]) if retrieved_contexts else ""
         first_meta = retrieved_contexts[0]["metadata"] if retrieved_contexts else {}
         analogy = first_meta.get("analogy", "")
         tips = first_meta.get("simplification_tips", "")
 
-        # If external API is configured, we construct prompt and call it
-        if self.gemini_key:
-            return self._call_gemini_api(question, context_body, language, topic, level, cognitive_load, analogy, tips)
-        
-        # High-Fidelity Domain-Grounded Response Generator
         return self._generate_intelligent_offline_response(
-            question, context_body, language, topic, level, cognitive_load, analogy, tips
+            question, context_body, language, topic, level, cognitive_load, analogy, tips, tutor_mode, code_context, retrieved_contexts
         )
 
     def generate_progressive_hint(
@@ -50,36 +56,43 @@ class LLMService:
         language: str
     ) -> Dict[str, Any]:
         """
-        Section 14: Progressive hints:
-        Hint 1 -> Conceptual hint
-        Hint 2 -> Approach
-        Hint 3 -> Pseudocode
-        Hint 4 -> Partial code (never full solution)
+        Section 54: 5-Tier Progressive Hints:
+        Level 1: Conceptual hint
+        Level 2: Approach
+        Level 3: Pseudocode
+        Level 4: Partial code skeleton
+        Level 5: Full guided walkthrough (after multiple interactions)
         """
-        hint_level = max(1, min(4, hint_level))
+        hint_level = max(1, min(5, hint_level))
         
         stages = {
-            1: "Conceptual Clue",
-            2: "Algorithmic Strategy",
-            3: "Pseudocode Blueprint",
-            4: "Code Skeleton & Fill-in-the-Blank"
+            1: "Level 1: Conceptual Clue",
+            2: "Level 2: Algorithmic Strategy",
+            3: "Level 3: Pseudocode Blueprint",
+            4: "Level 4: Code Skeleton (Fill-in-the-Blank)",
+            5: "Level 5: Full Guided Conceptual Walkthrough"
         }
 
+        lang_title = language.title()
+        topic_title = topic.replace("_", " ").title()
         content = ""
+
         if hint_level == 1:
-            content = f"💡 **Conceptual Clue**: Focus on the fundamental invariant of **{topic.replace('_', ' ').title()}** in {language.title()}. What condition must change on every step to guarantee termination without redundant memory allocation?"
+            content = f"💡 **Level 1 — Conceptual Clue**:\nFocus on the core invariant of **{topic_title}** in {lang_title}. What state or condition must change on every step to guarantee termination without redundant allocations?"
         elif hint_level == 2:
-            content = f"🧭 **Algorithmic Approach**: Break the problem down into three sequential phases:\n1. Initialize your state/accumulator.\n2. Iterate through each element or condition.\n3. Validate the boundary condition and return the computed outcome."
+            content = f"🧭 **Level 2 — Algorithmic Approach**:\n1. Initialize your accumulator/state variable.\n2. Iterate through each element or check your boolean boundary.\n3. Update your state conditionally.\n4. Return the computed outcome."
         elif hint_level == 3:
-            content = f"📝 **Pseudocode Blueprint**:\n```text\nBEGIN {topic.upper()}_SOLUTION(input_data):\n    SET result = initial_value\n    FOR EACH item IN input_data:\n        IF item satisfies_condition:\n            UPDATE result\n    RETURN result\nEND\n```"
-        else: # Hint 4
-            content = f"🧩 **Code Skeleton (Fill in the blanks)**:\n```{language.lower()}\n# Fill in the highlighted placeholders:\ndef solve_challenge(data):\n    # Step 1: Initialize baseline\n    accumulator = ... # TODO: choose start value\n    \n    # Step 2: Loop logic\n    for item in data:\n        if ...: # TODO: insert condition\n            accumulator += ...\n            \n    return accumulator\n```\n*Notice: Complete solutions are never directly provided to maximize your conceptual retention!*"
+            content = f"📝 **Level 3 — Pseudocode Blueprint**:\n```text\nFUNCTION solve_{topic.lower()}(input_data):\n    INITIALIZE result = default_value\n    WHILE condition_holds(input_data):\n        IF meets_criteria(item):\n            result = update(result, item)\n        ADVANCE pointers / iterators\n    RETURN result\nEND FUNCTION\n```"
+        elif hint_level == 4:
+            content = f"🧩 **Level 4 — Partial Code Skeleton**:\n```{language.lower()}\n# Fill in the designated blanks:\ndef solve(data):\n    # 1. State initialization\n    res = ... # choose starting value\n    \n    # 2. Main processing loop\n    for item in data:\n        if ...: # insert condition\n            res += item\n            \n    return res\n```\n*Notice: Test your logic with small numbers before running the full test suite!*"
+        else: # Level 5
+            content = f"🎓 **Level 5 — Full Guided Walkthrough**:\nHere is the complete conceptual blueprint explaining every line:\n```{language.lower()}\n# Complete reference implementation\ndef solve(data):\n    total = 0\n    for x in data:\n        if x % 2 == 0: # Checks if x is even\n            total += x\n    return total\n```\n**Why it works**: Iterating through `data` processes each element sequentially in $O(N)$ time and $O(1)$ extra space, correctly summing only elements satisfying the even parity test."
 
         return {
             "hint_level": hint_level,
             "stage": stages[hint_level],
             "hint_text": content,
-            "next_hint_available": hint_level < 4
+            "next_hint_available": hint_level < 5
         }
 
     def _generate_intelligent_offline_response(
@@ -91,67 +104,119 @@ class LLMService:
         level: str,
         cognitive_load: str,
         analogy: str,
-        tips: str
+        tips: str,
+        tutor_mode: str,
+        code_context: Optional[str],
+        retrieved_contexts: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
         lang_title = language.title()
         topic_title = topic.replace("_", " ").title()
 
-        if cognitive_load == "HIGH":
-            # Section 13: HIGH cognitive load formatting
+        # Section 53: 8 Explicit AI Tutor Response Modes
+        if tutor_mode == "SIMPLIFY":
             explanation = (
-                f"### 🌱 Guided Breakdown: {topic_title} ({lang_title})\n\n"
-                f"Don't worry if this concept feels a bit tricky at first! Let's take it step by step.\n\n"
-                f"#### 💡 Intuitive Analogy\n"
-                f"{analogy if analogy else f'Think of {topic_title} like following a clear recipe in a kitchen where every ingredient has its exact place.'}\n\n"
-                f"#### 🔍 Step-by-Step Walkthrough\n"
-                f"1. **What is it?** It's a foundational tool in {lang_title} used to control how data moves.\n"
-                f"2. **Why do we need it?** Without it, you would have to write repetitive code manually.\n"
-                f"3. **How does it look?** Keep it minimal and avoid nested complexity.\n\n"
-                f"#### ⚠️ Common Beginner Mistakes to Avoid\n"
-                f"- Forgetting that indices start at `0`.\n"
-                f"- Modifying variables inside a loop while checking their values.\n\n"
-                f"#### 🎯 Practice Checkpoint\n"
-                f"Can you explain in your own words what happens when the first iteration runs? Try experimenting with small `print` statements to watch the values change!"
+                f"### 🌱 Simplified Explanation: {topic_title}\n\n"
+                f"Let's make this crystal clear without heavy technical jargon!\n\n"
+                f"#### 💡 Everyday Analogy\n"
+                f"{analogy if analogy else f'Think of {topic_title} like following an orderly recipe: you inspect one ingredient at a time until the meal is complete.'}\n\n"
+                f"#### 🔑 The 3 Key Rules to Remember\n"
+                f"1. **Start**: Define where you begin.\n"
+                f"2. **Step**: Decide how you move forward on each turn.\n"
+                f"3. **Stop**: Make sure there is an end goal so you don't repeat forever!"
             )
-        elif cognitive_load == "LOW":
-            # Section 13: LOW cognitive load formatting
+        elif tutor_mode == "EXAMPLE":
             explanation = (
-                f"### ⚡ Fast-Track & Optimization: {topic_title} ({lang_title})\n\n"
-                f"You're already demonstrating strong mastery of the core concepts! Here is a concise, high-performance breakdown:\n\n"
-                f"- **Core Mechanism**: Zero-overhead control patterns in modern {lang_title}.\n"
-                f"- **Complexity Profile**: Aim for O(1) space overhead and amortized O(N) operations.\n"
-                f"- **Pro Tip**: {tips if tips else 'Prefer idiomatic memory-safe patterns over redundant manual bookkeeping.'}\n\n"
-                f"```\n// Optimized idiomatic structure\n// Leverage standard library utilities to maximize compiler vectorization\n```\n"
-                f"🚀 **Challenge**: Can you implement this utilizing minimal temporary variables while preventing cache misses?"
+                f"### 💻 Minimal Working Example: {topic_title} in {lang_title}\n\n"
+                f"Here is a clean, minimal code demonstration that you can test immediately:\n\n"
+                f"```{language.lower()}\n"
+                f"# Demonstration of {topic_title}\n"
+                f"data = [1, 2, 3, 4, 5]\n"
+                f"print('Processing items:')\n"
+                f"for val in data:\n"
+                f"    print(f'Item: {{val}} -> Doubled: {{val * 2}}')\n"
+                f"```\n\n"
+                f"**Expected Output**:\n```text\nProcessing items:\nItem: 1 -> Doubled: 2\nItem: 2 -> Doubled: 4\n...\n```"
             )
-        else: # MEDIUM
+        elif tutor_mode == "DEBUG":
+            code_preview = code_context if code_context else "# No code provided"
             explanation = (
-                f"### 📘 Clear Explanation: {topic_title} ({lang_title})\n\n"
-                f"Here is a balanced overview to reinforce your understanding of **{topic_title}**:\n\n"
-                f"#### Key Principles\n"
-                f"- In {lang_title}, {topic_title} is standard practice for clean and maintainable code.\n"
-                f"- It allows your application to handle varying inputs predictably.\n\n"
-                f"#### Practical Guidance\n"
-                f"{tips if tips else 'Ensure your base conditions and state updates are explicitly defined.'}\n\n"
-                f"#### Next Steps\n"
-                f"Try applying this in the interactive coding challenge below to test your implementation!"
+                f"### 🛠️ Code Diagnostic & Debug Analysis\n\n"
+                f"Inspecting your {lang_title} code snippet:\n```\n{code_preview}\n```\n\n"
+                f"#### 🔍 Key Inspection Checkpoints\n"
+                f"1. **Boundary Conditions**: Are your loop indices or ranges starting at `0` and terminating before `length`?\n"
+                f"2. **Return Values**: Did you explicitly `return` the computed outcome rather than letting the function finish with `None`?\n"
+                f"3. **State Mutation**: Ensure accumulator variables are reset properly between test cases."
             )
+        elif tutor_mode == "HINT":
+            explanation = (
+                f"### 💡 Quick Tutor Hint\n\n"
+                f"What invariant should remain true throughout your loop or function? Remember: in {lang_title}, `{topic_title}` guarantees predictable behavior when state transitions are explicit."
+            )
+        elif tutor_mode == "QUIZ":
+            explanation = (
+                f"### 🎯 Quick Knowledge Check\n\n"
+                f"**Question**: In {lang_title}, what will happen if you attempt to access an index equal to the length of the list/array?\n\n"
+                f"A) Returns the last item\nB) Throws an index out-of-range error\nC) Automatically expands the collection\n\n*Think about why indices are zero-based!*"
+            )
+        elif tutor_mode == "REVISE":
+            explanation = (
+                f"### 🔄 Quick Revision Summary: {topic_title}\n\n"
+                f"- **Core Concept**: Encapsulates iterative or modular logic in {lang_title}.\n"
+                f"- **Common Pitfalls**: Off-by-one bounds, infinite loops, and uninitialized accumulators.\n"
+                f"- **Pro Tip**: {tips if tips else 'Always test with boundary cases: empty input, single element, and large inputs.'}"
+            )
+        elif tutor_mode == "ADVANCED":
+            explanation = (
+                f"### ⚡ Advanced Deep Dive: {topic_title}\n\n"
+                f"- **Compiler Nuances**: Modern optimizing compilers vectorize simple iteration constructs using SIMD registers.\n"
+                f"- **Memory Cache Locality**: Sequential access delivers $O(1)$ cache hits; jumping addresses incurs cache line eviction penalties.\n"
+                f"- **Memory Safety**: In systems languages like C/C++, ensure pointers do not outlive their allocated stack/heap lifetime."
+            )
+        else: # Standard EXPLAIN conditioned on cognitive load
+            if cognitive_load == "HIGH":
+                explanation = (
+                    f"### 🌱 Guided Breakdown: {topic_title} ({lang_title})\n\n"
+                    f"Don't worry if this concept feels tricky at first! Let's break it down into bite-sized steps.\n\n"
+                    f"#### 💡 Intuitive Analogy\n"
+                    f"{analogy if analogy else f'Think of {topic_title} like following a clear recipe where every ingredient has its exact place.'}\n\n"
+                    f"#### 🔍 Step-by-Step Walkthrough\n"
+                    f"1. **What is it?** A foundational pattern in {lang_title} to control data flow.\n"
+                    f"2. **Why do we need it?** Without it, you would have to manually duplicate code.\n"
+                    f"3. **How does it look?** Keep it simple and avoid nested layers until confident."
+                )
+            elif cognitive_load == "LOW":
+                explanation = (
+                    f"### ⚡ Fast-Track & Optimization: {topic_title} ({lang_title})\n\n"
+                    f"You're already demonstrating strong mastery of the basics! Here is the high-performance perspective:\n\n"
+                    f"- **Complexity**: $O(1)$ space overhead and amortized $O(N)$ operations.\n"
+                    f"- **Pro Tip**: {tips if tips else 'Prefer idiomatic standard library algorithms over manual bookkeeping.'}\n"
+                    f"- **Challenge**: Can you implement this utilizing minimal temporary variables while preventing cache misses?"
+                )
+            else:
+                explanation = (
+                    f"### 📘 Clear Explanation: {topic_title} ({lang_title})\n\n"
+                    f"Here is a balanced overview to reinforce your understanding:\n\n"
+                    f"#### Key Principles\n"
+                    f"- In {lang_title}, {topic_title} is standard practice for clean and maintainable code.\n"
+                    f"- It enables predictable handling of variable input sets.\n\n"
+                    f"#### Practical Guidance\n"
+                    f"{tips if tips else 'Ensure your base conditions and state updates are explicitly defined.'}"
+                )
+
+        # Section 64: Distinguish retrieved sources
+        sources = [
+            f"{lang_title} Core Language Reference",
+            f"Course Knowledge Base: {topic_title}"
+        ]
+        if retrieved_contexts:
+            sources.append(f"Grounded Chunk: {retrieved_contexts[0].get('id', 'concept_doc')}")
 
         return {
             "answer": explanation,
             "cognitive_mode_applied": cognitive_load,
-            "sources": [
-                f"{lang_title} Official Core Curriculum",
-                f"Knowledge Base: {topic_title}"
-            ]
+            "tutor_mode_applied": tutor_mode,
+            "sources": sources
         }
 
-    def _call_gemini_api(self, question, context, language, topic, level, cognitive_load, analogy, tips):
-        # Optional external call if GEMINI_API_KEY is available
-        # Fallback to offline if any network issue occurs
-        return self._generate_intelligent_offline_response(
-            question, context, language, topic, level, cognitive_load, analogy, tips
-        )
-
-# Global LLM singleton
+# Global singleton
 llm_service = LLMService()

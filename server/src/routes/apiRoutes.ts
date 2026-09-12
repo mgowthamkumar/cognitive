@@ -7,15 +7,25 @@ import * as behaviorCtrl from '../controllers/behaviorController.js';
 import * as adaptiveCtrl from '../controllers/adaptiveController.js';
 import * as aiCtrl from '../controllers/aiController.js';
 import * as adminCtrl from '../controllers/adminController.js';
+import * as dashboardCtrl from '../controllers/dashboardController.js';
+import * as projectCtrl from '../controllers/projectController.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
+
+// Platform Public Statistics (Section 43)
+router.get('/stats/platform', dashboardCtrl.getPlatformStats);
 
 // Authentication
 router.post('/auth/register', authCtrl.register);
 router.post('/auth/login', authCtrl.login);
 router.get('/auth/me', requireAuth, authCtrl.getMe);
 router.post('/auth/preferences', requireAuth, authCtrl.updatePreferences);
+
+// Personalized Dashboard & Visual Roadmaps (Section 44, 46)
+router.get('/dashboard/snapshot', dashboardCtrl.getDashboardSnapshot);
+router.get('/dashboard/roadmap/:language', dashboardCtrl.getLanguageRoadmap);
+router.post('/feedback/submit', dashboardCtrl.submitContentFeedback);
 
 // Courses & Topics
 router.get('/courses', courseCtrl.getCourses);
@@ -43,6 +53,11 @@ router.get('/adaptive/recommendation', adaptiveCtrl.getLatestRecommendation);
 // AI Learning Assistant & Progressive Hints (Section 14)
 router.post('/ai/ask', aiCtrl.askAiAssistant);
 router.post('/ai/hint', aiCtrl.requestProgressiveHint);
+
+// Project-Based Learning & Capstones (Sections 82 & 83)
+router.get('/projects', projectCtrl.getProjects);
+router.get('/projects/:projectId', projectCtrl.getProjectDetail);
+router.post('/projects/:projectId/submit', projectCtrl.submitProject);
 
 // Admin & ML Analytics (Section 19)
 router.get('/admin/analytics', adminCtrl.getAdminAnalytics);
