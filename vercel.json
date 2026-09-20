@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "projectId": "prj_xc7UW0tagGCNjElCr6Mc5dr2SkKi",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.js"
+    }
+  ]
+}

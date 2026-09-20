@@ -1,6 +1,21 @@
 import { mockHandlers, isGitHubPages } from './mockFallback';
 
-const API_BASE = '/api';
+const VERCEL_BACKEND = 'https://learning-platform08-o7uub2ykr-aihack.vercel.app';
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
+  : (isGitHubPages ? `${VERCEL_BACKEND}/api` : '/api');
+
+async function fetchJson<T = any>(url: string, options?: RequestInit): Promise<T | null> {
+  try {
+    const res = await fetch(url, options);
+    if (!res.ok) return null;
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
 
 export interface UserInfo {
   id: string;
@@ -26,14 +41,12 @@ function getAuthHeaders(): HeadersInit {
 export const api = {
   // Auth
   register: async (payload: { name: string; email: string; password: string; role?: string }) => {
-    try {
-      const res = await fetch(`${API_BASE}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) return await res.json();
-    } catch {}
+    const data = await fetchJson(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (data) return data;
     const mockUser = { id: `user_${Date.now()}`, name: payload.name, email: payload.email, role: payload.role || 'student' };
     localStorage.setItem('cognitive_token', 'mock_jwt_token');
     return {
@@ -45,14 +58,12 @@ export const api = {
   },
 
   login: async (payload: { email: string; password: string }) => {
-    try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) return await res.json();
-    } catch {}
+    const data = await fetchJson(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (data) return data;
     localStorage.setItem('cognitive_token', 'mock_jwt_token');
     return {
       success: true,
@@ -63,12 +74,10 @@ export const api = {
   },
 
   getMe: async () => {
-    try {
-      const res = await fetch(`${API_BASE}/auth/me`, {
-        headers: getAuthHeaders()
-      });
-      if (res.ok) return await res.json();
-    } catch {}
+    const data = await fetchJson(`${API_BASE}/auth/me`, {
+      headers: getAuthHeaders()
+    });
+    if (data) return data;
     return {
       user: { id: 'guest-learner', name: 'Learner', email: 'learner@cognitive.edu', role: 'student' },
       preferences: { selected_language: 'python', current_level: 'beginner', preferred_mode: 'adaptive' }
@@ -76,91 +85,68 @@ export const api = {
   },
 
   updatePreferences: async (prefs: Partial<UserPreferences>) => {
-    try {
-      const res = await fetch(`${API_BASE}/auth/preferences`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(prefs)
-      });
-      if (res.ok) return await res.json();
-    } catch {}
+    const data = await fetchJson(`${API_BASE}/auth/preferences`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(prefs)
+    });
+    if (data) return data;
     return { success: true, preferences: prefs };
   },
 
   // Courses & Topics
   getCourses: async (language?: string, level?: string) => {
-    if (isGitHubPages) return mockHandlers.getCourses(language);
-    try {
-      const params = new URLSearchParams();
-      if (language) params.append('language', language);
-      if (level) params.append('level', level);
-      const res = await fetch(`${API_BASE}/courses?${params.toString()}`);
-      if (res.ok) return await res.json();
-    } catch {}
+    const params = new URLSearchParams();
+    if (language) params.append('language', language);
+    if (level) params.append('level', level);
+    const data = await fetchJson(`${API_BASE}/courses?${params.toString()}`);
+    if (data) return data;
     return mockHandlers.getCourses(language);
   },
 
   getCourseStructure: async (courseId: string) => {
-    if (isGitHubPages) return mockHandlers.getCourseDetail(courseId);
-    try {
-      const res = await fetch(`${API_BASE}/courses/${courseId}`);
-      if (res.ok) return await res.json();
-    } catch {}
+    const data = await fetchJson(`${API_BASE}/courses/${courseId}`);
+    if (data) return data;
     return mockHandlers.getCourseDetail(courseId);
   },
 
   getTopicDetail: async (topicId: string) => {
-    if (isGitHubPages) return mockHandlers.getTopicDetail(topicId);
-    try {
-      const res = await fetch(`${API_BASE}/topics/${topicId}`);
-      if (res.ok) return await res.json();
-    } catch {}
+    const data = await fetchJson(`${API_BASE}/topics/${topicId}`);
+    if (data) return data;
     return mockHandlers.getTopicDetail(topicId);
   },
 
   // Quizzes
   getTopicQuiz: async (topicId: string) => {
-    if (isGitHubPages) return mockHandlers.getTopicQuiz(topicId);
-    try {
-      const res = await fetch(`${API_BASE}/topics/${topicId}/quiz`);
-      if (res.ok) return await res.json();
-    } catch {}
+    const data = await fetchJson(`${API_BASE}/topics/${topicId}/quiz`);
+    if (data) return data;
     return mockHandlers.getTopicQuiz(topicId);
   },
 
   submitTopicQuiz: async (topicId: string, answers: Record<string, number>, timeSpentSeconds: number) => {
-    if (isGitHubPages) return mockHandlers.submitTopicQuiz(topicId, answers, timeSpentSeconds);
-    try {
-      const res = await fetch(`${API_BASE}/topics/${topicId}/quiz/submit`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ answers, time_spent: timeSpentSeconds })
-      });
-      if (res.ok) return await res.json();
-    } catch {}
+    const data = await fetchJson(`${API_BASE}/topics/${topicId}/quiz/submit`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ answers, time_spent: timeSpentSeconds })
+    });
+    if (data) return data;
     return mockHandlers.submitTopicQuiz(topicId, answers, timeSpentSeconds);
   },
 
   // Code Sandbox
   getTopicCodingChallenge: async (topicId: string) => {
-    if (isGitHubPages) return mockHandlers.getTopicCodingChallenge(topicId);
-    try {
-      const res = await fetch(`${API_BASE}/topics/${topicId}/coding`);
-      if (res.ok) return await res.json();
-    } catch {}
+    const data = await fetchJson(`${API_BASE}/topics/${topicId}/coding`);
+    if (data) return data;
     return mockHandlers.getTopicCodingChallenge(topicId);
   },
 
   runCode: async (code: string, language: string, customInput?: string) => {
-    if (isGitHubPages) return mockHandlers.runCode(code, language, customInput);
-    try {
-      const res = await fetch(`${API_BASE}/code/run`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ code, language, custom_input: customInput })
-      });
-      if (res.ok) return await res.json();
-    } catch {}
+    const data = await fetchJson(`${API_BASE}/code/run`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ code, language, custom_input: customInput })
+    });
+    if (data) return data;
     return mockHandlers.runCode(code, language, customInput);
   },
 
@@ -172,15 +158,12 @@ export const api = {
     keystrokes: number;
     pasteEvents: number;
   }) => {
-    if (isGitHubPages) return mockHandlers.submitCode(payload.topicId, payload.code, payload);
-    try {
-      const res = await fetch(`${API_BASE}/code/submit`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) return await res.json();
-    } catch {}
+    const data = await fetchJson(`${API_BASE}/code/submit`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (data) return data;
     return mockHandlers.submitCode(payload.topicId, payload.code, payload);
   },
 

@@ -43,9 +43,16 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   res.status(500).json({ error: err.message || 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`🚀 Cognitive Engine Backend API running on port ${PORT}`);
-  console.log(`🌐 Base URL: http://localhost:${PORT}/api`);
-  console.log(`====================================================`);
-});
+// Export app for Vercel and serverless environments
+export default app;
+export { app };
+
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`🚀 Cognitive Engine Backend API running on port ${PORT}`);
+    console.log(`🌐 Base URL: http://localhost:${PORT}/api`);
+    console.log(`====================================================`);
+  });
+}
+
