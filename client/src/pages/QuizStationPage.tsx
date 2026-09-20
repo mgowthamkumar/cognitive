@@ -216,6 +216,16 @@ export const QuizStationPage: React.FC<QuizStationProps> = ({
                 <Terminal className="w-3.5 h-3.5" />
                 <span>Try Coding Challenge</span>
               </button>
+
+              {result.passed && onNextTopic && (
+                <button
+                  onClick={onNextTopic}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-bold transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-1.5"
+                >
+                  <span>Advance to Next Topic</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           </div>
 

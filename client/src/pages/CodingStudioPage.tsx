@@ -34,12 +34,14 @@ interface CodingStudioProps {
   topicId?: string;
   onOpenAiDrawer: () => void;
   onBackToLesson: () => void;
+  onNextTopic?: () => void;
 }
 
 export const CodingStudioPage: React.FC<CodingStudioProps> = ({
   topicId,
   onOpenAiDrawer,
-  onBackToLesson
+  onBackToLesson,
+  onNextTopic
 }) => {
   const { preferences } = useAuth();
   const { updateFromFeedback, currentLoad } = useCognitive();
@@ -338,6 +340,15 @@ export const CodingStudioPage: React.FC<CodingStudioProps> = ({
           >
             ← Back to Lesson
           </button>
+          {isPassed && onNextTopic && (
+            <button
+              onClick={onNextTopic}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-bold transition-all shadow-md shadow-emerald-500/20 flex items-center gap-1.5"
+            >
+              <span>Advance to Next Topic</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
           <button
             disabled={running}
             onClick={handleRunCustom}
@@ -612,10 +623,21 @@ export const CodingStudioPage: React.FC<CodingStudioProps> = ({
                       <div className="flex items-center justify-between pb-2 border-b border-slate-800">
                         <span className="font-bold text-white flex items-center gap-2">
                           {isPassed ? (
-                            <>
-                              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                              <span className="text-emerald-400">All Test Cases Passed!</span>
-                            </>
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-1.5">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                                <span className="text-emerald-400">All Test Cases Passed!</span>
+                              </div>
+                              {onNextTopic && (
+                                <button
+                                  onClick={onNextTopic}
+                                  className="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-all shadow-sm flex items-center gap-1"
+                                >
+                                  <span>Next Topic</span>
+                                  <ArrowRight className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
                           ) : (
                             <>
                               <XCircle className="w-4 h-4 text-rose-400" />

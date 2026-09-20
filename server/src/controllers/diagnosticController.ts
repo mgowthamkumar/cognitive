@@ -94,18 +94,18 @@ export const submitDiagnostic = async (req: Request, res: Response): Promise<voi
     const codingScore = codingTotal > 0 ? Math.round((codingCorrect / codingTotal) * 100) : 65;
 
     let recommendedLevel: 'beginner' | 'intermediate' | 'advanced' = 'beginner';
-    let startingTopicId = 'top-py-loops';
+    let startingTopicId = 'top-py-fundamentals';
 
     if (targetLang === 'python') {
       if (totalScore >= 80) {
         recommendedLevel = 'advanced';
-        startingTopicId = 'top-py-datastruct';
+        startingTopicId = 'top-py-modules-regex';
       } else if (totalScore >= 50) {
         recommendedLevel = 'intermediate';
-        startingTopicId = 'top-py-functions';
+        startingTopicId = 'top-py-lists';
       } else {
         recommendedLevel = 'beginner';
-        startingTopicId = 'top-py-loops';
+        startingTopicId = 'top-py-fundamentals';
       }
     } else if (targetLang === 'c') {
       if (totalScore >= 75) {

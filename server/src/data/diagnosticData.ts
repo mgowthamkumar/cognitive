@@ -141,6 +141,116 @@ export const initialDiagnosticQuestions: DiagnosticQuestion[] = [
     explanation: 'The `with` statement utilizes the context management protocol (`__enter__` and `__exit__`), guaranteeing file cleanup.',
     difficulty_weight: 1
   },
+  {
+    id: 'diag-py-13',
+    language: 'python',
+    category: 'concept',
+    question: 'What is the exact output of `10.0 // 3` in Python 3?',
+    options: ['3', '3.0', '3.3333333333333335', 'TypeError'],
+    correct_index: 1,
+    explanation: 'Floor division `//` performs floor arithmetic, but if at least one operand is a float (`10.0`), the result is coerced to float (`3.0`).',
+    difficulty_weight: 1
+  },
+  {
+    id: 'diag-py-14',
+    language: 'python',
+    category: 'problem_solving',
+    question: 'What happens when evaluating `int("0b1111")` in Python?',
+    options: [
+      'Returns integer 15',
+      'Raises ValueError: invalid literal for int() with base 10',
+      'Returns binary string "0b1111"',
+      'Returns 1111'
+    ],
+    correct_index: 1,
+    explanation: '`int(string)` expects a base-10 integer string by default. To parse binary strings, the base must be explicitly passed: `int("0b1111", 2)`. Calling `int("0b1111")` raises ValueError.',
+    difficulty_weight: 2
+  },
+  {
+    id: 'diag-py-15',
+    language: 'python',
+    category: 'concept',
+    question: 'How do you define a single-valued tuple containing the number 10 in Python?',
+    options: ['t = (10)', 't = (10,)', 't = tuple[10]', 't = [10]'],
+    correct_index: 1,
+    explanation: '`t = (10)` is evaluated as a grouped integer. A trailing comma `(10,)` is mandatory for Python to recognize it as a single-element tuple.',
+    difficulty_weight: 1
+  },
+  {
+    id: 'diag-py-16',
+    language: 'python',
+    category: 'problem_solving',
+    question: 'Given set `s = {10, 20}`, what is the difference between `s.remove(50)` and `s.discard(50)`?',
+    options: [
+      '`remove(50)` raises a KeyError; `discard(50)` completes without error',
+      '`discard(50)` raises a KeyError; `remove(50)` returns None',
+      'Both methods raise a ValueError',
+      'Both methods automatically insert 50 into the set'
+    ],
+    correct_index: 0,
+    explanation: 'In Python sets, `remove()` raises a KeyError if the element does not exist. `discard()` removes the element if present, or safely does nothing if absent.',
+    difficulty_weight: 2
+  },
+  {
+    id: 'diag-py-17',
+    language: 'python',
+    category: 'coding_ability',
+    question: 'Why does calling `calc(b=50, 100)` cause a SyntaxError in Python?',
+    options: [
+      'Positional arguments cannot follow keyword arguments in a function call',
+      'Python functions can only accept keyword arguments',
+      'Parameter `b` must be capitalized',
+      'Arguments must always be enclosed in a tuple'
+    ],
+    correct_index: 0,
+    explanation: 'In Python syntax, all positional arguments must precede any keyword arguments in a function call.',
+    difficulty_weight: 2
+  },
+  {
+    id: 'diag-py-18',
+    language: 'python',
+    category: 'coding_ability',
+    question: 'What types do variable-length positional arguments `*args` and keyword arguments `**kwargs` have inside a Python function?',
+    options: [
+      '`*args` is a tuple, `**kwargs` is a dict',
+      '`*args` is a list, `**kwargs` is a tuple',
+      '`*args` is a set, `**kwargs` is a list',
+      '`*args` is a generator, `**kwargs` is an object'
+    ],
+    correct_index: 0,
+    explanation: '`*args` packages excess positional arguments into an immutable tuple, while `**kwargs` packages named arguments into a dictionary.',
+    difficulty_weight: 2
+  },
+  {
+    id: 'diag-py-19',
+    language: 'python',
+    category: 'concept',
+    question: 'Out of the 33 reserved keywords in Python, which ones start with a capital letter?',
+    options: [
+      'True, False, None',
+      'Def, Class, Return',
+      'If, Elif, Else',
+      'All 33 keywords are lowercase'
+    ],
+    correct_index: 0,
+    explanation: 'Only True, False, and None are capitalized in Python keywords. The remaining 30 are strictly lowercase.',
+    difficulty_weight: 1
+  },
+  {
+    id: 'diag-py-20',
+    language: 'python',
+    category: 'problem_solving',
+    question: 'Which regular expression pattern validates a 10-digit Indian mobile number starting with digits 6 to 9?',
+    options: [
+      're.fullmatch(r"[6-9]\\d{9}", number)',
+      're.match(r"[0-9]{10}", number)',
+      're.search(r"\\d{10}", number)',
+      're.findall(r"[6-9]{10}", number)'
+    ],
+    correct_index: 0,
+    explanation: '`[6-9]` requires the first digit to be 6, 7, 8, or 9, followed by exactly 9 digits (`\\d{9}`). Using `re.fullmatch` guarantees no unvalidated prefix or suffix.',
+    difficulty_weight: 2
+  },
 
   // --- C DIAGNOSTIC QUESTIONS ---
   {

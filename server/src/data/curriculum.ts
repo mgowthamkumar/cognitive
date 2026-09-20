@@ -32,11 +32,13 @@ export const initialCurriculum: CurriculumData = {
   ],
 
   modules: [
-    // Python Modules
-    { id: 'mod-py-1', course_id: 'py-beg', title: 'Basics & Control Flow', description: 'Conditionals and loop constructs', order_index: 1 },
-    { id: 'mod-py-2', course_id: 'py-beg', title: 'Modular Code with Functions', description: 'Function declarations, scope, and recursion', order_index: 2 },
-    { id: 'mod-py-3', course_id: 'py-int', title: 'Compound Data Structures', description: 'Lists, dictionaries, and comprehension patterns', order_index: 3 },
-    { id: 'mod-py-4', course_id: 'py-adv', title: 'OOP & Metaprogramming', description: 'Classes, decorators, and generators', order_index: 4 },
+    // Python Modules (6 Stages directly corresponding to Python1.pdf Units 1-6)
+    { id: 'mod-py-1', course_id: 'py-beg', title: 'Stage 1 (Unit 1): Language Fundamentals, Types & Operators', description: 'Python history, keywords, datatypes, immutability, operators, dynamic input/output', order_index: 1 },
+    { id: 'mod-py-2', course_id: 'py-beg', title: 'Stage 2 (Unit 2): Flow Control, Loops & Pattern Printing', description: 'Conditional statements, iterative loops, transfer statements, and pattern printing', order_index: 2 },
+    { id: 'mod-py-3', course_id: 'py-int', title: 'Stage 3 (Unit 3): Strings, Slicing & String Algorithms', description: 'Positive/negative slicing, substring search, character testing, and string algorithms', order_index: 1 },
+    { id: 'mod-py-4', course_id: 'py-int', title: 'Stage 4 (Unit 4): Lists, Matrices & Comprehensions', description: 'List methods, aliasing vs cloning, nested 2D matrices, and list comprehensions', order_index: 2 },
+    { id: 'mod-py-5', course_id: 'py-int', title: 'Stage 5 (Unit 5): Tuples, Sets & Dictionaries', description: 'Tuple immutability, packing/unpacking, set uniqueness, dict methods, and comprehensions', order_index: 3 },
+    { id: 'mod-py-6', course_id: 'py-adv', title: 'Stage 6 (Unit 6): Functions, Modules & Regular Expressions', description: 'Functions, *args/**kwargs, LEGB scope, recursion, random/math modules, and regex', order_index: 1 },
 
     // C Modules
     { id: 'mod-c-1', course_id: 'c-beg', title: 'Core Syntax & Control Flow', description: 'Variables, loops, and conditions', order_index: 1 },
@@ -55,21 +57,165 @@ export const initialCurriculum: CurriculumData = {
   ],
 
   topics: [
-    // --- PYTHON TOPICS ---
+    // --- PYTHON TOPICS (Stage 1 to 6 - Units 1 to 6 of Python1.pdf) ---
+    // Stage 1 (Unit 1): Language Fundamentals & Types
+    {
+      id: 'top-py-fundamentals',
+      module_id: 'mod-py-1',
+      title: 'Language Fundamentals, Datatypes & Immutability',
+      order_index: 1,
+      learning_objective: 'Understand Python history, 11 core features, 6 flavours, 14 built-in datatypes, object identity (id/type), and immutability.',
+      content_standard: 'Python was created by Guido Van Rossum in 1989 and released in 1991. It is high-level, interpreted, and dynamically typed. All fundamental types (int, float, complex, bool, str) are immutable objects in memory.',
+      content_low: '### ⚡ Fast-Track Summary\n- 11 features: simple, freeware, platform-independent (PVM), interpreted, dynamically typed, extensible, embedded, rich library.\n- Flavours: CPython (standard), Jython (JVM), IronPython (.NET), PyPy (JIT speed).\n- 14 types: int, float, complex, bool, str, bytes, bytearray, range, list, tuple, set, frozenset, dict, None.\n- Immutability: fundamental objects cannot be modified in place; `id(x)` reflects memory location; `is` checks address, `==` checks value.',
+      content_medium: '### 📘 Standard Guide\nPython handles memory automatically via PVM. Identifiers cannot start with digits. Only 3 of 33 keywords are capitalized: `True`, `False`, `None`.\nBase conversions: `bin()`, `oct()`, `hex()`. Fundamental types are immutable: modifying a variable rebinds it to a new object.',
+      content_high: '### 🌱 Step-by-Step Breakdown\n1. **High-Level**: You don\'t worry about low-level memory allocation or pointers.\n2. **Dynamic Typing**: Write `x = 10` (integer) or `x = "Hello"` (string); Python determines types automatically.\n3. **Analogy**: Variables are sticky labels on boxes, not the boxes themselves!',
+      syntax: '# Base conversion\na = 15\nprint(bin(a)) # 0b1111\nprint(hex(a)) # 0xf\n\n# Identity vs Equality\nx = 256; y = 256\nprint(x is y) # True (object interning)',
+      examples: '# Check memory address and type\na = 10\nprint(type(a), id(a))\na = a + 1\nprint(type(a), id(a)) # New memory address created!',
+      common_mistakes: '1. Using reserved words as variable names (e.g. `def = 44` causes SyntaxError).\n2. Expecting immutable objects to change in-place without assignment.',
+      practice_prompt: 'Write a script that demonstrates integer base conversion from decimal to binary, octal, and hexadecimal.',
+      sections: [
+        {
+          id: 'sec-py-fund-1',
+          title: '1. Python Architecture & Flavours',
+          order_index: 1,
+          content: 'Guido Van Rossum developed Python borrowing functional syntax from C, OOP from C++, and scripting from Perl/Shell. PyPy uses a JIT compiler inside the PVM for massive performance speedups.',
+          code_snippet: 'import sys\nprint(sys.version)',
+          mini_check: {
+            question: 'Which flavour of Python runs on the Java Virtual Machine (JVM)?',
+            options: ['CPython', 'Jython', 'IronPython', 'PyPy'],
+            correct_index: 1,
+            explanation: 'Jython (originally JPython) is designed to run seamlessly on the Java Virtual Machine.'
+          }
+        },
+        {
+          id: 'sec-py-fund-2',
+          title: '2. The 33 Keywords & Identifier Rules',
+          order_index: 2,
+          content: 'Identifiers allow letters, digits, and underscores, but cannot start with a digit. Only 3 keywords are capitalized: True, False, and None. The other 30 are strictly lowercase.',
+          code_snippet: 'import keyword\nprint("Total keywords:", len(keyword.kwlist))\nprint([k for k in keyword.kwlist if k[0].isupper()])',
+          pitfalls: 'Using identifiers like `2total` or keywords like `class` as variable names will trigger immediate SyntaxErrors.'
+        },
+        {
+          id: 'sec-py-fund-3',
+          title: '3. Immutability & Object Interning',
+          order_index: 3,
+          content: 'All fundamental data types are immutable. Small integers (-5 to 256) are interned so identical values share the exact same object in memory.',
+          code_snippet: 'a = 100\nb = 100\nprint("Same object?", a is b) # True\nprint("Same content?", a == b) # True'
+        }
+      ]
+    },
+
+    // Stage 1 (Unit 1): Operators & Dynamic I/O
+    {
+      id: 'top-py-operators-io',
+      module_id: 'mod-py-1',
+      title: 'Operators & Dynamic Input/Output Statements',
+      order_index: 2,
+      learning_objective: 'Master arithmetic, floor division, bitwise operations, ternary operators, single-line multiple inputs, and formatted print output.',
+      content_standard: 'Python supports 7 arithmetic operators including floor division `//` and exponent `**`. In Python 3, `input()` returns string data. Use `[int(x) for x in input().split()]` to read space-separated values.',
+      content_low: '### ⚡ Fast-Track Summary\n- Division `/` always returns float; `//` returns integer floor if both operands are int, or float floor if either is float.\n- Bitwise `~x = -(x + 1)` (two\'s complement).\n- Ternary: `val = a if cond else b` (supports nesting).\n- `print(*args, sep=" ", end="\\n")`.\n- Format: `f"{val:.2f}"` or `"{0} {1}".format(a, b)`.',
+      content_medium: '### 📘 Standard Guide\n1. Single line multiple inputs: `a, b = [int(x) for x in input().split()]`.\n2. String repetition `*` requires integer count: `\'hello\' * 3`.\n3. `print()` parameters: `sep=","` alters argument delimiter; `end=" "` prevents newline.',
+      content_high: '### 🌱 Step-by-Step Breakdown\n1. **Floor Division**: `10 // 3` gives 3 (chops off decimals).\n2. **Ternary Operator**: `result = "Pass" if score >= 50 else "Fail"` reads like an English sentence!\n3. **Input Tokenization**: `.split()` cuts a long input string into separate words.',
+      syntax: '# Reading multiple integers\nx, y = [int(n) for n in input("Enter 2 numbers: ").split()]\n\n# Formatted output\nprint("x={}, y={}".format(x, y))\nprint(x, y, sep="::", end="\\n")',
+      examples: '# Nested ternary for min of 3 numbers\na, b, c = 10, 20, 5\nmin_val = a if a < b and a < c else b if b < c else c\nprint("Minimum:", min_val)',
+      common_mistakes: '1. Multiplying two strings (`"a" * "b"` raises TypeError).\n2. Division by zero (`x // 0` raises ZeroDivisionError).',
+      practice_prompt: 'Write a program to read 3 numbers in a single line and print their average formatted to 2 decimal places.',
+      prerequisite_topic_id: 'top-py-fundamentals',
+      sections: [
+        {
+          id: 'sec-py-op-1',
+          title: '1. Division vs Floor Division',
+          order_index: 1,
+          content: 'Normal division `/` always returns a float (`10 / 2` is `5.0`). Floor division `//` truncates to the lowest whole integer (`10 // 3` is `3`, but `10.0 // 3` is `3.0`).',
+          code_snippet: 'print("10/2 =", 10/2)   # 5.0\nprint("10//3 =", 10//3) # 3\nprint("10.0//3 =", 10.0//3) # 3.0',
+          mini_check: {
+            question: 'What is the value of `10.0 // 3`?',
+            options: ['3', '3.0', '3.33', 'Error'],
+            correct_index: 1,
+            explanation: 'When either operand is a float, floor division returns a floating point number (3.0).'
+          }
+        },
+        {
+          id: 'sec-py-op-2',
+          title: '2. Dynamic Single-Line Input with Unpacking',
+          order_index: 2,
+          content: 'Read multiple space-separated numbers using `split()` and list comprehension unpacking in one clean line.',
+          code_snippet: 'a, b = [int(x) for x in "10 20".split()]\nprint("Sum is:", a + b)'
+        },
+        {
+          id: 'sec-py-op-3',
+          title: '3. Output Customization: sep and end',
+          order_index: 3,
+          content: 'The `sep` keyword defines what character separates arguments; `end` controls what character prints after the final argument.',
+          code_snippet: 'print(10, 20, 30, sep="-", end="***")\nprint(40, 50, sep=":")\n# Output: 10-20-30***40:50'
+        }
+      ]
+    },
+
+    // Stage 2 (Unit 2): Flow Control & Conditionals
+    {
+      id: 'top-py-flow-control',
+      module_id: 'mod-py-2',
+      title: 'Flow Control, Conditionals & Transfer Statements',
+      order_index: 1,
+      learning_objective: 'Master if-elif-else branching, indentation syntax, transfer statements (break, continue, pass), and variable deletion with del vs None.',
+      content_standard: 'In Python, flow control statements determine execution paths. Python uses colons and 4-space indentation instead of braces. Transfer statements include break, continue, pass, and del.',
+      content_low: '### ⚡ Fast-Track Summary\n- Indentation-based block syntax; no `switch` or `goto`.\n- `pass` is syntactic no-op; `del x` unbinds name; `x = None` retains name.\n- Short-circuit boolean evaluation: `x and y`, `x or y`.',
+      content_medium: '### 📘 Standard Guide\n1. Use `if-elif-else` for multi-condition branching.\n2. `pass` acts as a placeholder for unfinished functions or empty blocks.\n3. `del x` deletes the variable from memory; calling `x` afterwards raises `NameError`.',
+      content_high: '### 🌱 Step-by-Step Breakdown\n1. **Branching**: Like a fork in the road. If condition is True, turn left; else turn right.\n2. **Pass**: Like an "Under Construction" sign—lets Python drive by smoothly without crashing!\n3. **Del vs None**: `del x` throws away the box and label; `x = None` puts an empty note in the box.',
+      syntax: 'if condition1:\n    # block 1\nelif condition2:\n    # block 2\nelse:\n    # fallback block\n\n# Placeholder\nif is_admin:\n    pass\n\n# Deletion\nx = 100\ndel x',
+      examples: '# Grade evaluator\nscore = 85\nif score >= 90:\n    print("Grade: A")\nelif score >= 80:\n    print("Grade: B")\nelse:\n    print("Grade: C")',
+      common_mistakes: '1. Inconsistent indentation mixing tabs and spaces.\n2. Confusing `del x` (removes variable) with `x = None` (keeps variable with None value).',
+      practice_prompt: 'Write a program to evaluate whether a student passed (marks >= 40 in all 3 subjects and average >= 50).',
+      prerequisite_topic_id: 'top-py-operators-io',
+      sections: [
+        {
+          id: 'sec-py-fc-1',
+          title: '1. Conditional Branching with if-elif-else',
+          order_index: 1,
+          content: 'Python uses indentation to demarcate code blocks following an `if`, `elif`, or `else:` header. Evaluation stops at the first branch whose condition is True.',
+          code_snippet: 'x = 15\nif x > 20:\n    print("Large")\nelif x > 10:\n    print("Medium")\nelse:\n    print("Small")',
+          mini_check: {
+            question: 'What character initiates a code block in Python conditional statements?',
+            options: ['Semicolon (;)', 'Colon (:)', 'Curly brace ({)', 'Arrow (->)'],
+            correct_index: 1,
+            explanation: 'In Python, a colon (:) marks the end of the header line and initiates the indented block.'
+          }
+        },
+        {
+          id: 'sec-py-fc-2',
+          title: '2. The pass Statement as a Syntactic Placeholder',
+          order_index: 2,
+          content: '`pass` is a null statement in Python. When executed, nothing happens, but it prevents IndentationError when a statement block is syntactically required.',
+          code_snippet: 'def future_function():\n    pass # Will implement tomorrow\n\nfor i in range(5):\n    if i == 2:\n        pass # Do nothing for 2\n    print(i)'
+        },
+        {
+          id: 'sec-py-fc-3',
+          title: '3. del Statement vs None Assignment',
+          order_index: 3,
+          content: '`del x` removes the variable name `x` entirely from the local/global namespace. In contrast, `x = None` retains the name, simply referencing the singleton `None` object.',
+          code_snippet: 'a = 10\na = None # a still exists\nprint(a) # prints None\n\nb = 20\ndel b # b is destroyed\n# print(b) would raise NameError: name \'b\' is not defined',
+          pitfalls: 'Calling `del` on a variable does not necessarily delete the object immediately if another reference still points to it (reference counting garbage collection).'
+        }
+      ]
+    },
+
+    // Stage 2 (Unit 2): Loops & Pattern Printing
     {
       id: 'top-py-loops',
-      module_id: 'mod-py-1',
-      title: 'Loops and Iteration Constructs',
-      order_index: 1,
-      learning_objective: 'Master for and while loops, iteration over ranges and sequences, and loop termination controls (break, continue, else).',
+      module_id: 'mod-py-2',
+      title: 'Loops, Iteration Constructs & Pattern Printing',
+      order_index: 2,
+      learning_objective: 'Master for and while loops, iteration over ranges and sequences, loop else clauses, and geometric pattern printing techniques.',
       content_standard: 'In Python, loops provide repetition without code duplication. `for item in sequence:` iterates over iterables, while `while condition:` continues until the boolean condition evaluates to False.',
       content_low: '### ⚡ Fast-Track Summary\n- `for i in range(n)`: O(1) space lazy sequence generation.\n- List comprehensions preferred over imperative loops when mapping/filtering.\n- `break` exits immediately; `continue` skips to next step; `else:` triggers only on non-break completion.',
       content_medium: '### 📘 Standard Guide\nPython supports two primary loops:\n1. **For Loop**: Best when the count or sequence is known in advance.\n2. **While Loop**: Best when looping depends on dynamic runtime conditions.\nRemember: `range(1, 5)` yields values `1, 2, 3, 4`.',
       content_high: '### 🌱 Step-by-Step Breakdown\nLet\'s take this slowly! A loop is like an automated counting machine.\n\n1. **Start small**: `for i in range(3): print(i)` will print 0, then 1, then 2.\n2. **Analogy**: Imagine checking off items on a grocery checklist one by one.\n3. **Notice**: Stop value is never included. `range(0, 5)` stops before 5!',
       syntax: 'for item in iterable:\n    # execute block\n\nwhile condition:\n    # execute block\n    # ensure condition progresses toward False!',
-      examples: '# Example 1: Summing numbers with for loop\ntotal = sum(i for i in range(1, 6))\nprint("Sum 1..5:", total)\n\n# Example 2: While loop with countdown\ncount = 3\nwhile count > 0:\n    print(count)\n    count -= 1\nprint("Blast off!")',
+      examples: '# Example 1: Right-angled number triangle\nn = 4\nfor i in range(1, n + 1):\n    print(" ".join([str(i)] * i))\n\n# Example 2: While loop with countdown\ncount = 3\nwhile count > 0:\n    print(count)\n    count -= 1\nprint("Blast off!")',
       common_mistakes: '1. Infinite while loops due to missing update statements.\n2. Off-by-one errors with range(start, stop).\n3. Modifying a collection while actively looping over it.',
       practice_prompt: 'Write a loop that calculates the sum of all even numbers from 1 to 20 inclusive.',
+      prerequisite_topic_id: 'top-py-flow-control',
       sections: [
         {
           id: 'sec-py-loop-1',
@@ -94,35 +240,213 @@ export const initialCurriculum: CurriculumData = {
         },
         {
           id: 'sec-py-loop-3',
-          title: '3. Controlling Flow: break and continue',
+          title: '3. Controlling Flow: break, continue, and loop else',
           order_index: 3,
-          content: '`break` terminates the enclosing loop immediately. `continue` skips the remainder of the current iteration and jumps to the next.',
-          code_snippet: 'for num in range(10):\n    if num == 5:\n        break # Stop here\n    if num % 2 == 0:\n        continue # Skip evens\n    print("Odd:", num)'
+          content: '`break` terminates the enclosing loop immediately. `continue` skips to the next iteration. An `else:` block on a loop runs only if the loop finishes naturally without breaking.',
+          code_snippet: 'for num in range(10):\n    if num == 5:\n        break\n    if num % 2 == 0:\n        continue\n    print("Odd:", num)\nelse:\n    print("Done!")'
         },
         {
           id: 'sec-py-loop-4',
-          title: '4. Common Mistakes & Best Practices',
+          title: '4. Pattern Printing with Loops',
           order_index: 4,
-          content: '1. Off-by-one errors with `range(1, 10)` which stops at 9.\n2. In-place mutation of a list while iterating over it.\n3. Forgetting accumulator step in while loops.',
-          pitfalls: 'Never do `for x in my_list: my_list.remove(x)`. It causes items to be skipped because the internal index shifts.'
+          content: 'Pattern printing reinforces nested loop logic and string multiplication. Using `" ".join([str(i)] * i)` or nested `for j in range(i)` prints geometric formations.',
+          code_snippet: '# Number triangle\nfor i in range(1, 5):\n    for j in range(i):\n        print(i, end=" ")\n    print()'
         }
       ]
     },
+
+    // Stage 3 (Unit 3): Strings & Slicing
+    {
+      id: 'top-py-strings',
+      module_id: 'mod-py-3',
+      title: 'In-Depth String Operations, Slicing & Algorithms',
+      order_index: 1,
+      learning_objective: 'Master positive/negative string slicing, substring searching (find vs index), character validation methods, and string algorithms.',
+      content_standard: 'Strings are immutable sequences of characters supporting forward (positive) and backward (negative) indexing. Slicing with step `s[begin:end:step]` allows stride selection and full reversal with `s[::-1]`.',
+      content_low: '### ⚡ Fast-Track Summary\n- Slicing: `s[begin:end:step]`. Default begin=0, end=len, step=1. Negative step reverses.\n- Searching: `s.find()` returns -1 on failure; `s.index()` raises ValueError.\n- Methods: `strip()`, `split()`, `rsplit()`, `join()`, `replace()`.\n- Checks: `isalnum()`, `isalpha()`, `isdigit()`, `islower()`, `isupper()`, `isspace()`.',
+      content_medium: '### 📘 Standard Guide\n1. Slicing never raises IndexError: `s[3:1000]` returns up to string end.\n2. Reversal idiom: `reversed_s = s[::-1]`.\n3. Replace: `s.replace("old", "new")` creates a new string without mutating original.',
+      content_high: '### 🌱 Step-by-Step Breakdown\n1. **Indexing**: First letter is `s[0]`, last letter is `s[-1]`.\n2. **Slicing**: Like cutting slices of a loaf of bread: `s[1:4]` takes slice from index 1 up to 3.\n3. **Reverse**: `s[::-1]` flips the entire word backwards instantly!',
+      syntax: 's = "karthikeya"\nprint(s[0])    # \'k\'\nprint(s[-1])   # \'a\'\nprint(s[2:7])  # \'rthik\'\nprint(s[::-1]) # reverse',
+      examples: '# Alternate string merge\ns1 = "karthi"\ns2 = "sahasra"\nmerged = []\ni, j = 0, 0\nwhile i < len(s1) or j < len(s2):\n    if i < len(s1): merged.append(s1[i]); i += 1\n    if j < len(s2): merged.append(s2[j]); j += 1\nprint("Merged:", "".join(merged))',
+      common_mistakes: '1. Attempting in-place modification: `s[0] = "A"` raises TypeError.\n2. Using `s.index()` without try-except when substring may not exist.',
+      practice_prompt: 'Write a program to reverse the internal characters of each word in a given sentence.',
+      prerequisite_topic_id: 'top-py-loops',
+      sections: [
+        {
+          id: 'sec-py-str-1',
+          title: '1. Slicing with Step & String Reversal',
+          order_index: 1,
+          content: 'The slice operator takes `[start:stop:step]`. With negative step, Python traverses backwards, enabling clean one-line reversal without loops.',
+          code_snippet: 'msg = "Python Learning"\nprint(msg[::-1]) # gninraeL nohtyP'
+        },
+        {
+          id: 'sec-py-str-2',
+          title: '2. find() vs index() and count()',
+          order_index: 2,
+          content: '`find()` returns -1 if the substring is missing. `index()` raises ValueError. `count()` returns total non-overlapping occurrences.',
+          code_snippet: 's = "abcabc"\nprint(s.find("z"))  # -1\nprint(s.count("ab")) # 2'
+        },
+        {
+          id: 'sec-py-str-3',
+          title: '3. Character Testing: isalnum, isalpha, isdigit',
+          order_index: 3,
+          content: 'Python provides built-in boolean validators to inspect character classes without regex overhead.',
+          code_snippet: 'print("A123".isalnum()) # True\nprint("Hello".isalpha()) # True\nprint("99".isdigit())    # True'
+        }
+      ]
+    },
+
+    // Stage 4 (Unit 4): Lists & Comprehensions
+    {
+      id: 'top-py-lists',
+      module_id: 'mod-py-4',
+      title: 'List Data Structure, Matrices & Comprehensions',
+      order_index: 1,
+      learning_objective: 'Master list operations (append, insert, extend, pop, remove, sort), aliasing vs cloning ([:], copy()), 2D nested matrices, and list comprehensions.',
+      content_standard: 'Lists are mutable ordered collections supporting dynamic resizing. Aliasing (`b = a`) shares references, whereas cloning (`b = a[:]` or `a.copy()`) creates independent copies. List comprehensions provide concise filtering and transformation.',
+      content_low: '### ⚡ Fast-Track Summary\n- `append(x)` (single item) vs `extend(it)` (unpacks iterable) vs `insert(i, x)`.\n- Aliasing shares memory pointer; `copy()` or `[:]` clones shallowly; `copy.deepcopy()` for nested lists.\n- List comprehensions `[f(x) for x in seq if cond]` are byte-code optimized.',
+      content_medium: '### 📘 Standard Guide\n1. Mutability: `lst[0] = 99` changes list in place.\n2. Removing: `remove(val)` deletes first occurrence (raises ValueError if absent); `pop()` deletes and returns last element.\n3. 2D grids: `matrix[r][c]` accesses row and column.',
+      content_high: '### 🌱 Step-by-Step Breakdown\n1. **List**: A numbered shopping list. You can cross items out, add items to the bottom, or reorder them.\n2. **Aliasing**: Giving a second key to the same house. If someone changes the sofa, both key-holders see it!\n3. **Cloning**: Building an identical house. Changes inside do not affect the other.',
+      syntax: '# Methods\nnums = [1, 2, 3]\nnums.append(4)\nnums.extend([5, 6])\n\n# Cloning\nclone = nums[:]\n\n# 2D Matrix & Comprehension\nmatrix = [[1, 2], [3, 4]]\nsquares = [x**2 for x in range(1, 6) if x % 2 != 0]',
+      examples: '# Matrix Transpose\nmatrix = [[1, 2, 3], [4, 5, 6]]\ntransposed = [[row[i] for row in matrix] for i in range(len(matrix[0]))]\nprint("Transposed:", transposed)',
+      common_mistakes: '1. Modifying aliased lists assuming they are independent copies.\n2. Calling `sort()` and expecting a return value (`lst.sort()` returns None!).',
+      practice_prompt: 'Write a program to transpose a 2D matrix using list comprehension.',
+      prerequisite_topic_id: 'top-py-strings',
+      sections: [
+        {
+          id: 'sec-py-list-1',
+          title: '1. Adding & Removing Elements: append vs extend',
+          order_index: 1,
+          content: '`append(x)` inserts `x` as a single object at the end of the list. `extend(iterable)` iterates through `iterable` and appends each element individually.',
+          code_snippet: 'a = [1, 2]\na.append([3, 4]) # [1, 2, [3, 4]]\nb = [1, 2]\nb.extend([3, 4]) # [1, 2, 3, 4]',
+          mini_check: {
+            question: 'What is the length of `a` after `a = [1, 2]; a.append([3, 4])`?',
+            options: ['3', '4', '2', 'Error'],
+            correct_index: 0,
+            explanation: 'append([3, 4]) adds the nested list as a single 3rd element, so len(a) is 3.'
+          }
+        },
+        {
+          id: 'sec-py-list-2',
+          title: '2. Aliasing vs Cloning: The Shallow Copy Trap',
+          order_index: 2,
+          content: 'Aliasing (`y = x`) assigns the same object reference. To modify a list without mutating the original, clone it via slicing `x[:]` or `x.copy()`.',
+          code_snippet: 'x = [10, 20]\ny = x      # Aliasing\nz = x.copy() # Cloning\nx[0] = 99\nprint("y[0]:", y[0]) # 99 (modified!)\nprint("z[0]:", z[0]) # 10 (untouched!)'
+        },
+        {
+          id: 'sec-py-list-3',
+          title: '3. 2D Matrices & List Comprehensions',
+          order_index: 3,
+          content: 'List comprehensions `[expr for item in seq if cond]` replace multi-line loops with fast, expressive syntax.',
+          code_snippet: 'evens = [x for x in range(10) if x % 2 == 0]\nmatrix = [[1, 2], [3, 4]]\nflat = [val for row in matrix for val in row]\nprint("Flattened:", flat)'
+        }
+      ]
+    },
+
+    // Stage 5 (Unit 5): Tuples & Sets
+    {
+      id: 'top-py-tuples-sets',
+      module_id: 'mod-py-5',
+      title: 'Tuples and Sets Data Structures',
+      order_index: 1,
+      learning_objective: 'Understand tuple immutability, packing/unpacking, set uniqueness, discard vs remove, and mathematical set operations.',
+      content_standard: 'Tuples are immutable ordered sequences (`(10, 20)`). Sets are mutable, unordered collections of unique elements (`{10, 20}`). Sets eliminate duplicates and support union, intersection, and difference.',
+      content_low: '### ⚡ Fast-Track Summary\n- Tuples: read-only lists, memory-efficient, single-item tuple requires comma `(10,)`.\n- Sets: hash-table backed, O(1) membership `in`, unordered, unindexed.\n- Set operations: `|` (union), `&` (intersection), `-` (difference), `^` (symmetric difference).\n- `s.discard(x)` does not crash if x missing; `s.remove(x)` raises KeyError.',
+      content_medium: '### 📘 Standard Guide\n1. Use tuples when data is fixed (e.g. coordinates, database rows).\n2. Use sets when duplicates must be eliminated.\n3. Empty set requires `set()`; `{}` creates an empty dictionary.',
+      content_high: '### 🌱 Step-by-Step Breakdown\n- **Tuple**: An engraved stone tablet. You cannot add or erase words.\n- **Set**: A guest list with a strict doorman. If a name is already on the list, duplicate entries are thrown away.',
+      syntax: '# Tuples\nt = (10, 20, 30)\na, b, c = t # unpacking\n\n# Sets\ns = {10, 20, 30, 20}\nprint(s) # {10, 20, 30}',
+      examples: '# Set operations\nA = {1, 2, 3, 4}\nB = {3, 4, 5, 6}\nprint("Union:", A | B)\nprint("Intersection:", A & B)\nprint("Difference:", A - B)',
+      common_mistakes: '1. Creating single-element tuple without comma: `t = (10)` is an int, not a tuple! Must be `t = (10,)`.\n2. Attempting indexing on a set (`s[0]` raises TypeError).',
+      practice_prompt: 'Given a list of numbers with duplicates, use a set to print all unique elements in sorted order.',
+      prerequisite_topic_id: 'top-py-lists',
+      sections: [
+        {
+          id: 'sec-py-ts-1',
+          title: '1. Tuples: Immutability & Packing',
+          order_index: 1,
+          content: 'Tuples prevent accidental data modification. Single valued tuples must terminate with a comma: `t = (10,)`. Tuple packing combines variables; unpacking assigns them back.',
+          code_snippet: 't = 10, 20, 30 # packing\nx, y, z = t    # unpacking\nprint("y =", y)'
+        },
+        {
+          id: 'sec-py-ts-2',
+          title: '2. Sets: Uniqueness & remove vs discard',
+          order_index: 2,
+          content: 'Sets automatically deduplicate elements. Use `discard()` when an item might not exist to avoid KeyError crashes.',
+          code_snippet: 's = {10, 20, 30}\ns.discard(50) # Safe, no error\n# s.remove(50) would raise KeyError'
+        },
+        {
+          id: 'sec-py-ts-3',
+          title: '3. Mathematical Set Operations',
+          order_index: 3,
+          content: 'Perform union (`|`), intersection (`&`), difference (`-`), and symmetric difference (`^`) with native operators.',
+          code_snippet: 'x = {1, 2, 3}\ny = {3, 4, 5}\nprint("Common:", x & y) # {3}\nprint("Only in x:", x - y) # {1, 2}'
+        }
+      ]
+    },
+
+    // Stage 5 (Unit 5): Dictionaries
+    {
+      id: 'top-py-dictionaries',
+      module_id: 'mod-py-5',
+      title: 'Dictionary Data Structure & Hash Tables',
+      order_index: 2,
+      learning_objective: 'Understand key-value mappings, immutable key constraints, dict methods (get, pop, items, setdefault), frequency counters, and dictionary comprehensions.',
+      content_standard: 'Dictionaries store key-value associations backed by hash tables with O(1) average lookup. Keys must be hashable and unique. Use `get(k, default)` to avoid KeyError.',
+      content_low: '### ⚡ Fast-Track Summary\n- Keys must be immutable (str, int, tuple). Values can be any type.\n- `.setdefault(k, d)` returns existing value or sets default.\n- Dict comprehensions: `{k: v for k, v in ...}`.\n- In Python 3.7+, insertion order is guaranteed preserved.',
+      content_medium: '### 📘 Standard Guide\n1. Access with `d.get(key, fallback)` to avoid KeyError crashes.\n2. Frequency counting pattern: `freq[ch] = freq.get(ch, 0) + 1`.\n3. Iterate pairs with `for k, v in d.items():`.\n4. Keys must be hashable: lists cannot be keys, but tuples can.',
+      content_high: '### 🌱 Step-by-Step Breakdown\n1. **Dictionary**: Like a real dictionary or phone book. You look up a word (key) to get its definition (value).\n2. **Safe Lookup**: Asking "Does room 101 have a key?" instead of blindly opening the door.',
+      syntax: 'd = {"apple": 5, "banana": 3}\nprint(d.get("orange", 0)) # Safe fallback 0\nd["orange"] = 7\nfor k, v in d.items():\n    print(f"{k}: {v}")',
+      examples: '# Frequency count of words\ntext = "hello world hello python"\nfreq = {}\nfor word in text.split():\n    freq[word] = freq.get(word, 0) + 1\nprint(freq)',
+      common_mistakes: '1. Using a mutable list as a dictionary key (`d[[1, 2]] = "val"` raises TypeError: unhashable type).\n2. Using `d[k]` when k might not exist instead of `d.get(k)`.',
+      practice_prompt: 'Write a program that takes a sentence and counts the frequency of each unique word using a dictionary.',
+      prerequisite_topic_id: 'top-py-tuples-sets',
+      sections: [
+        {
+          id: 'sec-py-dict-1',
+          title: '1. Keys, Values & Hashability Rules',
+          order_index: 1,
+          content: 'Dictionary keys must be immutable and hashable (integers, strings, floats, tuples). Values can be of any type, including mutable lists or nested dictionaries.',
+          code_snippet: 'd = {1: "one", "pi": 3.14, (0, 0): "origin"}\nprint(d[(0, 0)]) # "origin"',
+          mini_check: {
+            question: 'Which of the following can be used as a dictionary key in Python?',
+            options: ['[1, 2] (list)', '{1, 2} (set)', '(1, 2) (tuple)', '{"a": 1} (dict)'],
+            correct_index: 2,
+            explanation: 'Tuples are immutable and hashable, making them valid dictionary keys. Lists, sets, and dicts are mutable and unhashable.'
+          }
+        },
+        {
+          id: 'sec-py-dict-2',
+          title: '2. Safe Lookups & Methods: get, setdefault, pop',
+          order_index: 2,
+          content: '`get(key, default)` returns the default value without raising KeyError if the key is missing. `setdefault(key, val)` returns the current value, or sets and returns `val` if missing.',
+          code_snippet: 'scores = {"Alice": 95}\nprint(scores.get("Bob", 0)) # 0\nscores.setdefault("Bob", 80)\nprint(scores["Bob"]) # 80'
+        },
+        {
+          id: 'sec-py-dict-3',
+          title: '3. Frequency Counting & Dict Comprehensions',
+          order_index: 3,
+          content: 'The idiom `d[x] = d.get(x, 0) + 1` builds frequency maps in O(N) time. Dict comprehensions `{k: v for ...}` construct mappings declaratively.',
+          code_snippet: 'squares = {x: x**2 for x in range(1, 6)}\nprint(squares) # {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}'
+        }
+      ]
+    },
+
+    // Stage 6 (Unit 6): Functions & Scope
     {
       id: 'top-py-functions',
-      module_id: 'mod-py-2',
-      title: 'Functions, Parameters & Scope',
-      order_index: 2,
-      learning_objective: 'Define modular functions, understand positional vs keyword parameters, default arguments, and variable scope.',
+      module_id: 'mod-py-6',
+      title: 'Functions, Parameters & Scope (LEGB)',
+      order_index: 1,
+      learning_objective: 'Define modular functions, understand positional vs keyword parameters, default arguments, *args/**kwargs, and the LEGB variable scope rule.',
       content_standard: 'Functions encapsulate reusable logic using `def func_name(args):`. Python functions are first-class citizens and can be passed as arguments or returned from other functions.',
-      content_low: '### ⚡ Fast-Track Summary\n- First-class citizen functions with `*args`, `**kwargs` unpacking.\n- Closure and lexical scoping (LEGB rule: Local, Enclosing, Global, Built-in).\n- Avoid mutable default arguments (`def f(x=[])`).',
-      content_medium: '### 📘 Standard Guide\nDefine functions using `def`. Return values using `return`. Scope determines where a variable is accessible: local variables inside a function cannot be seen outside.',
+      content_low: '### ⚡ Fast-Track Summary\n- First-class citizen functions with `*args` (tuple) and `**kwargs` (dict) unpacking.\n- Closure and lexical scoping (LEGB rule: Local, Enclosing, Global, Built-in).\n- Avoid mutable default arguments (`def f(x=[])`).',
+      content_medium: '### 📘 Standard Guide\nDefine functions using `def`. Return values using `return`. Scope determines where a variable is accessible: local variables inside a function cannot be seen outside unless declared `global`.',
       content_high: '### 🌱 Step-by-Step Breakdown\nA function is like a kitchen recipe or a mini-calculator:\n1. You give it ingredients (parameters).\n2. It follows steps inside its body.\n3. It serves you the final dish (return value).',
-      syntax: 'def function_name(param1, param2=default_val):\n    """Docstring explanation."""\n    result = param1 + param2\n    return result',
+      syntax: 'def function_name(param1, *args, param2=default_val, **kwargs):\n    """Docstring explanation."""\n    result = param1 + param2\n    return result',
       examples: 'def greet(name, title="Learner"):\n    return f"Welcome, {title} {name}!"\n\nprint(greet("Ada", "Dr."))\nprint(greet("Alan"))',
       common_mistakes: '1. Forgetting the `return` keyword (functions default to returning `None`).\n2. Defining mutable defaults like `def add(val, lst=[]):` which persist across calls.',
       practice_prompt: 'Create a function `is_palindrome(text)` that returns True if a given string reads the same forwards and backwards.',
-      prerequisite_topic_id: 'top-py-loops',
+      prerequisite_topic_id: 'top-py-dictionaries',
       sections: [
         {
           id: 'sec-py-func-1',
@@ -133,10 +457,10 @@ export const initialCurriculum: CurriculumData = {
         },
         {
           id: 'sec-py-func-2',
-          title: '2. Parameters & Default Arguments',
+          title: '2. Parameters, *args, and **kwargs',
           order_index: 2,
-          content: 'Parameters accept input values. You can provide default values for optional arguments.',
-          code_snippet: 'def power(base, exponent=2):\n    return base ** exponent\n\nprint(power(4))    # 16 (default exponent 2)\nprint(power(2, 3)) # 8'
+          content: 'Parameters accept input values. `*args` collects extra positional arguments into a tuple; `**kwargs` collects extra keyword arguments into a dictionary.',
+          code_snippet: 'def show_info(title, *tags, **details):\n    print("Title:", title)\n    print("Tags tuple:", tags)\n    print("Details dict:", details)\n\nshow_info("Python", "dev", "ai", author="Guido", year=1991)'
         },
         {
           id: 'sec-py-func-3',
@@ -147,11 +471,13 @@ export const initialCurriculum: CurriculumData = {
         }
       ]
     },
+
+    // Stage 6 (Unit 6): Recursion
     {
       id: 'top-py-recursion',
-      module_id: 'mod-py-2',
+      module_id: 'mod-py-6',
       title: 'Recursion and Recursive Thinking',
-      order_index: 3,
+      order_index: 2,
       learning_objective: 'Understand base cases, recursive decomposition, call stacks, and recursive function execution in Python.',
       content_standard: 'Recursion occurs when a function calls itself directly or indirectly to solve a smaller instance of the same problem. Every recursive function requires at least one base case to terminate execution.',
       content_low: '### ⚡ Fast-Track Summary\n- Base case: Halting condition preventing stack overflow (RecursionError).\n- Python recursion depth limit: default 1000 frames (`sys.getrecursionlimit()`).\n- Tail call optimization (TCO) is NOT supported in CPython; prefer memoization (`functools.lru_cache`) for recursive algorithms.',
@@ -186,35 +512,44 @@ export const initialCurriculum: CurriculumData = {
         }
       ]
     },
+
+    // Stage 6 (Unit 6): Modules, Math, Random & Regex
     {
-      id: 'top-py-datastruct',
-      module_id: 'mod-py-3',
-      title: 'Lists, Dictionaries & Comprehensions',
+      id: 'top-py-modules-regex',
+      module_id: 'mod-py-6',
+      title: 'Modules, Math, Random & Regular Expressions',
       order_index: 3,
-      learning_objective: 'Master Python sequences, hash maps (dictionaries), set operations, and idiomatic comprehensions.',
-      content_standard: 'Lists are mutable ordered arrays. Dictionaries are O(1) average lookup key-value hash maps. Comprehensions offer concise declarative mapping and filtering syntax.',
-      content_low: '### ⚡ Fast-Track Summary\n- Dictionaries are hash tables with O(1) amortized access.\n- List comprehensions `[expr for x in iterable if cond]` compiled into bytecode loop with zero method lookup overhead.\n- Use `collections.defaultdict` and `collections.deque` for specialized queues.',
-      content_medium: '### 📘 Standard Guide\nLists store ordered items: `[1, 2, 3]`. Dictionaries store key-value pairs: `{"name": "Python", "year": 1991}`. Access values using `.get(key, default)`.',
-      content_high: '### 🌱 Step-by-Step Breakdown\n- A **List** is like a numbered to-do list.\n- A **Dictionary** is like a real phonebook: you look up a person\'s name (the key) to find their number (the value).',
-      syntax: 'my_list = [1, 2, 3]\nmy_dict = {"a": 10, "b": 20}\nsquares = [x**2 for x in range(5) if x % 2 == 0]',
-      examples: 'student = {"name": "Grace", "gpa": 3.9}\nif student.get("gpa", 0) > 3.5:\n    print("Dean\'s Honor Roll!")',
-      common_mistakes: 'Using key lookup `dict[k]` directly when the key might not exist, causing KeyError instead of using `.get(k)`.',
-      practice_prompt: 'Write a dictionary comprehension that maps numbers 1 through 5 to their cubes.',
+      learning_objective: 'Understand module aliasing, reloading, random/math functions, and regular expression pattern matching with `re` module.',
+      content_standard: 'Modules group reusable Python code. `re` provides pattern matching via compile, search, match, and finditer with character classes and quantifiers for validation.',
+      content_low: '### ⚡ Fast-Track Summary\n- `import module as alias` for aliasing; `from importlib import reload` to reload dynamic changes.\n- `random`: `randint(a, b)` (inclusive int), `uniform(a, b)` (float), `choice(seq)`.\n- Regex: `re.fullmatch()` validates entire string; `re.findall()` extracts all occurrences.\n- Classes: `\\d` (digit), `\\w` (word char), `\\s` (space). Anchors: `^` (start), `$` (end).',
+      content_medium: '### 📘 Standard Guide\n1. Modules avoid code duplication.\n2. `random.randint(100000, 999999)` generates a 6-digit OTP.\n3. Regex: `re.fullmatch(r"[6-9]\\d{9}", phone)` validates a 10-digit Indian phone number.',
+      content_high: '### 🌱 Step-by-Step Breakdown\n- A **Module** is a toolbox you import with one command.\n- **Regular Expressions** are like specialized search filters. Instead of checking every character manually, you specify a pattern like "starts with 7, 8, or 9 and has 10 digits"!',
+      syntax: 'import re\npattern = r"[6-9]\\d{9}"\nis_valid = bool(re.fullmatch(pattern, "9885768283"))\nprint("Valid phone?", is_valid)',
+      examples: '# Generate random 6-digit OTP\nfrom random import randint\notp = "".join(str(randint(0, 9)) for _ in range(6))\nprint("Generated OTP:", otp)',
+      common_mistakes: '1. Using `re.match()` instead of `re.fullmatch()` for phone/email validation, allowing trailing garbage characters.\n2. Forgetting that `re.search()` stops at the first match.',
+      practice_prompt: 'Write a regex pattern to validate vehicle registration numbers in the format `TS07EA7777`.',
       prerequisite_topic_id: 'top-py-functions',
       sections: [
         {
-          id: 'sec-py-ds-1',
-          title: '1. Lists & Indexing',
+          id: 'sec-py-mr-1',
+          title: '1. Modules, Aliasing & __name__',
           order_index: 1,
-          content: 'Lists in Python are dynamic, zero-indexed arrays that can hold mixed data types.',
-          code_snippet: 'fruits = ["apple", "banana", "cherry"]\nprint(fruits[0]) # "apple"\nprint(fruits[-1]) # "cherry" (reverse indexing)'
+          content: 'Every Python file is a module. When executed directly, `__name__ == "__main__"`. Use `importlib.reload(module)` if a module is modified during a live interactive session.',
+          code_snippet: 'import math as m\nprint("Pi:", m.pi)\nprint("Square root of 16:", m.sqrt(16))'
         },
         {
-          id: 'sec-py-ds-2',
-          title: '2. Dictionaries & Fast Key-Value Lookups',
+          id: 'sec-py-mr-2',
+          title: '2. Random Library & OTP Generation',
           order_index: 2,
-          content: 'Dictionaries use hashing to give O(1) instant lookups by key.',
-          code_snippet: 'scores = {"Alice": 95, "Bob": 82}\nprint(scores.get("Charlie", 0)) # Safe fallback 0'
+          content: '`random.randint(0, 9)` produces random integers. We can assemble cryptographically sound one-time passwords and shuffle sequences.',
+          code_snippet: 'from random import randint\nprint("6-digit OTP:", "".join(str(randint(0, 9)) for _ in range(6)))'
+        },
+        {
+          id: 'sec-py-mr-3',
+          title: '3. Regular Expressions: re.fullmatch & Classes',
+          order_index: 3,
+          content: '`re.fullmatch()` verifies that the entire input satisfies the pattern from start `^` to end `$`. Use `\\d` for digits and `[6-9]` for specific leading ranges.',
+          code_snippet: 'import re\nmobile = "9885768283"\nmatch = re.fullmatch(r"[6-9]\\d{9}", mobile)\nprint("Valid Mobile?", match is not None)'
         }
       ]
     },
@@ -481,6 +816,332 @@ export const initialCurriculum: CurriculumData = {
       correct_index: 2,
       explanation: 'Python raises `RecursionError: maximum recursion depth exceeded` when the call stack reaches the recursion limit.'
     },
+    {
+      id: 'mcq-py-rec-3',
+      topic_id: 'top-py-recursion',
+      difficulty: 'hard',
+      question: 'Does standard CPython support Tail Call Optimization (TCO) for recursive functions?',
+      options: [
+        'Yes, if compiled with the -O flag',
+        'No, CPython does not optimize tail calls; every recursive call allocates a stack frame',
+        'Yes, for all functions with a single return statement',
+        'Only for generator functions'
+      ],
+      correct_index: 1,
+      explanation: 'CPython intentionally omits Tail Call Optimization to preserve complete stack traces for debugging and inspection.'
+    },
+
+    // Unit 1 Fundamentals MCQs
+    {
+      id: 'mcq-py-fund-1',
+      topic_id: 'top-py-fundamentals',
+      difficulty: 'easy',
+      question: 'Out of the 33 reserved keywords in Python, how many begin with an uppercase letter?',
+      options: [
+        'None of them (all 33 are strictly lowercase)',
+        'Exactly 3: True, False, and None',
+        '5 keywords: True, False, None, Class, and Def',
+        'All 33 keywords start with uppercase letters'
+      ],
+      correct_index: 1,
+      explanation: 'In Python, only True, False, and None begin with capital letters. All other 30 keywords are entirely lowercase.'
+    },
+    {
+      id: 'mcq-py-fund-2',
+      topic_id: 'top-py-fundamentals',
+      difficulty: 'medium',
+      question: 'What happens in Python when you evaluate `a = 10; b = 10; a is b`?',
+      options: [
+        'Returns False because two separate variables always get distinct memory addresses',
+        'Returns True because Python interns small integers (-5 to 256) to point to the exact same object',
+        'Raises a SyntaxError because `is` cannot be applied to integers',
+        'Returns 0'
+      ],
+      correct_index: 1,
+      explanation: 'Python uses object interning for small integers (-5 to 256). Both references point to the identical memory address, so `a is b` returns True.'
+    },
+    {
+      id: 'mcq-py-fund-3',
+      topic_id: 'top-py-fundamentals',
+      difficulty: 'hard',
+      question: 'What is the output of evaluating `a = (1, 2, [3, 4]); a[2].append(5); print(a)` in Python?',
+      options: [
+        'Raises TypeError because tuples are immutable',
+        '(1, 2, [3, 4, 5])',
+        '(1, 2, [3, 4])',
+        'Raises AttributeError: tuple object has no append'
+      ],
+      correct_index: 1,
+      explanation: 'While the tuple itself cannot be rebound to point to different objects, mutable elements contained within the tuple (like lists) CAN be mutated in-place.'
+    },
+
+    // Unit 2 Operators & I/O MCQs
+    {
+      id: 'mcq-py-op-1',
+      topic_id: 'top-py-operators-io',
+      difficulty: 'easy',
+      question: 'What is the value and type of `10.0 // 3` in Python 3?',
+      options: ['3 (int)', '3.0 (float)', '3.3333333333333335 (float)', 'Raises TypeError'],
+      correct_index: 1,
+      explanation: 'Floor division `//` returns the floor value. If at least one operand is a float, the result is always a float (`3.0`).'
+    },
+    {
+      id: 'mcq-py-op-2',
+      topic_id: 'top-py-operators-io',
+      difficulty: 'medium',
+      question: 'What is the output of print("karthi" * False)?',
+      options: ['"karthi0"', 'An empty string (prints nothing)', 'Raises TypeError', 'None'],
+      correct_index: 1,
+      explanation: 'In Python, False has integer value 0. Multiplying a string by 0 repeats it 0 times, returning an empty string.'
+    },
+    {
+      id: 'mcq-py-op-3',
+      topic_id: 'top-py-operators-io',
+      difficulty: 'hard',
+      question: 'What does the bitwise complement `~10` evaluate to in Python (using 2\'s complement)?',
+      options: ['-10', '-11', '11', '9'],
+      correct_index: 1,
+      explanation: 'In Python, the bitwise complement formula is `~x = -(x + 1)`. Thus `~10 = -(10 + 1) = -11`.'
+    },
+
+    // Unit 3 Strings MCQs
+    {
+      id: 'mcq-py-str-1',
+      topic_id: 'top-py-strings',
+      difficulty: 'easy',
+      question: 'What does the slice expression `s[::-1]` evaluate to for any string `s`?',
+      options: [
+        'Returns the first character',
+        'Reverses the entire string backwards',
+        'Raises an IndexError: step cannot be negative',
+        'Returns an empty string'
+      ],
+      correct_index: 1,
+      explanation: 'A step of -1 in slicing tells Python to traverse the sequence in reverse direction from end to start, reversing the string.'
+    },
+    {
+      id: 'mcq-py-str-2',
+      topic_id: 'top-py-strings',
+      difficulty: 'medium',
+      question: 'What is the difference between `s.find("abc")` and `s.index("abc")` when "abc" is absent from `s`?',
+      options: [
+        '`find()` raises a ValueError, while `index()` returns -1',
+        '`find()` returns -1, while `index()` raises a ValueError',
+        'Both methods return None',
+        'Both methods raise an IndexError'
+      ],
+      correct_index: 1,
+      explanation: '`find()` returns -1 safely if the substring is not found, whereas `index()` raises a `ValueError`.'
+    },
+    {
+      id: 'mcq-py-str-3',
+      topic_id: 'top-py-strings',
+      difficulty: 'hard',
+      question: 'What is the value of `"karthikeya"[1:9:2]`?',
+      options: ['"athi"', '"krhk"', '"atke"', '"rthk"'],
+      correct_index: 0,
+      explanation: 'Starting at index 1 ("a"), stepping by 2 picks indices 1 ("a"), 3 ("t"), 5 ("h"), 7 ("i") up to index 9, producing "athi".'
+    },
+
+    // Unit 5 Tuples & Sets MCQs
+    {
+      id: 'mcq-py-ts-1',
+      topic_id: 'top-py-tuples-sets',
+      difficulty: 'easy',
+      question: 'What is the type of `t = (10)` vs `t = (10,)` in Python?',
+      options: [
+        'Both are of type tuple',
+        '`(10)` is an int, while `(10,)` is a tuple',
+        '`(10)` is a tuple, while `(10,)` causes a SyntaxError',
+        'Both are of type list'
+      ],
+      correct_index: 1,
+      explanation: 'Parentheses around a single value without a comma are treated as standard mathematical grouping. Single-item tuples must end with a comma: `(10,)`.'
+    },
+    {
+      id: 'mcq-py-ts-2',
+      topic_id: 'top-py-tuples-sets',
+      difficulty: 'medium',
+      question: 'What happens when calling `s.remove(50)` vs `s.discard(50)` on a set `s = {10, 20}` where 50 is NOT present?',
+      options: [
+        '`remove()` raises a KeyError, whereas `discard()` does nothing and raises no error',
+        '`discard()` raises a KeyError, whereas `remove()` returns False',
+        'Both methods raise ValueError',
+        'Both methods automatically add 50 to the set'
+      ],
+      correct_index: 0,
+      explanation: '`remove(x)` raises a `KeyError` if element x is missing from the set. `discard(x)` safely removes x if present, or silently does nothing if absent.'
+    },
+    {
+      id: 'mcq-py-ts-3',
+      topic_id: 'top-py-tuples-sets',
+      difficulty: 'hard',
+      question: 'What does the symmetric difference operator `^` return for two sets `A = {1, 2, 3}` and `B = {3, 4, 5}`?',
+      options: ['{3}', '{1, 2, 4, 5}', '{1, 2, 3, 4, 5}', '{}'],
+      correct_index: 1,
+      explanation: 'Symmetric difference (`A ^ B`) returns elements present in either A or B, but NOT in both (excluding the intersection {3}), which gives {1, 2, 4, 5}.'
+    },
+
+    // Unit 6 Regex MCQs
+    {
+      id: 'mcq-py-reg-1',
+      topic_id: 'top-py-modules-regex',
+      difficulty: 'easy',
+      question: 'Which regex function verifies that the ENTIRE input string matches the specified pattern from beginning to end?',
+      options: ['re.match()', 're.search()', 're.fullmatch()', 're.findall()'],
+      correct_index: 2,
+      explanation: '`re.fullmatch()` requires the entire target string to match the regex pattern. `re.match()` only checks if the pattern matches at the beginning.'
+    },
+    {
+      id: 'mcq-py-reg-2',
+      topic_id: 'top-py-modules-regex',
+      difficulty: 'medium',
+      question: 'Which regular expression pattern correctly validates a 10-digit Indian mobile number starting with 6, 7, 8, or 9?',
+      options: [
+        '[0-9]{10}',
+        '[6-9]\\d{9}',
+        '[6789][0-9]{10}',
+        '\\d{10}'
+      ],
+      correct_index: 1,
+      explanation: '`[6-9]` validates that the first digit is 6, 7, 8, or 9, followed by `\\d{9}` (exactly 9 more digits), making a total of 10 digits.'
+    },
+    {
+      id: 'mcq-py-reg-3',
+      topic_id: 'top-py-modules-regex',
+      difficulty: 'hard',
+      question: 'In the Python `re` module, what is the difference between `re.match()` and `re.search()`?',
+      options: [
+        '`match()` searches anywhere in the string, while `search()` matches only at the start',
+        '`match()` checks for a match only at the beginning of the string, while `search()` scans through the entire string for the first match',
+        'There is zero difference',
+        '`match()` returns a list while `search()` returns a boolean'
+      ],
+      correct_index: 1,
+      explanation: '`re.match()` only checks if the pattern matches at the beginning of the string. `re.search()` scans through the entire string to find the first location where the pattern matches.'
+    },
+
+    // Stage 2 Flow Control MCQs
+    {
+      id: 'mcq-py-fc-1',
+      topic_id: 'top-py-flow-control',
+      difficulty: 'easy',
+      question: 'What is the purpose of the `pass` statement in Python?',
+      options: [
+        'Terminates program execution immediately',
+        'Acts as a syntactic null placeholder (does nothing)',
+        'Skips the current loop iteration',
+        'Raises a PassException'
+      ],
+      correct_index: 1,
+      explanation: '`pass` is a syntactic no-op null statement used when a statement is required syntactically but no code needs to execute.'
+    },
+    {
+      id: 'mcq-py-fc-2',
+      topic_id: 'top-py-flow-control',
+      difficulty: 'medium',
+      question: 'What is the key difference between `del x` and `x = None` in Python?',
+      options: [
+        '`del x` unbinds the variable name from namespace entirely, while `x = None` rebinds the variable to the None object',
+        '`del x` sets x to 0, while `x = None` causes a SyntaxError',
+        'Both statements perform the exact same operation',
+        '`x = None` deletes the variable from memory while `del x` does not'
+      ],
+      correct_index: 0,
+      explanation: '`del x` deletes the variable name itself from the namespace (accessing x afterwards raises NameError). `x = None` retains the name and points it to the singleton None object.'
+    },
+    {
+      id: 'mcq-py-fc-3',
+      topic_id: 'top-py-flow-control',
+      difficulty: 'hard',
+      question: 'Which of the following control structures does NOT exist in standard Python 3.8 and earlier?',
+      options: [
+        'while-else construct',
+        'switch-case and do-while statements',
+        'nested if-elif-else',
+        'for-in iteration'
+      ],
+      correct_index: 1,
+      explanation: 'Standard Python does not have `switch-case` (until match-case in 3.10) or `do-while` loop constructs.'
+    },
+
+    // Stage 4 Lists MCQs
+    {
+      id: 'mcq-py-list-1',
+      topic_id: 'top-py-lists',
+      difficulty: 'easy',
+      question: 'What is the output of `a = [1, 2]; a.append([3, 4]); print(len(a))`?',
+      options: ['4', '3', '2', 'Raises TypeError'],
+      correct_index: 1,
+      explanation: '`append([3, 4])` appends the nested list as a single 3rd element: `[1, 2, [3, 4]]`, so `len(a)` is 3. To unpack, `extend()` is used.'
+    },
+    {
+      id: 'mcq-py-list-2',
+      topic_id: 'top-py-lists',
+      difficulty: 'medium',
+      question: 'If `l1 = [10, 20]` and `l2 = l1`, what happens when you execute `l1[0] = 99`?',
+      options: [
+        'Only l1[0] becomes 99 because assignments copy by value',
+        'Both l1[0] and l2[0] become 99 because l2 is an alias referencing the same memory object',
+        'Python raises an UnboundAssignmentError',
+        'l2 is automatically deleted'
+      ],
+      correct_index: 1,
+      explanation: 'Assignment `l2 = l1` creates an alias (both reference identical memory address). Mutating `l1` in-place alters `l2` as well.'
+    },
+    {
+      id: 'mcq-py-list-3',
+      topic_id: 'top-py-lists',
+      difficulty: 'hard',
+      question: 'Which syntax creates a true independent clone (shallow copy) of a list `l1`?',
+      options: [
+        '`l2 = l1[:]` or `l2 = l1.copy()`',
+        '`l2 = l1`',
+        '`l2 = list.clone(l1)`',
+        '`l2 = l1.duplicate()`'
+      ],
+      correct_index: 0,
+      explanation: 'Both slice notation `l1[:]` and the `.copy()` method create a shallow clone with independent memory from the original list.'
+    },
+
+    // Stage 5 Dictionaries MCQs
+    {
+      id: 'mcq-py-dict-1',
+      topic_id: 'top-py-dictionaries',
+      difficulty: 'easy',
+      question: 'Why does `d = {}; d[[1, 2]] = "data"` raise a TypeError?',
+      options: [
+        'Dictionaries do not allow bracket notation',
+        'Lists are mutable and unhashable, making them invalid as dictionary keys',
+        'Dictionaries can only hold string keys',
+        'Square brackets are reserved for tuples'
+      ],
+      correct_index: 1,
+      explanation: 'Dictionary keys must be hashable and immutable (integers, strings, floats, tuples). Lists are mutable, so Python raises `TypeError: unhashable type: \'list\'`.'
+    },
+    {
+      id: 'mcq-py-dict-2',
+      topic_id: 'top-py-dictionaries',
+      difficulty: 'medium',
+      question: 'What is the safe idiom to look up a key `k` in dictionary `d` with a fallback 0 if missing?',
+      options: ['d[k] or 0', 'd.get(k, 0)', 'd.find(k, 0)', 'd.lookup(k, 0)'],
+      correct_index: 1,
+      explanation: '`d.get(key, default)` safely returns default if the key is missing instead of raising a KeyError.'
+    },
+    {
+      id: 'mcq-py-dict-3',
+      topic_id: 'top-py-dictionaries',
+      difficulty: 'hard',
+      question: 'What does `d.setdefault("count", 0)` do if "count" does NOT exist in `d`?',
+      options: [
+        'Raises a KeyError',
+        'Returns None without modifying d',
+        'Inserts "count": 0 into d and returns 0',
+        'Returns True'
+      ],
+      correct_index: 2,
+      explanation: '`setdefault(key, default)` checks for key existence; if absent, it inserts `key: default` and returns `default`.'
+    },
 
     // C Pointer MCQs
     {
@@ -573,6 +1234,29 @@ export const initialCurriculum: CurriculumData = {
   ],
 
   codingQuestions: [
+    // Python Coding Challenge 0 (Stage 1: Integer Base Conversion & Identity Inspector)
+    {
+      id: 'code-py-base-conversion',
+      topic_id: 'top-py-fundamentals',
+      title: 'Integer Base Conversion & Identity Inspector',
+      difficulty: 'easy',
+      problem_statement: 'Read a single non-negative decimal integer N from standard input. Output its binary (using bin()), octal (using oct()), and hexadecimal (using hex()) representations on a single line separated by spaces.',
+      input_format: 'A single non-negative integer N.',
+      output_format: 'Three space-separated strings: binary, octal, and hexadecimal representations.',
+      constraints: '0 <= N <= 10^9',
+      sample_input: '15',
+      sample_output: '0b1111 0o17 0xf',
+      starter_code: {
+        python: 'import sys\n\ndef solve():\n    raw = sys.stdin.read().strip()\n    if not raw:\n        return\n    n = int(raw)\n    # Output binary, octal, and hex\n    print(f"{bin(n)} {oct(n)} {hex(n)}")\n\nif __name__ == "__main__":\n    solve()'
+      },
+      test_cases: [
+        { input: '15', expected_output: '0b1111 0o17 0xf', is_hidden: false },
+        { input: '0', expected_output: '0b0 0o0 0x0', is_hidden: false },
+        { input: '255', expected_output: '0b11111111 0o377 0xff', is_hidden: true },
+        { input: '100', expected_output: '0b1100100 0o144 0x64', is_hidden: true }
+      ]
+    },
+
     // Python Coding Challenge 1 (Loops)
     {
       id: 'code-py-sum-evens',
@@ -662,6 +1346,168 @@ export const initialCurriculum: CurriculumData = {
         { input: '0', expected_output: '1', is_hidden: false },
         { input: '3', expected_output: '6', is_hidden: false },
         { input: '7', expected_output: '5040', is_hidden: true }
+      ]
+    },
+
+    // Python Coding Challenge 4 (Nested Ternary Operator)
+    {
+      id: 'code-py-min-ternary',
+      topic_id: 'top-py-operators-io',
+      title: 'Find Minimum of 3 Numbers with Ternary Operator',
+      difficulty: 'easy',
+      problem_statement: 'Read 3 space-separated integers A, B, and C from standard input and print the minimum value using a nested ternary conditional operator.',
+      input_format: 'A single line containing three space-separated integers.',
+      output_format: 'The minimum integer.',
+      constraints: '-10^6 <= A, B, C <= 10^6',
+      sample_input: '10 20 5',
+      sample_output: '5',
+      starter_code: {
+        python: 'import sys\n\ndef solve():\n    raw = sys.stdin.read().strip()\n    if not raw:\n        return\n    a, b, c = [int(x) for x in raw.split()]\n    # TODO: Calculate minimum using nested ternary operator\n    min_val = a if a < b and a < c else b if b < c else c\n    print(min_val)\n\nif __name__ == "__main__":\n    solve()'
+      },
+      test_cases: [
+        { input: '10 20 5', expected_output: '5', is_hidden: false },
+        { input: '30 10 20', expected_output: '10', is_hidden: false },
+        { input: '-10 -20 -30', expected_output: '-30', is_hidden: true },
+        { input: '7 7 7', expected_output: '7', is_hidden: true }
+      ]
+    },
+
+    // Python Coding Challenge 5 (Alternate String Merge)
+    {
+      id: 'code-py-str-merge',
+      topic_id: 'top-py-strings',
+      title: 'Alternate String Character Merger',
+      difficulty: 'medium',
+      problem_statement: 'Read two space-separated strings s1 and s2 from standard input. Merge them by taking characters alternately. If one string is longer than the other, append the remaining characters to the end.',
+      input_format: 'Two space-separated strings on a single line.',
+      output_format: 'The merged string.',
+      constraints: '1 <= len(s1), len(s2) <= 500',
+      sample_input: 'karthi sahasra',
+      sample_output: 'ksaarhtahsira',
+      starter_code: {
+        python: 'import sys\n\ndef merge_alternate(s1: str, s2: str) -> str:\n    # TODO: Merge characters alternatively and append remainder\n    output = []\n    i, j = 0, 0\n    while i < len(s1) or j < len(s2):\n        if i < len(s1):\n            output.append(s1[i])\n            i += 1\n        if j < len(s2):\n            output.append(s2[j])\n            j += 1\n    return "".join(output)\n\nif __name__ == "__main__":\n    parts = sys.stdin.read().strip().split()\n    if len(parts) >= 2:\n        print(merge_alternate(parts[0], parts[1]))'
+      },
+      test_cases: [
+        { input: 'karthi sahasra', expected_output: 'ksaarhtahsira', is_hidden: false },
+        { input: 'abc 12345', expected_output: 'a1b2c345', is_hidden: false },
+        { input: 'hello world', expected_output: 'hweolrllod', is_hidden: true },
+        { input: 'a z', expected_output: 'az', is_hidden: true }
+      ]
+    },
+
+    // Python Coding Challenge 6 (Order-Preserving Deduplication)
+    {
+      id: 'code-py-dedup-list',
+      topic_id: 'top-py-tuples-sets',
+      title: 'Order-Preserving List Deduplication',
+      difficulty: 'easy',
+      problem_statement: 'Read space-separated integers from stdin and print the sequence with all duplicates removed while strictly preserving the original first-occurrence order.',
+      input_format: 'A single line of space-separated integers.',
+      output_format: 'Space-separated integers with duplicates eliminated.',
+      constraints: '1 <= count <= 1000',
+      sample_input: '10 20 30 10 20 40',
+      sample_output: '10 20 30 40',
+      starter_code: {
+        python: 'import sys\n\ndef solve():\n    raw = sys.stdin.read().strip()\n    if not raw:\n        return\n    nums = [int(x) for x in raw.split()]\n    # TODO: Deduplicate while preserving first occurrence order\n    seen = set()\n    result = []\n    for x in nums:\n        if x not in seen:\n            seen.add(x)\n            result.append(x)\n    print(" ".join(str(x) for x in result))\n\nif __name__ == "__main__":\n    solve()'
+      },
+      test_cases: [
+        { input: '10 20 30 10 20 40', expected_output: '10 20 30 40', is_hidden: false },
+        { input: '5 5 5 5', expected_output: '5', is_hidden: false },
+        { input: '1 2 3 4', expected_output: '1 2 3 4', is_hidden: true },
+        { input: '9 8 7 8 9 6', expected_output: '9 8 7 6', is_hidden: true }
+      ]
+    },
+
+    // Python Coding Challenge 7 (Regex Mobile Validator)
+    {
+      id: 'code-py-mobile-regex',
+      topic_id: 'top-py-modules-regex',
+      title: 'Mobile Number Regular Expression Validator',
+      difficulty: 'medium',
+      problem_statement: 'Read a mobile number string from standard input. Print "VALID" if it contains exactly 10 digits and starts with 6, 7, 8, or 9 (optional leading 0 or +91 prefix is also accepted). Otherwise print "INVALID".',
+      input_format: 'A single line containing the candidate phone number string.',
+      output_format: '"VALID" or "INVALID".',
+      constraints: '1 <= string length <= 20',
+      sample_input: '9885768283',
+      sample_output: 'VALID',
+      starter_code: {
+        python: 'import sys\nimport re\n\ndef validate_phone(number: str) -> bool:\n    # TODO: Validate with re.fullmatch\n    pattern = r"(\\+91|0)?[6-9]\\d{9}"\n    return bool(re.fullmatch(pattern, number))\n\nif __name__ == "__main__":\n    raw = sys.stdin.read().strip()\n    print("VALID" if validate_phone(raw) else "INVALID")'
+      },
+      test_cases: [
+        { input: '9885768283', expected_output: 'VALID', is_hidden: false },
+        { input: '+917485920584', expected_output: 'VALID', is_hidden: false },
+        { input: '07435637732', expected_output: 'VALID', is_hidden: true },
+        { input: '5543210987', expected_output: 'INVALID', is_hidden: true },
+        { input: '9885768283abc', expected_output: 'INVALID', is_hidden: true }
+      ]
+    },
+
+    // Python Coding Challenge 8 (Stage 2: Right-Angled Number Triangle Pattern)
+    {
+      id: 'code-py-pattern-triangle',
+      topic_id: 'top-py-flow-control',
+      title: 'Right-Angled Number Triangle Generator',
+      difficulty: 'easy',
+      problem_statement: 'Read an integer N (1 <= N <= 9) from stdin and print a right-angled number triangle with N rows, where row i contains the number i repeated i times separated by a space.',
+      input_format: 'A single integer N.',
+      output_format: 'N lines representing the number triangle.',
+      constraints: '1 <= N <= 9',
+      sample_input: '4',
+      sample_output: '1\n2 2\n3 3 3\n4 4 4 4',
+      starter_code: {
+        python: 'import sys\n\ndef print_pattern(n: int):\n    # TODO: Generate right-angled number triangle\n    for i in range(1, n + 1):\n        print(" ".join([str(i)] * i))\n\nif __name__ == "__main__":\n    raw = sys.stdin.read().strip()\n    if raw:\n        print_pattern(int(raw))'
+      },
+      test_cases: [
+        { input: '4', expected_output: '1\n2 2\n3 3 3\n4 4 4 4', is_hidden: false },
+        { input: '1', expected_output: '1', is_hidden: false },
+        { input: '3', expected_output: '1\n2 2\n3 3 3', is_hidden: true },
+        { input: '5', expected_output: '1\n2 2\n3 3 3\n4 4 4 4\n5 5 5 5 5', is_hidden: true }
+      ]
+    },
+
+    // Python Coding Challenge 9 (Stage 4: 2D Matrix Transpose Comprehension)
+    {
+      id: 'code-py-matrix-transpose',
+      topic_id: 'top-py-lists',
+      title: 'Matrix Transpose via List Comprehension',
+      difficulty: 'medium',
+      problem_statement: 'Read input where the first line gives R (rows) and C (columns), followed by R lines of C space-separated integers. Print the transposed matrix (C rows with R integers each) using list comprehension.',
+      input_format: 'Line 1: R and C. Next R lines: C space-separated integers.',
+      output_format: 'C lines of R space-separated integers representing the transposed matrix.',
+      constraints: '1 <= R, C <= 50',
+      sample_input: '2 3\n1 2 3\n4 5 6',
+      sample_output: '1 4\n2 5\n3 6',
+      starter_code: {
+        python: 'import sys\n\ndef solve():\n    lines = sys.stdin.read().strip().split("\\n")\n    if not lines or not lines[0]:\n        return\n    r, c = [int(x) for x in lines[0].split()]\n    matrix = []\n    for i in range(1, r + 1):\n        matrix.append([int(x) for x in lines[i].split()])\n    # TODO: Transpose using list comprehension\n    transposed = [[matrix[i][j] for i in range(r)] for j in range(c)]\n    for row in transposed:\n        print(" ".join(str(x) for x in row))\n\nif __name__ == "__main__":\n    solve()'
+      },
+      test_cases: [
+        { input: '2 3\n1 2 3\n4 5 6', expected_output: '1 4\n2 5\n3 6', is_hidden: false },
+        { input: '2 2\n10 20\n30 40', expected_output: '10 30\n20 40', is_hidden: false },
+        { input: '1 3\n7 8 9', expected_output: '7\n8\n9', is_hidden: true },
+        { input: '3 1\n1\n2\n3', expected_output: '1 2 3', is_hidden: true }
+      ]
+    },
+
+    // Python Coding Challenge 10 (Stage 5: Word Frequency Counter with Dictionary)
+    {
+      id: 'code-py-word-frequency',
+      topic_id: 'top-py-dictionaries',
+      title: 'Word Frequency Counter using Dictionary',
+      difficulty: 'medium',
+      problem_statement: 'Read a line of words from standard input. Count the frequency of each unique word (case-insensitive) and print each word and its count in alphabetical order formatted as "word: count".',
+      input_format: 'A single line containing space-separated words.',
+      output_format: 'Alphabetically sorted lines in format "word: count".',
+      constraints: '1 <= word count <= 500',
+      sample_input: 'apple banana apple Orange banana apple',
+      sample_output: 'apple: 3\nbanana: 2\norange: 1',
+      starter_code: {
+        python: 'import sys\n\ndef solve():\n    raw = sys.stdin.read().strip()\n    if not raw:\n        return\n    words = raw.lower().split()\n    # TODO: Build frequency dictionary and print sorted\n    freq = {}\n    for w in words:\n        freq[w] = freq.get(w, 0) + 1\n    for w in sorted(freq.keys()):\n        print(f"{w}: {freq[w]}")\n\nif __name__ == "__main__":\n    solve()'
+      },
+      test_cases: [
+        { input: 'apple banana apple Orange banana apple', expected_output: 'apple: 3\nbanana: 2\norange: 1', is_hidden: false },
+        { input: 'to be or not to be', expected_output: 'be: 2\nnot: 1\nor: 1\nto: 2', is_hidden: false },
+        { input: 'python Python PYTHON', expected_output: 'python: 3', is_hidden: true },
+        { input: 'cat dog bird', expected_output: 'bird: 1\ncat: 1\ndog: 1', is_hidden: true }
       ]
     }
   ]

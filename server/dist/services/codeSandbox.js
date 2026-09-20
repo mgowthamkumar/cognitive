@@ -63,7 +63,7 @@ class CodeSandboxService {
                 totalHidden++;
             else
                 totalVisible++;
-            const res = await this.runProcess('python', [scriptPath], tc.input, runDir);
+            const res = await this.runProcess('python', ['solution.py'], tc.input, runDir);
             if (res.timedOut) {
                 return {
                     status: 'TIME_LIMIT_EXCEEDED',
@@ -118,10 +118,11 @@ class CodeSandboxService {
     }
     async evaluateC(runDir, code, testCases, startTime) {
         const srcPath = path_1.default.join(runDir, 'solution.c');
-        const binPath = path_1.default.join(runDir, 'solution.exe');
+        const binName = process.platform === 'win32' ? 'solution.exe' : 'solution';
+        const binPath = path_1.default.join(runDir, binName);
         fs_1.default.writeFileSync(srcPath, code, 'utf-8');
         // Compile with gcc / g++
-        const compileRes = await this.runProcess('g++', ['-O2', srcPath, '-o', binPath], '', runDir);
+        const compileRes = await this.runProcess('g++', ['-O2', 'solution.c', '-o', binName], '', runDir);
         if (compileRes.exitCode !== 0) {
             return {
                 status: 'COMPILE_ERROR',
@@ -138,10 +139,11 @@ class CodeSandboxService {
     }
     async evaluateCpp(runDir, code, testCases, startTime) {
         const srcPath = path_1.default.join(runDir, 'solution.cpp');
-        const binPath = path_1.default.join(runDir, 'solution.exe');
+        const binName = process.platform === 'win32' ? 'solution.exe' : 'solution';
+        const binPath = path_1.default.join(runDir, binName);
         fs_1.default.writeFileSync(srcPath, code, 'utf-8');
         // Compile with g++
-        const compileRes = await this.runProcess('g++', ['-std=c++17', '-O2', srcPath, '-o', binPath], '', runDir);
+        const compileRes = await this.runProcess('g++', ['-std=c++17', '-O2', 'solution.cpp', '-o', binName], '', runDir);
         if (compileRes.exitCode !== 0) {
             return {
                 status: 'COMPILE_ERROR',
@@ -160,7 +162,7 @@ class CodeSandboxService {
         const srcPath = path_1.default.join(runDir, 'Main.java');
         fs_1.default.writeFileSync(srcPath, code, 'utf-8');
         // Attempt to compile with javac
-        const compileRes = await this.runProcess('javac', [srcPath], '', runDir);
+        const compileRes = await this.runProcess('javac', ['Main.java'], '', runDir);
         if (compileRes.exitCode !== 0) {
             return {
                 status: 'COMPILE_ERROR',
@@ -183,7 +185,7 @@ class CodeSandboxService {
                 totalHidden++;
             else
                 totalVisible++;
-            const res = await this.runProcess('java', ['-cp', runDir, 'Main'], tc.input, runDir);
+            const res = await this.runProcess('java', ['-cp', '.', 'Main'], tc.input, runDir);
             if (res.timedOut) {
                 return {
                     status: 'TIME_LIMIT_EXCEEDED',
@@ -230,12 +232,13 @@ class CodeSandboxService {
         let totalVisible = 0;
         let passedHidden = 0;
         let totalHidden = 0;
+        const binName = process.platform === 'win32' ? '.\\solution.exe' : './solution';
         for (const tc of testCases) {
             if (tc.is_hidden)
                 totalHidden++;
             else
                 totalVisible++;
-            const res = await this.runProcess(binPath, [], tc.input, runDir);
+            const res = await this.runProcess(binName, [], tc.input, runDir);
             if (res.timedOut) {
                 return {
                     status: 'TIME_LIMIT_EXCEEDED',
@@ -293,7 +296,9 @@ class CodeSandboxService {
             let stdout = '';
             let stderr = '';
             let timedOut = false;
-            const proc = (0, child_process_1.spawn)(command, args, {
+            const safeArgs = args.map(a => (a.includes(' ') && !a.startsWith('"')) ? `"${a}"` : a);
+            const safeCommand = (command.includes(' ') && !command.startsWith('"')) ? `"${command}"` : command;
+            const proc = (0, child_process_1.spawn)(safeCommand, safeArgs, {
                 cwd,
                 windowsHide: true,
                 shell: true,

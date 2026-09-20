@@ -23,9 +23,23 @@ import { NotesPage } from './pages/NotesPage';
 import { LearningHistoryPage } from './pages/LearningHistoryPage';
 import { WifiOff } from 'lucide-react';
 
+const PYTHON_STAGE_TOPICS = [
+  'top-py-fundamentals', // Stage 1 (Unit 1): Fundamentals
+  'top-py-operators-io', // Stage 1 (Unit 1): Operators & I/O
+  'top-py-flow-control', // Stage 2 (Unit 2): Flow Control
+  'top-py-loops',        // Stage 2 (Unit 2): Loops & Patterns
+  'top-py-strings',      // Stage 3 (Unit 3): Strings & Slicing
+  'top-py-lists',        // Stage 4 (Unit 4): Lists & Comprehensions
+  'top-py-tuples-sets',  // Stage 5 (Unit 5): Tuples & Sets
+  'top-py-dictionaries', // Stage 5 (Unit 5): Dictionaries
+  'top-py-functions',    // Stage 6 (Unit 6): Functions & Scope
+  'top-py-recursion',    // Stage 6 (Unit 6): Recursion
+  'top-py-modules-regex' // Stage 6 (Unit 6): Modules & Regex
+];
+
 const AppContent: React.FC = () => {
   const [currentView, setCurrentView] = useState<string>('landing');
-  const [selectedTopicId, setSelectedTopicId] = useState<string>('top-py-loops');
+  const [selectedTopicId, setSelectedTopicId] = useState<string>('top-py-fundamentals');
   const [diagnosticLang, setDiagnosticLang] = useState<string>('python');
   
   // Modals
@@ -52,6 +66,17 @@ const AppContent: React.FC = () => {
   const handleSelectTopic = (topicId: string) => {
     setSelectedTopicId(topicId);
     setCurrentView('lesson');
+  };
+
+  const handleNextTopic = () => {
+    const currentIndex = PYTHON_STAGE_TOPICS.indexOf(selectedTopicId);
+    if (currentIndex >= 0 && currentIndex < PYTHON_STAGE_TOPICS.length - 1) {
+      const nextTopicId = PYTHON_STAGE_TOPICS[currentIndex + 1];
+      setSelectedTopicId(nextTopicId);
+      setCurrentView('lesson');
+    } else {
+      setCurrentView('catalog');
+    }
   };
 
   const handleStartDiagnostic = (lang: string) => {
@@ -105,6 +130,7 @@ const AppContent: React.FC = () => {
             topicId={selectedTopicId}
             onBackToLesson={() => setCurrentView('lesson')}
             onGoToCoding={() => setCurrentView('coding')}
+            onNextTopic={handleNextTopic}
           />
         )}
 
@@ -113,6 +139,7 @@ const AppContent: React.FC = () => {
             topicId={selectedTopicId}
             onOpenAiDrawer={() => setAiDrawerOpen(true)}
             onBackToLesson={() => setCurrentView('lesson')}
+            onNextTopic={handleNextTopic}
           />
         )}
 

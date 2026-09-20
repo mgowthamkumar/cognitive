@@ -10,6 +10,9 @@ scripts/**/*.py linguist-detectable=true linguist-language=Python
 *.py linguist-detectable=true linguist-language=Python
 
 # Web Frontend (HTML, CSS, JavaScript)
+index.html linguist-detectable=true linguist-language=HTML
+assets/**/*.css linguist-detectable=true linguist-language=CSS
+assets/**/*.js linguist-detectable=true linguist-language=JavaScript
 docs/**/*.html linguist-detectable=true linguist-language=HTML
 docs/**/*.css linguist-detectable=true linguist-language=CSS
 docs/**/*.js linguist-detectable=true linguist-language=JavaScript

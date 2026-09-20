@@ -22,7 +22,7 @@ def request(url, method="GET", data=None, token=None):
     req = urllib.request.Request(url, data=encoded_data, headers=headers, method=method)
     
     try:
-        with urllib.request.urlopen(req, timeout=10) as response:
+        with urllib.request.urlopen(req, timeout=30) as response:
             res_body = response.read().decode("utf-8")
             return response.status, json.loads(res_body) if res_body else {}
     except urllib.error.HTTPError as e:
@@ -103,10 +103,10 @@ def run_tests():
     print("\n--- 6. Sandboxed Code Execution (Python & C) ---")
     py_code = """
 import sys
-input_data = sys.stdin.read().strip()
-nums = [int(x) for x in input_data.split()] if input_data else []
-even_sum = sum(x for x in nums if x % 2 == 0)
-print(even_sum)
+raw = sys.stdin.read().strip()
+if raw:
+    n = int(raw)
+    print(f"{bin(n)} {oct(n)} {hex(n)}")
 """
     status, submit_res = request(f"{BASE_URL}/code/submit", method="POST", data={
         "topicId": first_topic["id"],
@@ -118,7 +118,27 @@ print(even_sum)
     }, token=token)
     assert status == 200, f"Code submission failed: {submit_res}"
     exec_info = submit_res["execution"]
-    print(f"✓ Python Sandbox Result: Status={exec_info['status']}, Passed Tests={exec_info['passed_test_cases']}/{exec_info['total_test_cases']}, Hidden Passed={exec_info['hidden_passed']}/{exec_info['hidden_total']}")
+    print(f"✓ Python Stage 1 (Base Conversion) Sandbox: Status={exec_info['status']}, Passed Tests={exec_info['passed_test_cases']}/{exec_info['total_test_cases']}")
+
+    # Also test Stage 2 Loops challenge
+    py_loops_code = """
+import sys
+input_data = sys.stdin.read().strip()
+nums = [int(x) for x in input_data.split()] if input_data else []
+even_sum = sum(x for x in nums if x % 2 == 0)
+print(even_sum)
+"""
+    status, submit_loops_res = request(f"{BASE_URL}/code/submit", method="POST", data={
+        "topicId": "top-py-loops",
+        "code": py_loops_code,
+        "language": "python",
+        "codingTimeSeconds": 30,
+        "keystrokes": 90,
+        "pasteEvents": 0
+    }, token=token)
+    assert status == 200, f"Loops code submission failed: {submit_loops_res}"
+    exec_loops = submit_loops_res["execution"]
+    print(f"✓ Python Stage 2 (Sum Evens) Sandbox: Status={exec_loops['status']}, Passed Tests={exec_loops['passed_test_cases']}/{exec_loops['total_test_cases']}")
 
     # Test C Code Runner with g++
     c_code = """
