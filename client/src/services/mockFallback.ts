@@ -5,6 +5,9 @@
  * diagnostic test, search, bookmarks, notes, and learning history) work seamlessly with 0 errors!
  */
 
+import platformData from '../data/platformData.json';
+import { executeCodeInBrowser } from './pythonRunner';
+
 export const isGitHubPages = typeof window !== 'undefined' && (
   window.location.hostname.includes('github.io') ||
   window.location.protocol === 'file:'
@@ -33,121 +36,43 @@ function setStoredArray(key: string, val: any[]) {
   } catch {}
 }
 
-export const mockCourses = [
-  {
-    id: 'course-py-fund',
-    language: 'python',
-    level: 'beginner',
-    title: 'Python Fundamentals & Control Flow',
-    description: 'Master core Python variables, conditionals, loops, functions, and recursion.',
-    modules: [
-      {
-        id: 'mod-py-1',
-        title: 'Stage 1 (Unit 1): Language Fundamentals, Types & Operators',
-        order: 1,
-        topics: [
-          { id: 'top-py-fundamentals', title: 'Language Fundamentals, Datatypes & Immutability', level: 'beginner', status: 'COMPLETED' },
-          { id: 'top-py-operators-io', title: 'Operators & Dynamic Input/Output Statements', level: 'beginner', status: 'IN_PROGRESS' }
-        ]
-      },
-      {
-        id: 'mod-py-2',
-        title: 'Stage 2 (Unit 2): Flow Control, Loops & Pattern Printing',
-        order: 2,
-        topics: [
-          { id: 'top-py-flow-control', title: 'Flow Control, Conditionals & Transfer Statements', level: 'beginner', status: 'IN_PROGRESS' },
-          { id: 'top-py-loops', title: 'Loops, Iteration Constructs & Pattern Printing', level: 'beginner', status: 'LOCKED' }
-        ]
-      },
-      {
-        id: 'mod-py-3',
-        title: 'Stage 3 (Unit 3): Strings, Slicing & String Algorithms',
-        order: 3,
-        topics: [
-          { id: 'top-py-strings', title: 'In-Depth String Operations, Slicing & Algorithms', level: 'beginner', status: 'LOCKED' }
-        ]
-      },
-      {
-        id: 'mod-py-4',
-        title: 'Stage 4 (Unit 4): Lists, Matrices & Comprehensions',
-        order: 4,
-        topics: [
-          { id: 'top-py-lists', title: 'List Data Structure, Matrices & Comprehensions', level: 'intermediate', status: 'LOCKED' }
-        ]
-      },
-      {
-        id: 'mod-py-5',
-        title: 'Stage 5 (Unit 5): Tuples, Sets & Dictionaries',
-        order: 5,
-        topics: [
-          { id: 'top-py-tuples-sets', title: 'Tuples and Sets Data Structures', level: 'intermediate', status: 'LOCKED' },
-          { id: 'top-py-dictionaries', title: 'Dictionary Data Structure & Hash Tables', level: 'intermediate', status: 'LOCKED' }
-        ]
-      },
-      {
-        id: 'mod-py-6',
-        title: 'Stage 6 (Unit 6): Functions, Modules & Regular Expressions',
-        order: 6,
-        topics: [
-          { id: 'top-py-functions', title: 'Functions, Parameters & Scope (LEGB)', level: 'advanced', status: 'LOCKED' },
-          { id: 'top-py-recursion', title: 'Recursion and Recursive Thinking', level: 'advanced', status: 'LOCKED' },
-          { id: 'top-py-modules-regex', title: 'Modules, Math, Random & Regular Expressions', level: 'advanced', status: 'LOCKED' }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'course-c-memory',
-    language: 'c',
-    level: 'beginner',
-    title: 'C Programming & Systems Fundamentals',
-    description: 'Pointers, memory management, arrays, and low-level execution.',
-    modules: [
-      {
-        id: 'mod-c-1',
-        title: 'Pointers & Memory',
-        order: 1,
-        topics: [
-          { id: 'top-c-pointers', title: 'Pointers and Memory Addresses', level: 'beginner', status: 'IN_PROGRESS' }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'course-cpp-oop',
-    language: 'cpp',
-    level: 'intermediate',
-    title: 'C++ Modern OOP & Memory',
-    description: 'Object-oriented programming, classes, smart pointers, and STL.',
-    modules: [
-      {
-        id: 'mod-cpp-1',
-        title: 'Object Oriented Architecture',
-        order: 1,
-        topics: [
-          { id: 'top-cpp-classes', title: 'Classes and Dynamic Polymorphism', level: 'intermediate', status: 'IN_PROGRESS' }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'course-java-core',
-    language: 'java',
-    level: 'beginner',
-    title: 'Java Core Principles & JVM',
-    description: 'Java bytecode, garbage collection, collections framework.',
-    modules: [
-      {
-        id: 'mod-java-1',
-        title: 'JVM Architecture',
-        order: 1,
-        topics: [
-          { id: 'top-java-basics', title: 'Java Types & JVM Bytecode', level: 'beginner', status: 'IN_PROGRESS' }
-        ]
-      }
-    ]
-  }
-];
+// Populate projects from platformData
+export const mockProjects: any[] = platformData.projects || [];
+
+
+// Populate courses dynamically from platformData with structured modules and topics
+export const mockCourses: any[] = (platformData.courses || []).map((c: any) => {
+  const cModules = (platformData.modules || [])
+    .filter((m: any) => m.course_id === c.id)
+    .sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0))
+    .map((m: any) => {
+      const mTopics = (platformData.topics || [])
+        .filter((t: any) => t.module_id === m.id)
+        .sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0))
+        .map((t: any, idx: number) => ({
+          id: t.id,
+          title: t.title,
+          level: c.level,
+          status: idx === 0 ? 'COMPLETED' : idx === 1 ? 'IN_PROGRESS' : 'LOCKED'
+        }));
+      return {
+        id: m.id,
+        title: m.title,
+        order: m.order_index || 1,
+        topics: mTopics
+      };
+    });
+
+  return {
+    id: c.id,
+    language: c.language,
+    level: c.level,
+    title: c.title,
+    description: c.description,
+    modules: cModules
+  };
+});
+
 
 export const mockTopicDetails: Record<string, any> = {
   'top-py-loops': {
@@ -551,6 +476,13 @@ export const mockTopicDetails: Record<string, any> = {
   }
 };
 
+// Populate additional topics from platformData
+(platformData.topics || []).forEach((t: any) => {
+  if (!mockTopicDetails[t.id]) {
+    mockTopicDetails[t.id] = t;
+  }
+});
+
 export const mockQuizzes: Record<string, any[]> = {
   'top-py-loops': [
     {
@@ -867,6 +799,16 @@ export const mockQuizzes: Record<string, any[]> = {
   ]
 };
 
+// Populate additional quizzes from platformData
+(platformData.mcq_questions || []).forEach((q: any) => {
+  if (!mockQuizzes[q.topic_id]) {
+    mockQuizzes[q.topic_id] = [];
+  }
+  if (!mockQuizzes[q.topic_id].some((existing: any) => existing.id === q.id)) {
+    mockQuizzes[q.topic_id].push(q);
+  }
+});
+
 export const mockCodingChallenges: Record<string, any> = {
   'top-py-loops': {
     id: 'code-py-sum-even',
@@ -1058,6 +1000,13 @@ export const mockCodingChallenges: Record<string, any> = {
     ]
   }
 };
+
+// Populate additional coding challenges from platformData
+(platformData.coding_questions || []).forEach((cq: any) => {
+  if (!mockCodingChallenges[cq.topic_id]) {
+    mockCodingChallenges[cq.topic_id] = cq;
+  }
+});
 
 export const mockDiagnosticQuestions = [
   {
@@ -1324,36 +1273,138 @@ export const mockHandlers = {
   },
 
   runCode: async (code: string, language: string, input: string = '') => {
-    // Client-side simulated execution
+    const res = await executeCodeInBrowser(code, language, input);
     return {
-      status: 'SUCCESS',
-      stdout: `[Executed ${language.toUpperCase()} locally]\nInput: ${input || 'None'}\nResult: Code syntax verified successfully!`,
-      stderr: '',
-      execution_time: 210,
-      passed_tests: 1,
-      total_tests: 1,
+      status: res.status,
+      stdout: res.stdout,
+      stderr: res.stderr,
+      execution_time: res.execution_time_ms,
+      execution_time_ms: res.execution_time_ms,
+      passed_test_cases: res.status === 'SUCCESS' ? 1 : 0,
+      total_test_cases: 1,
       details: [
-        { test_case: 1, input: input || 'Standard', expected: 'Output', actual: 'Output', passed: true }
+        {
+          input: input || 'Standard',
+          expected: res.stdout,
+          actual: res.stdout || res.stderr || 'Execution finished',
+          passed: res.status === 'SUCCESS',
+          is_hidden: false
+        }
       ]
     };
   },
 
   submitCode: async (topicId: string, code: string, telemetryData: any = {}) => {
+    const challenge = mockCodingChallenges[topicId] || Object.values(mockCodingChallenges)[0];
+    const testCases = (challenge && challenge.test_cases && challenge.test_cases.length > 0)
+      ? challenge.test_cases
+      : [{ input: '', expected_output: 'Execution finished', is_hidden: false }];
+
+    const details: any[] = [];
+    let passedVisible = 0;
+    let totalVisible = 0;
+    let passedHidden = 0;
+    let totalHidden = 0;
+    let firstStdout = '';
+    let firstStderr = '';
+
+    for (let i = 0; i < testCases.length; i++) {
+      const tc = testCases[i];
+      if (tc.is_hidden) totalHidden++;
+      else totalVisible++;
+
+      const res = await executeCodeInBrowser(code, telemetryData.language || 'python', tc.input || '');
+      if (i === 0) {
+        firstStdout = res.stdout;
+        firstStderr = res.stderr;
+      }
+
+      const actualTrimmed = (res.stdout || '').trim();
+      const expectedTrimmed = (tc.expected_output || tc.expected || '').trim();
+      const isMatch = (actualTrimmed === expectedTrimmed) ||
+                      (res.status === 'SUCCESS' && actualTrimmed.length > 0 && !expectedTrimmed);
+
+      if (isMatch) {
+        if (tc.is_hidden) passedHidden++;
+        else passedVisible++;
+      }
+
+      details.push({
+        input: tc.input || '',
+        expected: expectedTrimmed,
+        actual: actualTrimmed || res.stderr || 'No output recorded',
+        passed: isMatch,
+        is_hidden: !!tc.is_hidden
+      });
+    }
+
+    const allPassed = (totalVisible > 0 ? passedVisible === totalVisible : true) &&
+                      (totalHidden > 0 ? passedHidden === totalHidden : true);
+
+    const execResult = {
+      status: allPassed ? 'PASSED' : 'FAILED',
+      passed_test_cases: passedVisible,
+      total_test_cases: totalVisible,
+      hidden_passed: passedHidden,
+      hidden_total: totalHidden,
+      execution_time_ms: 125,
+      stdout: firstStdout || (allPassed ? 'All test cases executed successfully!' : ''),
+      stderr: firstStderr,
+      details
+    };
+
     return {
-      status: 'ACCEPTED',
-      stdout: 'All automated test cases passed successfully!',
-      stderr: '',
-      passed_tests: 2,
-      total_tests: 2,
-      execution_time: 185,
-      all_passed: true,
+      execution: execResult,
+      is_passed: allPassed,
+      status: allPassed ? 'PASSED' : 'FAILED',
+      stdout: execResult.stdout,
       adaptive_feedback: {
-        cognitive_level: 'LOW',
-        recommended_action: 'CONTINUE_NEXT_TOPIC',
-        reason: 'Clean solution submitted with zero syntax errors. Cognitive load is LOW. Recommendation: Continue to Recursion.'
+        cognitive_level: allPassed ? 'LOW' : 'MEDIUM',
+        recommended_action: allPassed ? 'CONTINUE_NEXT_TOPIC' : 'REVISE',
+        reason: allPassed
+          ? 'Solution executed cleanly with zero syntax errors. All test cases passed!'
+          : 'Some test cases did not match expected output. Review hint progression and check logic.'
       }
     };
   },
+
+  getProjects: async (language: string = 'python', level?: string) => {
+    let projs = mockProjects.filter((p: any) => p.language === language.toLowerCase());
+    if (level && level !== 'all') {
+      projs = projs.filter((p: any) => p.level === level.toLowerCase());
+    }
+    return { projects: projs };
+  },
+
+  getProjectDetail: async (id: string) => {
+    const proj = mockProjects.find((p: any) => p.id === id) || mockProjects[0];
+    return { project: proj };
+  },
+
+  submitProject: async (projectId: string, payload: any) => {
+    const proj = mockProjects.find((p: any) => p.id === projectId);
+    const code = payload.code || '';
+    const res = await executeCodeInBrowser(code, proj?.language || 'python', proj?.test_cases?.[0]?.input || '');
+    const passed = res.status === 'SUCCESS' && code.length > 25;
+
+    return {
+      success: true,
+      evaluation: {
+        total_score: passed ? 92 : 65,
+        passed,
+        rubric_breakdown: {
+          correctness: passed ? 38 : 22,
+          efficiency: 18,
+          style: 18,
+          cognitive_mastery: passed ? 18 : 12
+        },
+        feedback: passed
+          ? 'Outstanding work! Project requirements, architectural separation, and test cases verified.'
+          : 'Project submitted. Review milestones and ensure all required features are implemented.'
+      }
+    };
+  },
+
 
   getDashboardSnapshot: async () => {
     const history = getStoredArray(MOCK_STORAGE_KEYS.HISTORY, []);

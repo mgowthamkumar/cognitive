@@ -89,6 +89,7 @@ export const api = {
 
   // Courses & Topics
   getCourses: async (language?: string, level?: string) => {
+    if (isGitHubPages) return mockHandlers.getCourses(language);
     try {
       const params = new URLSearchParams();
       if (language) params.append('language', language);
@@ -100,6 +101,7 @@ export const api = {
   },
 
   getCourseStructure: async (courseId: string) => {
+    if (isGitHubPages) return mockHandlers.getCourseDetail(courseId);
     try {
       const res = await fetch(`${API_BASE}/courses/${courseId}`);
       if (res.ok) return await res.json();
@@ -108,6 +110,7 @@ export const api = {
   },
 
   getTopicDetail: async (topicId: string) => {
+    if (isGitHubPages) return mockHandlers.getTopicDetail(topicId);
     try {
       const res = await fetch(`${API_BASE}/topics/${topicId}`);
       if (res.ok) return await res.json();
@@ -117,6 +120,7 @@ export const api = {
 
   // Quizzes
   getTopicQuiz: async (topicId: string) => {
+    if (isGitHubPages) return mockHandlers.getTopicQuiz(topicId);
     try {
       const res = await fetch(`${API_BASE}/topics/${topicId}/quiz`);
       if (res.ok) return await res.json();
@@ -125,6 +129,7 @@ export const api = {
   },
 
   submitTopicQuiz: async (topicId: string, answers: Record<string, number>, timeSpentSeconds: number) => {
+    if (isGitHubPages) return mockHandlers.submitTopicQuiz(topicId, answers, timeSpentSeconds);
     try {
       const res = await fetch(`${API_BASE}/topics/${topicId}/quiz/submit`, {
         method: 'POST',
@@ -138,6 +143,7 @@ export const api = {
 
   // Code Sandbox
   getTopicCodingChallenge: async (topicId: string) => {
+    if (isGitHubPages) return mockHandlers.getTopicCodingChallenge(topicId);
     try {
       const res = await fetch(`${API_BASE}/topics/${topicId}/coding`);
       if (res.ok) return await res.json();
@@ -146,6 +152,7 @@ export const api = {
   },
 
   runCode: async (code: string, language: string, customInput?: string) => {
+    if (isGitHubPages) return mockHandlers.runCode(code, language, customInput);
     try {
       const res = await fetch(`${API_BASE}/code/run`, {
         method: 'POST',
@@ -165,6 +172,7 @@ export const api = {
     keystrokes: number;
     pasteEvents: number;
   }) => {
+    if (isGitHubPages) return mockHandlers.submitCode(payload.topicId, payload.code, payload);
     try {
       const res = await fetch(`${API_BASE}/code/submit`, {
         method: 'POST',
@@ -175,6 +183,7 @@ export const api = {
     } catch {}
     return mockHandlers.submitCode(payload.topicId, payload.code, payload);
   },
+
 
   // Telemetry & Behavior
   sendTelemetryEvent: async (event: {
@@ -419,6 +428,7 @@ export const api = {
 
   // Projects & Rubric Evaluation (Sections 82-84, 94)
   getProjects: async (language: string = 'python', level?: string) => {
+    if (isGitHubPages) return mockHandlers.getProjects(language, level);
     try {
       const params = new URLSearchParams({ language });
       if (level) params.append('level', level);
@@ -427,20 +437,22 @@ export const api = {
       });
       if (res.ok) return await res.json();
     } catch {}
-    return { projects: [] };
+    return mockHandlers.getProjects(language, level);
   },
 
   getProjectDetail: async (id: string) => {
+    if (isGitHubPages) return mockHandlers.getProjectDetail(id);
     try {
       const res = await fetch(`${API_BASE}/projects/${id}`, {
         headers: getAuthHeaders()
       });
       if (res.ok) return await res.json();
     } catch {}
-    return { project: null };
+    return mockHandlers.getProjectDetail(id);
   },
 
   submitProject: async (projectId: string, payload: { code: string; completion_time_seconds?: number; keystrokes?: number; paste_events?: number }) => {
+    if (isGitHubPages) return mockHandlers.submitProject(projectId, payload);
     try {
       const res = await fetch(`${API_BASE}/projects/${projectId}/submit`, {
         method: 'POST',
@@ -449,20 +461,7 @@ export const api = {
       });
       if (res.ok) return await res.json();
     } catch {}
-    return {
-      evaluation: {
-        overall_score: 92,
-        passed: true,
-        correctness: 90,
-        test_case_score: 100,
-        code_quality: 90,
-        complexity: 85,
-        best_practices: 90,
-        concept_coverage: 95,
-        feedback: 'Excellent work! Your code passes all functional test suites with clean structure.'
-      },
-      integrity: { status: 'normal', confidence: 0.98 }
-    };
+    return mockHandlers.submitProject(projectId, payload);
   },
 
   submitProjectSolution: async (id: string, payload: {
@@ -471,6 +470,7 @@ export const api = {
     keystrokes: number;
     pasteEvents: number;
   }) => {
+    if (isGitHubPages) return mockHandlers.submitProject(id, payload);
     try {
       const res = await fetch(`${API_BASE}/projects/${id}/submit`, {
         method: 'POST',
@@ -479,20 +479,7 @@ export const api = {
       });
       if (res.ok) return await res.json();
     } catch {}
-    return {
-      evaluation: {
-        overall_score: 92,
-        passed: true,
-        correctness: 90,
-        test_case_score: 100,
-        code_quality: 90,
-        complexity: 85,
-        best_practices: 90,
-        concept_coverage: 95,
-        feedback: 'Excellent work! Your code passes all functional test suites with clean structure.'
-      },
-      integrity: { status: 'normal', confidence: 0.98 }
-    };
+    return mockHandlers.submitProject(id, payload);
   },
 
   // Diagnostic Assessment (Section 109 & 110)

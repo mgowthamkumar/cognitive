@@ -168,10 +168,12 @@ export const CodingStudioPage: React.FC<CodingStudioProps> = ({
         pasteEvents
       });
 
-      setExecResult(res.execution);
-      setIsPassed(res.is_passed);
+      const execution = res.execution || res;
+      setExecResult(execution);
+      const passed = res.is_passed !== undefined ? res.is_passed : (execution?.status === 'PASSED');
+      setIsPassed(!!passed);
 
-      if (res.is_passed) {
+      if (passed) {
         confetti({ particleCount: 75, spread: 70, origin: { y: 0.6 } });
       }
 
@@ -680,10 +682,62 @@ export const CodingStudioPage: React.FC<CodingStudioProps> = ({
               )}
 
               {activeTab === 'output' && (
-                <div>
-                  <pre className="text-slate-300 whitespace-pre-wrap">
-                    {execResult?.compilation_error || execResult?.runtime_error || (execResult?.details && execResult.details[0]?.actual) || 'No output recorded.'}
-                  </pre>
+                <div className="space-y-3 font-mono">
+                  {execResult?.stdout && (
+                    <div>
+                      <div className="text-[10px] font-bold text-slate-400 mb-1 flex items-center gap-1.5">
+                        <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>Standard Output (stdout):</span>
+                      </div>
+                      <pre className="text-emerald-300 whitespace-pre-wrap bg-slate-950 p-3 rounded-xl border border-slate-800 leading-relaxed text-xs">
+                        {execResult.stdout}
+                      </pre>
+                    </div>
+                  )}
+                  {execResult?.stderr && (
+                    <div>
+                      <div className="text-[10px] font-bold text-rose-400 mb-1 flex items-center gap-1.5">
+                        <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                        <span>Standard Error (stderr):</span>
+                      </div>
+                      <pre className="text-rose-300 whitespace-pre-wrap bg-rose-950/20 p-3 rounded-xl border border-rose-900/40 leading-relaxed text-xs">
+                        {execResult.stderr}
+                      </pre>
+                    </div>
+                  )}
+                  {execResult?.compilation_error && (
+                    <div>
+                      <div className="text-[10px] font-bold text-rose-400 mb-1 flex items-center gap-1.5">
+                        <XCircle className="w-3.5 h-3.5 text-rose-400" />
+                        <span>Compilation Error:</span>
+                      </div>
+                      <pre className="text-rose-300 whitespace-pre-wrap bg-rose-950/20 p-3 rounded-xl border border-rose-900/40 leading-relaxed text-xs">
+                        {execResult.compilation_error}
+                      </pre>
+                    </div>
+                  )}
+                  {execResult?.runtime_error && (
+                    <div>
+                      <div className="text-[10px] font-bold text-rose-400 mb-1 flex items-center gap-1.5">
+                        <XCircle className="w-3.5 h-3.5 text-rose-400" />
+                        <span>Runtime Error:</span>
+                      </div>
+                      <pre className="text-rose-300 whitespace-pre-wrap bg-rose-950/20 p-3 rounded-xl border border-rose-900/40 leading-relaxed text-xs">
+                        {execResult.runtime_error}
+                      </pre>
+                    </div>
+                  )}
+                  {!execResult?.stdout && !execResult?.stderr && !execResult?.compilation_error && !execResult?.runtime_error && (
+                    <div className="text-slate-400 py-4 text-center">
+                      {(execResult?.details && execResult.details[0]?.actual) ? (
+                        <pre className="text-slate-300 whitespace-pre-wrap text-left bg-slate-950 p-3 rounded-xl border border-slate-800">
+                          {execResult.details[0].actual}
+                        </pre>
+                      ) : (
+                        'No output recorded yet. Click "Run Code" or "Submit Code" to execute.'
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
