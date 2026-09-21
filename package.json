@@ -4,13 +4,26 @@
   "description": "AI/ML + RAG + LLM Adaptive Programming Learning Platform",
   "scripts": {
     "start": "node launcher.js",
+    "build": "npm --prefix client run build && npm --prefix server run build",
+    "build:client": "npm --prefix client run build",
+    "build:server": "npm --prefix server run build",
+    "build:docs": "npm --prefix client run build",
     "dev:server": "npm --prefix server run dev",
     "dev:py-backend": "python python_backend/run.py",
     "dev:client": "npm --prefix client run dev",
     "dev:ml": "uvicorn ml_service.app.main:app --host 127.0.0.1 --port 8000 --reload",
-    "build:client": "npm --prefix client run build",
-    "build:docs": "npm --prefix client run build",
     "train:ml": "python ml_service/app/ml/train_model.py"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
   },
   "keywords": ["adaptive-learning", "cognitive-load", "machine-learning", "rag", "llm", "education"],
   "author": "Antigravity Engineering",

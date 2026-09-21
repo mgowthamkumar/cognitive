@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.dbService = void 0;
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
+const os_1 = __importDefault(require("os"));
 const curriculum_js_1 = require("../data/curriculum.js");
 const projectsData_js_1 = require("../data/projectsData.js");
 const INITIAL_ACHIEVEMENTS = [
@@ -26,9 +27,17 @@ class DatabaseService {
     jsonStorePath;
     inMemoryStore;
     constructor() {
-        this.dataDir = path_1.default.resolve(process.cwd(), 'data');
-        if (!fs_1.default.existsSync(this.dataDir)) {
-            fs_1.default.mkdirSync(this.dataDir, { recursive: true });
+        const isServerless = process.env.VERCEL === '1' || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+        this.dataDir = isServerless
+            ? path_1.default.join(os_1.default.tmpdir(), 'cognitive_data')
+            : path_1.default.resolve(process.cwd(), 'data');
+        try {
+            if (!fs_1.default.existsSync(this.dataDir)) {
+                fs_1.default.mkdirSync(this.dataDir, { recursive: true });
+            }
+        }
+        catch (err) {
+            console.warn('Notice: Unable to create data directory, operating in memory-only mode:', err);
         }
         this.jsonStorePath = path_1.default.join(this.dataDir, 'platform_store.json');
         this.inMemoryStore = {

@@ -6,20 +6,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.codeSandbox = exports.CodeSandboxService = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const os_1 = __importDefault(require("os"));
 const child_process_1 = require("child_process");
 class CodeSandboxService {
     sandboxBaseDir;
     timeoutMs = 5000;
     constructor() {
-        this.sandboxBaseDir = path_1.default.resolve(process.cwd(), 'scratch_sandbox');
-        if (!fs_1.default.existsSync(this.sandboxBaseDir)) {
-            fs_1.default.mkdirSync(this.sandboxBaseDir, { recursive: true });
+        const isServerless = process.env.VERCEL === '1' || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+        this.sandboxBaseDir = isServerless
+            ? path_1.default.join(os_1.default.tmpdir(), 'scratch_sandbox')
+            : path_1.default.resolve(process.cwd(), 'scratch_sandbox');
+        try {
+            if (!fs_1.default.existsSync(this.sandboxBaseDir)) {
+                fs_1.default.mkdirSync(this.sandboxBaseDir, { recursive: true });
+            }
+        }
+        catch (err) {
+            console.warn('Notice: Unable to create sandbox directory:', err);
         }
     }
     async evaluateCode(code, language, testCases) {
         const runId = `exec_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
         const runDir = path_1.default.join(this.sandboxBaseDir, runId);
-        fs_1.default.mkdirSync(runDir, { recursive: true });
+        try {
+            if (!fs_1.default.existsSync(runDir)) {
+                fs_1.default.mkdirSync(runDir, { recursive: true });
+            }
+        }
+        catch (err) {
+            console.warn('Notice: Unable to create runDir in sandbox:', err);
+        }
         const startTime = Date.now();
         try {
             let rawResult;

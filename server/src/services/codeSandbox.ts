@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { spawn } from 'child_process';
 import { TestCase, CodingErrorCategory } from '../types.js';
 
@@ -29,9 +30,16 @@ export class CodeSandboxService {
   private timeoutMs = 5000;
 
   constructor() {
-    this.sandboxBaseDir = path.resolve(process.cwd(), 'scratch_sandbox');
-    if (!fs.existsSync(this.sandboxBaseDir)) {
-      fs.mkdirSync(this.sandboxBaseDir, { recursive: true });
+    const isServerless = process.env.VERCEL === '1' || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+    this.sandboxBaseDir = isServerless
+      ? path.join(os.tmpdir(), 'scratch_sandbox')
+      : path.resolve(process.cwd(), 'scratch_sandbox');
+    try {
+      if (!fs.existsSync(this.sandboxBaseDir)) {
+        fs.mkdirSync(this.sandboxBaseDir, { recursive: true });
+      }
+    } catch (err) {
+      console.warn('Notice: Unable to create sandbox directory:', err);
     }
   }
 
@@ -42,7 +50,13 @@ export class CodeSandboxService {
   ): Promise<ExecutionResult> {
     const runId = `exec_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const runDir = path.join(this.sandboxBaseDir, runId);
-    fs.mkdirSync(runDir, { recursive: true });
+    try {
+      if (!fs.existsSync(runDir)) {
+        fs.mkdirSync(runDir, { recursive: true });
+      }
+    } catch (err) {
+      console.warn('Notice: Unable to create runDir in sandbox:', err);
+    }
 
     const startTime = Date.now();
     try {

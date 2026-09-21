@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
 import { initialCurriculum } from '../data/curriculum.js';
 import { initialProjects } from '../data/projectsData.js';
 import {
@@ -121,9 +122,16 @@ class DatabaseService {
   };
 
   constructor() {
-    this.dataDir = path.resolve(process.cwd(), 'data');
-    if (!fs.existsSync(this.dataDir)) {
-      fs.mkdirSync(this.dataDir, { recursive: true });
+    const isServerless = process.env.VERCEL === '1' || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+    this.dataDir = isServerless
+      ? path.join(os.tmpdir(), 'cognitive_data')
+      : path.resolve(process.cwd(), 'data');
+    try {
+      if (!fs.existsSync(this.dataDir)) {
+        fs.mkdirSync(this.dataDir, { recursive: true });
+      }
+    } catch (err) {
+      console.warn('Notice: Unable to create data directory, operating in memory-only mode:', err);
     }
     this.jsonStorePath = path.join(this.dataDir, 'platform_store.json');
 
