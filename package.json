@@ -25,7 +25,15 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2"
   },
-  "keywords": ["adaptive-learning", "cognitive-load", "machine-learning", "rag", "llm", "education"],
+  "keywords": [
+    "adaptive-learning",
+    "cognitive-load",
+    "machine-learning",
+    "rag",
+    "llm",
+    "education"
+  ],
   "author": "Antigravity Engineering",
-  "license": "MIT"
+  "license": "MIT",
+  "allowScripts": {}
 }
