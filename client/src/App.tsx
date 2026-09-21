@@ -3,7 +3,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { CognitiveProvider } from './context/CognitiveContext';
 import { useOfflineSync } from './hooks/useOfflineSync';
-import { Navbar } from './components/Navbar';
+import { Sidebar } from './components/Sidebar';
 import { AiAssistantDrawer } from './components/AiAssistantDrawer';
 import { AuthModal } from './components/AuthModal';
 import { GlobalSearchModal } from './components/GlobalSearchModal';
@@ -21,7 +21,7 @@ import { DiagnosticAssessmentPage } from './pages/DiagnosticAssessmentPage';
 import { BookmarksPage } from './pages/BookmarksPage';
 import { NotesPage } from './pages/NotesPage';
 import { LearningHistoryPage } from './pages/LearningHistoryPage';
-import { WifiOff } from 'lucide-react';
+import { WifiOff, Menu, Brain, Search } from 'lucide-react';
 
 const PYTHON_STAGE_TOPICS = [
   'top-py-fundamentals', // Stage 1 (Unit 1): Fundamentals
@@ -41,6 +41,7 @@ const AppContent: React.FC = () => {
   const [currentView, setCurrentView] = useState<string>('landing');
   const [selectedTopicId, setSelectedTopicId] = useState<string>('top-py-fundamentals');
   const [diagnosticLang, setDiagnosticLang] = useState<string>('python');
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
   
   // Modals
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -85,63 +86,107 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col selection:bg-cyan-500 selection:text-white">
-      {/* Offline Status Banner */}
-      {!isOnline && (
-        <div className="bg-amber-500/20 border-b border-amber-500/40 px-4 py-2 text-center text-xs text-amber-300 flex items-center justify-center gap-2 font-medium">
-          <WifiOff className="w-4 h-4 text-amber-400" />
-          <span>You are currently working offline. Code drafts and responses are autosaving locally to your browser.</span>
-        </div>
-      )}
-
-      <Navbar
+    <div className="min-h-screen bg-slate-950 flex selection:bg-cyan-500 selection:text-white">
+      {/* Modern Vertical Sidebar (Matching reference layout) */}
+      <Sidebar
         currentView={currentView}
         setCurrentView={setCurrentView}
+        selectedTopicId={selectedTopicId}
+        onSelectTopic={handleSelectTopic}
         openAuthModal={() => setAuthModalOpen(true)}
         openAiDrawer={() => setAiDrawerOpen(true)}
         openSearchModal={() => setSearchModalOpen(true)}
         openOnboardingModal={() => setOnboardingModalOpen(true)}
         openDemoModal={() => setDemoModalOpen(true)}
+        isMobileOpen={mobileSidebarOpen}
+        setIsMobileOpen={setMobileSidebarOpen}
       />
 
-      <main className="flex-1">
-        {currentView === 'landing' && (
-          <LandingPage
-            onStartLearning={() => setOnboardingModalOpen(true)}
-            onExploreCourses={() => setCurrentView('catalog')}
-          />
+      {/* Main Content Area with desktop left-padding for sidebar */}
+      <div className="flex-1 flex flex-col min-w-0 lg:pl-64">
+        {/* Offline Status Banner */}
+        {!isOnline && (
+          <div className="bg-amber-500/20 border-b border-amber-500/40 px-4 py-2 text-center text-xs text-amber-300 flex items-center justify-center gap-2 font-medium">
+            <WifiOff className="w-4 h-4 text-amber-400" />
+            <span>You are currently working offline. Code drafts and responses are autosaving locally to your browser.</span>
+          </div>
         )}
 
-        {currentView === 'catalog' && (
-          <CourseCatalogPage onSelectTopic={handleSelectTopic} />
-        )}
+        {/* Mobile Top Header (visible only on mobile/tablet) */}
+        <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 h-14 bg-slate-950/90 border-b border-slate-800 backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileSidebarOpen(true)}
+              className="p-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white"
+              aria-label="Open navigation sidebar"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <div
+              onClick={() => setCurrentView('landing')}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <Brain className="w-5 h-5 text-cyan-400" />
+              <span className="text-sm font-bold text-white">CognitiveLoad</span>
+            </div>
+          </div>
 
-        {currentView === 'lesson' && (
-          <TopicLessonPage
-            topicId={selectedTopicId}
-            onStartQuiz={() => setCurrentView('quiz')}
-            onOpenCoding={() => setCurrentView('coding')}
-            onBackToCatalog={() => setCurrentView('catalog')}
-          />
-        )}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setSearchModalOpen(true)}
+              className="p-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
+              title="Global Search"
+            >
+              <Search className="w-4 h-4 text-cyan-400" />
+            </button>
+            <button
+              onClick={() => setAiDrawerOpen(true)}
+              className="px-2.5 py-1 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-300 text-xs font-bold"
+            >
+              ✨ AI Tutor
+            </button>
+          </div>
+        </header>
 
-        {currentView === 'quiz' && (
-          <QuizStationPage
-            topicId={selectedTopicId}
-            onBackToLesson={() => setCurrentView('lesson')}
-            onGoToCoding={() => setCurrentView('coding')}
-            onNextTopic={handleNextTopic}
-          />
-        )}
+        <main className="flex-1">
+          {currentView === 'landing' && (
+            <LandingPage
+              onStartLearning={() => setOnboardingModalOpen(true)}
+              onExploreCourses={() => setCurrentView('catalog')}
+            />
+          )}
 
-        {currentView === 'coding' && (
-          <CodingStudioPage
-            topicId={selectedTopicId}
-            onOpenAiDrawer={() => setAiDrawerOpen(true)}
-            onBackToLesson={() => setCurrentView('lesson')}
-            onNextTopic={handleNextTopic}
-          />
-        )}
+          {currentView === 'catalog' && (
+            <CourseCatalogPage onSelectTopic={handleSelectTopic} />
+          )}
+
+          {currentView === 'lesson' && (
+            <TopicLessonPage
+              topicId={selectedTopicId}
+              onStartQuiz={() => setCurrentView('quiz')}
+              onOpenCoding={() => setCurrentView('coding')}
+              onBackToCatalog={() => setCurrentView('catalog')}
+            />
+          )}
+
+          {currentView === 'quiz' && (
+            <QuizStationPage
+              topicId={selectedTopicId}
+              onBackToLesson={() => setCurrentView('lesson')}
+              onGoToCoding={() => setCurrentView('coding')}
+              onNextTopic={handleNextTopic}
+            />
+          )}
+
+          {currentView === 'coding' && (
+            <CodingStudioPage
+              topicId={selectedTopicId}
+              onOpenAiDrawer={() => setAiDrawerOpen(true)}
+              onBackToLesson={() => setCurrentView('lesson')}
+              onGoToQuiz={() => setCurrentView('quiz')}
+              onNextTopic={handleNextTopic}
+            />
+          )}
 
         {currentView === 'projects' && (
           <ProjectHubPage />
@@ -228,6 +273,7 @@ const AppContent: React.FC = () => {
           <p>Cognitive-Load-Aware Adaptive Learning Engine • Built with AI/ML, RAG, and Safe Sandbox Execution</p>
         </footer>
       )}
+      </div>
     </div>
   );
 };

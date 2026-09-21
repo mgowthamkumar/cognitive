@@ -259,7 +259,7 @@ export const CourseCatalogPage: React.FC<CourseCatalogProps> = ({ onSelectTopic 
                     onClick={() => onSelectTopic(course.first_topic_id || 'top-py-loops')}
                     className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 group/btn"
                   >
-                    Continue Course
+                    <span>Start Lesson</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
                   </button>
                 </div>

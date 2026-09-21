@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { QuickNoteModal } from '../components/QuickNoteModal';
+import { TopicLearningStepper } from '../components/TopicLearningStepper';
 
 interface TopicLessonPageProps {
   topicId: string;
@@ -201,12 +202,24 @@ export const TopicLessonPage: React.FC<TopicLessonPageProps> = ({
   const isMicroLearning = currentLoad === 'HIGH';
 
   return (
-    <div ref={containerRef} className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-      {/* 1. REAL-TIME COGNITIVE LOAD BANNER & OVERRIDE */}
-      <CognitiveLoadBanner />
+    <div ref={containerRef} className="space-y-6">
+      {/* 3-STAGE LEARNING STEPPER: 1. Lesson -> 2. Quiz -> 3. Coding */}
+      <TopicLearningStepper
+        currentStep="lesson"
+        topicId={topicId}
+        onNavigateStep={(step) => {
+          if (step === 'quiz') onStartQuiz();
+          if (step === 'coding') onOpenCoding();
+        }}
+        onBackToCurriculum={onBackToCatalog}
+      />
 
-      {/* 2. TOPIC HEADER & SUBTOPIC PROGRESS (Section 47) */}
-      <div className="p-6 rounded-3xl border border-slate-800 bg-slate-900/60 shadow-xl">
+      <div className="max-w-4xl mx-auto px-4 py-2 space-y-6">
+        {/* 1. REAL-TIME COGNITIVE LOAD BANNER & OVERRIDE */}
+        <CognitiveLoadBanner />
+
+        {/* 2. TOPIC HEADER & SUBTOPIC PROGRESS (Section 47) */}
+        <div className="p-6 rounded-3xl border border-slate-800 bg-slate-900/60 shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono text-cyan-400 font-bold mb-1">
@@ -500,22 +513,24 @@ export const TopicLessonPage: React.FC<TopicLessonPageProps> = ({
             <div className="flex items-center gap-3">
               <button
                 onClick={onStartQuiz}
-                className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-md shadow-purple-500/20"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs transition-all flex items-center gap-2 shadow-lg shadow-purple-500/20"
               >
-                Start Topic Quiz
+                <span>Step 2: Take {topic.title} Quiz</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
                 onClick={onOpenCoding}
-                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-md shadow-emerald-500/20"
+                className="px-4 py-2.5 rounded-xl border border-emerald-500/40 bg-emerald-950/30 hover:bg-emerald-900/40 text-emerald-300 font-semibold text-xs transition-all flex items-center gap-1.5"
               >
-                Coding Challenge
-                <Terminal className="w-4 h-4" />
+                <span>Step 3: Code</span>
+                <Terminal className="w-3.5 h-3.5 text-emerald-400" />
               </button>
             </div>
           )}
         </div>
       </div>
+      </div>
+
       {/* Contextual Quick Note Modal */}
       <QuickNoteModal
         isOpen={noteModalOpen}

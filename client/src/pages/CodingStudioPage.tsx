@@ -29,11 +29,13 @@ import {
 } from 'lucide-react';
 import { BookmarkButton } from '../components/BookmarkButton';
 import { QuickNoteModal } from '../components/QuickNoteModal';
+import { TopicLearningStepper } from '../components/TopicLearningStepper';
 
 interface CodingStudioProps {
   topicId?: string;
   onOpenAiDrawer: () => void;
   onBackToLesson: () => void;
+  onGoToQuiz?: () => void;
   onNextTopic?: () => void;
 }
 
@@ -41,6 +43,7 @@ export const CodingStudioPage: React.FC<CodingStudioProps> = ({
   topicId,
   onOpenAiDrawer,
   onBackToLesson,
+  onGoToQuiz,
   onNextTopic
 }) => {
   const { preferences } = useAuth();
@@ -301,56 +304,79 @@ export const CodingStudioPage: React.FC<CodingStudioProps> = ({
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-4">
-      {/* Studio Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-cyan-400 font-mono mb-1 font-bold">
-            <Terminal className="w-4 h-4" />
-            <span>SANDBOX STUDIO</span>
-            <span>•</span>
-            <span className="uppercase">{preferences.selected_language}</span>
-            <span>•</span>
-            <span className="text-purple-400 uppercase">{challenge.difficulty}</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
-            {challenge.title}
-          </h1>
-        </div>
+    <div className="space-y-4">
+      {/* 3-STAGE LEARNING STEPPER: 1. Lesson -> 2. Quiz -> 3. Coding */}
+      <TopicLearningStepper
+        currentStep="coding"
+        topicId={activeTopic}
+        onNavigateStep={(step) => {
+          if (step === 'lesson') onBackToLesson();
+          if (step === 'quiz' && onGoToQuiz) onGoToQuiz();
+        }}
+        onBackToCurriculum={onBackToLesson}
+      />
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <BookmarkButton
-            itemType="lesson"
-            itemId={challenge?.id || activeTopic}
-            title={challenge?.title || 'Coding Challenge'}
-            snippet={challenge?.problem_statement?.slice(0, 80)}
-            topicId={activeTopic}
-            language={preferences.selected_language}
-          />
-          <button
-            onClick={() => setNoteModalOpen(true)}
-            className="px-3 py-2 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-xs font-semibold text-slate-300 transition-all flex items-center gap-1.5"
-            title="Add note for this challenge"
-          >
-            <FileText className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Note</span>
-          </button>
-          <button
-            onClick={onBackToLesson}
-            className="px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-xs font-semibold text-slate-300 transition-all"
-          >
-            ← Back to Lesson
-          </button>
-          {isPassed && onNextTopic && (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 space-y-4">
+        {/* Studio Header Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs text-emerald-400 font-mono mb-1 font-bold">
+              <span className="text-[10px] uppercase bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                Step 3 of 3 • Coding Challenge
+              </span>
+              <span>•</span>
+              <span className="uppercase">{preferences.selected_language}</span>
+              <span>•</span>
+              <span className="text-purple-400 uppercase">{challenge.difficulty}</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              {challenge.title}
+            </h1>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <BookmarkButton
+              itemType="lesson"
+              itemId={challenge?.id || activeTopic}
+              title={challenge?.title || 'Coding Challenge'}
+              snippet={challenge?.problem_statement?.slice(0, 80)}
+              topicId={activeTopic}
+              language={preferences.selected_language}
+            />
             <button
-              onClick={onNextTopic}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-bold transition-all shadow-md shadow-emerald-500/20 flex items-center gap-1.5"
+              onClick={() => setNoteModalOpen(true)}
+              className="px-3 py-2 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-xs font-semibold text-slate-300 transition-all flex items-center gap-1.5"
+              title="Add note for this challenge"
             >
-              <span>Advance to Next Topic</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <FileText className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Note</span>
             </button>
-          )}
+            <button
+              onClick={onBackToLesson}
+              className="px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-xs font-semibold text-slate-300 transition-all"
+              title="Return to the lesson content"
+            >
+              ← Review Lesson
+            </button>
+            {onGoToQuiz && (
+              <button
+                onClick={onGoToQuiz}
+                className="px-3.5 py-2 rounded-xl border border-purple-500/30 bg-purple-950/20 hover:bg-purple-900/30 text-xs font-semibold text-purple-300 transition-all"
+                title="Retake the quiz for this lesson"
+              >
+                ← Practice Quiz
+              </button>
+            )}
+            {isPassed && onNextTopic && (
+              <button
+                onClick={onNextTopic}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-bold transition-all shadow-md shadow-emerald-500/20 flex items-center gap-1.5"
+              >
+                <span>Advance to Next Topic Lesson</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           <button
             disabled={running}
             onClick={handleRunCustom}
@@ -758,6 +784,7 @@ export const CodingStudioPage: React.FC<CodingStudioProps> = ({
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       {/* SECTION 54: 5-TIER PROGRESSIVE HINTS MODAL */}
